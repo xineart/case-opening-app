@@ -694,5 +694,3 @@ app.get('/', (req, res) => {
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`>>> TerBDrop Szerver elindult a ${PORT} porton! <<<`);
 });
-  console.log(`>>> TerBDrop Szerver elindult a ${PORT} porton! <<<`);
-});
