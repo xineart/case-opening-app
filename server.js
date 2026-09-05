@@ -2,10 +2,14 @@ const express = require('express');
 const session = require('express-session');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const path = require('path');
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Statikus fájlok kiszolgálása a "public" mappából (ha külön HTML/CSS/JS fájlokat használsz)
+app.use(express.static(path.join(__dirname, 'public')));
 
 const PORT = process.env.PORT || 10000;
 const MONGO_URI = process.env.MONGO_URI;
@@ -54,92 +58,105 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: { 
-    secure: false, // HTTPS esetén a Renderen élesben átállítható true-ra
+    secure: false,
     maxAge: 7 * 24 * 60 * 60 * 1000 // 1 hét
   }
 }));
 
-// --- LÁDA / CASE ELEMEK MAFC (ITEMS) ---
-const AVAILABLE_ITEMS = [
-  { id: 'item_1', name: 'Karambit | Fade', price: 1200.00, color: '#ffd700', chance: 0.5, img: 'https://images.unsplash.com/photo-1589241062272-c0a000072dfa?w=150' },
-  { id: 'item_2', name: 'M4A4 | Howl', price: 850.00, color: '#eb4b4b', chance: 1.5, img: 'https://images.unsplash.com/photo-1595590424283-b8f17842773f?w=150' },
-  { id: 'item_3', name: 'AK-47 | Fire Serpent', price: 400.00, color: '#eb4b4b', chance: 3.0, img: 'https://images.unsplash.com/photo-1541185933-ef5d8ed016c2?w=150' },
-  { id: 'item_4', name: 'AWP | Asiimov', price: 120.00, color: '#d32ce6', chance: 10.0, img: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=150' },
-  { id: 'item_5', name: 'USP-S | Kill Confirmed', price: 65.00, color: '#8847ff', chance: 20.0, img: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150' },
-  { id: 'item_6', name: 'Glock-18 | Water Elemental', price: 15.00, color: '#4b69ff', chance: 30.0, img: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=150' },
-  { id: 'item_7', name: 'P250 | Sand Dune', price: 1.50, color: '#b0c3d9', chance: 35.0, img: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=150' }
-];
+// --- LÁDÁK ÉS TÁRGYAK DEFINIÁLÁSA ---
+const CASES = {
+  budget: {
+    id: 'budget',
+    name: 'Budget Case',
+    price: 15.00,
+    items: [
+      { id: 'b_1', name: 'AK-47 | Slate', price: 45.00, color: '#d32ce6', chance: 5.0, img: 'https://images.unsplash.com/photo-1541185933-ef5d8ed016c2?w=150' },
+      { id: 'b_2', name: 'AWP | Atheris', price: 18.00, color: '#8847ff', chance: 15.0, img: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=150' },
+      { id: 'b_3', name: 'M4A1-S | Briefing', price: 8.50, color: '#4b69ff', chance: 30.0, img: 'https://images.unsplash.com/photo-1595590424283-b8f17842773f?w=150' },
+      { id: 'b_4', name: 'USP-S | Flashback', price: 3.20, color: '#4b69ff', chance: 25.0, img: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150' },
+      { id: 'b_5', name: 'P250 | Sand Dune', price: 0.50, color: '#b0c3d9', chance: 25.0, img: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=150' }
+    ]
+  },
+  weapon: {
+    id: 'weapon',
+    name: 'Weapon Case v1',
+    price: 50.00,
+    items: [
+      { id: 'w_1', name: 'Karambit | Fade', price: 1200.00, color: '#ffd700', chance: 0.5, img: 'https://images.unsplash.com/photo-1589241062272-c0a000072dfa?w=150' },
+      { id: 'w_2', name: 'M4A4 | Howl', price: 850.00, color: '#eb4b4b', chance: 1.5, img: 'https://images.unsplash.com/photo-1595590424283-b8f17842773f?w=150' },
+      { id: 'w_3', name: 'AK-47 | Fire Serpent', price: 400.00, color: '#eb4b4b', chance: 3.0, img: 'https://images.unsplash.com/photo-1541185933-ef5d8ed016c2?w=150' },
+      { id: 'w_4', name: 'AWP | Asiimov', price: 120.00, color: '#d32ce6', chance: 10.0, img: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=150' },
+      { id: 'w_5', name: 'USP-S | Kill Confirmed', price: 65.00, color: '#8847ff', chance: 20.0, img: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150' },
+      { id: 'w_6', name: 'Glock-18 | Water Elemental', price: 15.00, color: '#4b69ff', chance: 30.0, img: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=150' },
+      { id: 'w_7', name: 'P250 | Sand Dune', price: 1.50, color: '#b0c3d9', chance: 35.0, img: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=150' }
+    ]
+  },
+  knife: {
+    id: 'knife',
+    name: 'Knife & Glove Case',
+    price: 150.00,
+    items: [
+      { id: 'k_1', name: 'Butterfly Knife | Doppler', price: 2100.00, color: '#ffd700', chance: 1.0, img: 'https://images.unsplash.com/photo-1589241062272-c0a000072dfa?w=150' },
+      { id: 'k_2', name: 'Karambit | Marble Fade', price: 1600.00, color: '#ffd700', chance: 2.5, img: 'https://images.unsplash.com/photo-1589241062272-c0a000072dfa?w=150' },
+      { id: 'k_3', name: 'M9 Bayonet | Tiger Tooth', price: 950.00, color: '#eb4b4b', chance: 6.5, img: 'https://images.unsplash.com/photo-1589241062272-c0a000072dfa?w=150' },
+      { id: 'k_4', name: 'Sport Gloves | Vice', price: 1400.00, color: '#eb4b4b', chance: 4.0, img: 'https://images.unsplash.com/photo-1595590424283-b8f17842773f?w=150' },
+      { id: 'k_5', name: 'Gut Knife | Doppler', price: 180.00, color: '#d32ce6', chance: 36.0, img: 'https://images.unsplash.com/photo-1589241062272-c0a000072dfa?w=150' },
+      { id: 'k_6', name: 'Navaja Knife | Safari Mesh', price: 80.00, color: '#8847ff', chance: 50.0, img: 'https://images.unsplash.com/photo-1589241062272-c0a000072dfa?w=150' }
+    ]
+  }
+};
 
-const CASE_PRICE = 50.00;
+// --- SEGÉDFÜGGVÉNY A SORSOLÁSHOZ ---
+function getRandomItemFromCase(caseKey) {
+  const selectedCase = CASES[caseKey];
+  if (!selectedCase) return null;
 
-// --- SEGÉDFÜGGVÉNYEK ---
-function getRandomItem() {
   const rand = Math.random() * 100;
   let cumulative = 0;
-  for (const item of AVAILABLE_ITEMS) {
+  for (const item of selectedCase.items) {
     cumulative += item.chance;
     if (rand <= cumulative) {
       return item;
     }
   }
-  return AVAILABLE_ITEMS[AVAILABLE_ITEMS.length - 1];
+  return selectedCase.items[selectedCase.items.length - 1];
 }
 
 // --- API VÉGPONTOK (BACKEND) ---
 
-// Status Check API
 app.get('/api/status', (req, res) => {
-  res.json({
-    dbStatus: dbStatus,
-    dbErrorDetails: dbErrorDetails,
-    readyState: mongoose.connection.readyState
-  });
+  res.json({ dbStatus, dbErrorDetails, readyState: mongoose.connection.readyState });
+});
+
+// Ládák adatainak lekérése
+app.get('/api/cases', (req, res) => {
+  res.json(CASES);
 });
 
 // Regisztráció
 app.post('/api/register', async (req, res) => {
   try {
     const { username, password } = req.body;
-
-    if (!username || !password) {
-      return res.status(400).json({ error: 'Minden mező kitöltése kötelező!' });
-    }
+    if (!username || !password) return res.status(400).json({ error: 'Minden mező kitöltése kötelező!' });
 
     if (mongoose.connection.readyState !== 1) {
-      return res.status(500).json({ 
-        error: `Adatbázis csatlakozási hiba [${dbStatus}]: ${dbErrorDetails || 'Nincs aktív kapcsolat.'}` 
-      });
+      return res.status(500).json({ error: `Adatbázis csatlakozási hiba [${dbStatus}]` });
     }
 
     const cleanUsername = username.trim();
-    if (cleanUsername.length < 3) {
-      return res.status(400).json({ error: 'A felhasználónévnek legalább 3 karakteresnek kell lennie!' });
-    }
+    if (cleanUsername.length < 3) return res.status(400).json({ error: 'Min. 3 karakteres név kell!' });
 
     const existingUser = await User.findOne({ username: new RegExp(`^${cleanUsername}$`, 'i') });
-    if (existingUser) {
-      return res.status(400).json({ error: 'Ez a felhasználónév már foglalt!' });
-    }
+    if (existingUser) return res.status(400).json({ error: 'Ez a felhasználónév már foglalt!' });
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({
-      username: cleanUsername,
-      password: hashedPassword,
-      balance: 500.00,
-      inventory: []
-    });
+    const newUser = new User({ username: cleanUsername, password: hashedPassword, balance: 500.00, inventory: [] });
 
     await newUser.save();
     req.session.userId = newUser._id;
 
-    res.json({ 
-      success: true, 
-      username: newUser.username, 
-      balance: newUser.balance,
-      inventory: newUser.inventory
-    });
+    res.json({ success: true, username: newUser.username, balance: newUser.balance, inventory: newUser.inventory });
   } catch (err) {
-    console.error("REGISZTRÁCIÓS HIBA:", err);
     res.status(500).json({ error: 'Szerveroldali hiba: ' + err.message });
   }
 });
@@ -148,84 +165,60 @@ app.post('/api/register', async (req, res) => {
 app.post('/api/login', async (req, res) => {
   try {
     const { username, password } = req.body;
-    if (!username || !password) {
-      return res.status(400).json({ error: 'Adja meg a felhasználónevet és a jelszót!' });
-    }
-
-    if (mongoose.connection.readyState !== 1) {
-      return res.status(500).json({ error: 'Adatbázis jelenleg nem elérhető!' });
-    }
+    if (!username || !password) return res.status(400).json({ error: 'Adja meg a felhasználónevet és a jelszót!' });
 
     const user = await User.findOne({ username: username.trim() });
-    if (!user) {
-      return res.status(400).json({ error: 'Hibás felhasználónév vagy jelszó!' });
-    }
+    if (!user) return res.status(400).json({ error: 'Hibás felhasználónév vagy jelszó!' });
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ error: 'Hibás felhasználónév vagy jelszó!' });
-    }
+    if (!isMatch) return res.status(400).json({ error: 'Hibás felhasználónév vagy jelszó!' });
 
     req.session.userId = user._id;
-    res.json({
-      success: true,
-      username: user.username,
-      balance: user.balance,
-      inventory: user.inventory
-    });
+    res.json({ success: true, username: user.username, balance: user.balance, inventory: user.inventory });
   } catch (err) {
-    console.error("BEJELENTKEZÉSI HIBA:", err);
     res.status(500).json({ error: 'Szerver hiba: ' + err.message });
   }
 });
 
 // Kijelentkezés
 app.post('/api/logout', (req, res) => {
-  req.session.destroy(err => {
-    if (err) return res.status(500).json({ error: 'Nem sikerült kijelentkezni!' });
+  req.session.destroy(() => {
     res.clearCookie('connect.sid');
     res.json({ success: true });
   });
 });
 
-// Saját adatok lekérése (Session check)
+// Saját adatok lekérése
 app.get('/api/me', async (req, res) => {
   try {
-    if (!req.session.userId) {
-      return res.json({ loggedIn: false });
-    }
+    if (!req.session.userId) return res.json({ loggedIn: false });
     const user = await User.findById(req.session.userId);
-    if (!user) {
-      return res.json({ loggedIn: false });
-    }
-    res.json({
-      loggedIn: true,
-      username: user.username,
-      balance: user.balance,
-      inventory: user.inventory
-    });
+    if (!user) return res.json({ loggedIn: false });
+    res.json({ loggedIn: true, username: user.username, balance: user.balance, inventory: user.inventory });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// Láda nyitása
+// Kiválasztott láda nyitása
 app.post('/api/open-case', async (req, res) => {
   try {
-    if (!req.session.userId) {
-      return res.status(401).json({ error: 'Kérjük, jelentkezzen be a nyitáshoz!' });
-    }
+    if (!req.session.userId) return res.status(401).json({ error: 'Kérjük, jelentkezzen be!' });
+
+    const { caseId } = req.body;
+    const targetCase = CASES[caseId || 'weapon'];
+
+    if (!targetCase) return res.status(400).json({ error: 'Érvénytelen láda kategória!' });
 
     const user = await User.findById(req.session.userId);
     if (!user) return res.status(404).json({ error: 'Felhasználó nem található!' });
 
-    if (user.balance < CASE_PRICE) {
-      return res.status(400).json({ error: 'Nincs elegendő egyenlege a láda kinyitásához! (Ár: 50.00 $)' });
+    if (user.balance < targetCase.price) {
+      return res.status(400).json({ error: `Nincs elegendő egyenlege! (Közösségi ár: ${targetCase.price} $)` });
     }
 
-    // Vonjuk le az árat és sorsoljunk
-    user.balance -= CASE_PRICE;
-    const wonItem = getRandomItem();
+    user.balance -= targetCase.price;
+    const wonItem = getRandomItemFromCase(targetCase.id);
 
     user.inventory.push({
       itemId: wonItem.id,
@@ -244,17 +237,14 @@ app.post('/api/open-case', async (req, res) => {
       inventory: user.inventory
     });
   } catch (err) {
-    console.error("NYITÁSI HIBA:", err);
     res.status(500).json({ error: 'Hiba a láda nyitása közben: ' + err.message });
   }
 });
 
-// Tárgy eladása az Invertory-ból
+// Tárgy eladása
 app.post('/api/sell-item', async (req, res) => {
   try {
-    if (!req.session.userId) {
-      return res.status(401).json({ error: 'Nem vagy bejelentkezve!' });
-    }
+    if (!req.session.userId) return res.status(401).json({ error: 'Nem vagy bejelentkezve!' });
 
     const { itemIndex } = req.body;
     const user = await User.findById(req.session.userId);
@@ -269,17 +259,13 @@ app.post('/api/sell-item', async (req, res) => {
 
     await user.save();
 
-    res.json({
-      success: true,
-      newBalance: user.balance,
-      inventory: user.inventory
-    });
+    res.json({ success: true, newBalance: user.balance, inventory: user.inventory });
   } catch (err) {
     res.status(500).json({ error: 'Eladási hiba: ' + err.message });
   }
 });
 
-// Ingyen egyenleg teszteléshez (Faucet/Refill)
+// Teszt pénz hozzáadása
 app.post('/api/add-funds', async (req, res) => {
   try {
     if (!req.session.userId) return res.status(401).json({ error: 'Nincs munkamenet.' });
@@ -292,7 +278,7 @@ app.post('/api/add-funds', async (req, res) => {
   }
 });
 
-// --- FULL FRONTEND HTML / CS / JS KÓD ---
+// --- FRONTEND (Fallback HTML, ha nincs public/index.html) ---
 app.get('/', (req, res) => {
   res.send(`
     <!DOCTYPE html>
@@ -300,45 +286,41 @@ app.get('/', (req, res) => {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>PACKDROP - Case Opening Platform</title>
+      <title>PACKDROP - Multi Case Platform</title>
       <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: #0b0e14; color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; }
-        
-        /* HEADER */
         header { background: #151a23; border-bottom: 2px solid #222938; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
         .logo { font-size: 24px; font-weight: 800; color: #ffb400; letter-spacing: 2px; }
         .user-info { display: flex; align-items: center; gap: 20px; }
         .balance-badge { background: #1c2331; padding: 8px 16px; border-radius: 20px; border: 1px solid #ffb400; font-weight: bold; color: #ffb400; }
         
-        /* BUTTONS & INPUTS */
         button { cursor: pointer; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; transition: 0.2s; }
         .btn-primary { background: #ffb400; color: #000; }
         .btn-primary:hover { background: #e09e00; }
         .btn-danger { background: #eb4b4b; color: #fff; }
         .btn-success { background: #2ecc71; color: #fff; }
+        .btn-case { background: #1c2331; color: #fff; border: 1px solid #2a354b; margin: 0 5px; }
+        .btn-case.active { background: #ffb400; color: #000; border-color: #ffb400; }
         
         input { background: #1c2331; border: 1px solid #2a354b; padding: 10px; color: #fff; border-radius: 6px; margin-bottom: 10px; width: 100%; }
-        
-        /* MAIN CONTAINERS */
         main { flex: 1; padding: 40px; max-width: 1200px; margin: 0 auto; width: 100%; }
         .auth-container { max-width: 400px; margin: 50px auto; background: #151a23; padding: 30px; border-radius: 12px; border: 1px solid #222938; text-align: center; }
         
-        /* ROULETTE / CASE ANIMATION */
-        .case-wrapper { position: relative; width: 100%; height: 200px; background: #151a23; border-radius: 12px; overflow: hidden; border: 2px solid #222938; margin: 30px 0; }
+        .case-wrapper { position: relative; width: 100%; height: 200px; background: #151a23; border-radius: 12px; overflow: hidden; border: 2px solid #222938; margin: 20px 0; }
         .pointer { position: absolute; top: 0; bottom: 0; left: 50%; width: 4px; background: #ffb400; z-index: 10; transform: translateX(-50%); box-shadow: 0 0 10px #ffb400; }
         .spinner-track { display: flex; position: absolute; left: 0; top: 20px; height: 160px; transition: transform 5s cubic-bezier(0.1, 1, 0.1, 1); }
         
         .item-card { min-width: 140px; height: 160px; background: #1c2331; margin: 0 5px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-bottom: 4px solid #fff; padding: 10px; text-align: center; font-size: 12px; }
         .item-card img { width: 80px; height: 80px; object-fit: contain; margin-bottom: 10px; }
         
-        /* INVENTORY GRID */
         .inventory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; margin-top: 20px; }
         .inv-item { background: #151a23; border-radius: 8px; padding: 15px; text-align: center; position: relative; border-bottom: 4px solid #555; }
         .inv-item img { width: 90px; height: 90px; object-fit: contain; }
         .inv-item .sell-btn { margin-top: 10px; font-size: 11px; padding: 6px 10px; width: 100%; }
 
         .hidden { display: none !important; }
+        .case-selector { display: flex; justify-content: center; gap: 10px; margin-bottom: 30px; }
       </style>
     </head>
     <body>
@@ -354,65 +336,71 @@ app.get('/', (req, res) => {
       </header>
 
       <main>
-        <!-- BEJELENTKEZÉS / REGISZTRÁCIÓ ABLAK -->
         <div id="auth-box" class="auth-container">
           <h2 id="auth-title" style="margin-bottom: 20px;">Bejelentkezés</h2>
           <input type="text" id="auth-username" placeholder="Felhasználónév">
           <input type="password" id="auth-password" placeholder="Jelszó">
-          
           <button id="auth-btn" onclick="submitAuth()" class="btn-primary" style="width: 100%; margin-top: 10px;">Bejelentkezés</button>
-          
           <p style="margin-top: 20px; font-size: 13px; color: #888;">
             <span id="auth-toggle-text">Nincs még fiókod?</span> 
             <a href="#" onclick="toggleAuthMode()" style="color: #ffb400;">Váltás regisztrációra</a>
           </p>
         </div>
 
-        <!-- JÁTÉK ÉS RAK TÁR ABLAK (Csak bejelentkezve látszik) -->
         <div id="game-box" class="hidden">
           
-          <div style="text-align: center;">
-            <h2>Weapon Case v1</h2>
-            <p style="color: #888;">Nyitási ár: <b>50.00 $</b></p>
+          <div class="case-selector">
+            <button class="btn-case" id="btn-budget" onclick="selectCase('budget')">Budget Case (15$)</button>
+            <button class="btn-case active" id="btn-weapon" onclick="selectCase('weapon')">Weapon Case (50$)</button>
+            <button class="btn-case" id="btn-knife" onclick="selectCase('knife')">Knife & Glove (150$)</button>
           </div>
 
-          <!-- LÁDA SPINNER -->
+          <div style="text-align: center;">
+            <h2 id="case-title">Weapon Case v1</h2>
+            <p style="color: #888;">Nyitási ár: <b id="case-price">50.00 $</b></p>
+          </div>
+
           <div class="case-wrapper">
             <div class="pointer"></div>
             <div class="spinner-track" id="spinner-track"></div>
           </div>
 
           <div style="text-align: center;">
-            <button id="open-btn" onclick="openCase()" class="btn-primary" style="font-size: 18px; padding: 15px 40px;">LÁDA NYITÁSA (50$)</button>
+            <button id="open-btn" onclick="openCase()" class="btn-primary" style="font-size: 18px; padding: 15px 40px;">LÁDA NYITÁSA</button>
           </div>
 
           <h3 style="margin-top: 50px; border-bottom: 1px solid #222938; padding-bottom: 10px;">Saját Raktár (Inventory)</h3>
-          <div class="inventory-grid" id="inventory-grid">
-            <!-- Dinamikusan töltődik be -->
-          </div>
+          <div class="inventory-grid" id="inventory-grid"></div>
 
         </div>
       </main>
 
       <script>
         let isRegisterMode = false;
-        let currentUser = null;
+        let selectedCaseKey = 'weapon';
+        let allCases = {};
 
-        const AVAILABLE_ITEMS = [
-          { id: 'item_1', name: 'Karambit | Fade', price: 1200.00, color: '#ffd700', img: 'https://images.unsplash.com/photo-1589241062272-c0a000072dfa?w=150' },
-          { id: 'item_2', name: 'M4A4 | Howl', price: 850.00, color: '#eb4b4b', img: 'https://images.unsplash.com/photo-1595590424283-b8f17842773f?w=150' },
-          { id: 'item_3', name: 'AK-47 | Fire Serpent', price: 400.00, color: '#eb4b4b', img: 'https://images.unsplash.com/photo-1541185933-ef5d8ed016c2?w=150' },
-          { id: 'item_4', name: 'AWP | Asiimov', price: 120.00, color: '#d32ce6', img: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=150' },
-          { id: 'item_5', name: 'USP-S | Kill Confirmed', price: 65.00, color: '#8847ff', img: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150' },
-          { id: 'item_6', name: 'Glock-18 | Water Elemental', price: 15.00, color: '#4b69ff', img: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=150' },
-          { id: 'item_7', name: 'P250 | Sand Dune', price: 1.50, color: '#b0c3d9', img: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=150' }
-        ];
-
-        // Indításkor ellenőrizzük, hogy be van-e lépve a felhasználó
         window.onload = async () => {
-          generateTrackItems();
+          await fetchCases();
           checkSession();
         };
+
+        async function fetchCases() {
+          const res = await fetch('/api/cases');
+          allCases = await res.json();
+          generateTrackItems();
+        }
+
+        function selectCase(key) {
+          selectedCaseKey = key;
+          document.querySelectorAll('.btn-case').forEach(b => b.classList.remove('active'));
+          document.getElementById('btn-' + key).classList.add('active');
+          
+          const c = allCases[key];
+          document.getElementById('case-title').innerText = c.name;
+          document.getElementById('case-price').innerText = c.price.toFixed(2) + ' $';
+          generateTrackItems();
+        }
 
         function toggleAuthMode() {
           isRegisterMode = !isRegisterMode;
@@ -424,9 +412,7 @@ app.get('/', (req, res) => {
         async function checkSession() {
           const res = await fetch('/api/me');
           const data = await res.json();
-          if (data.loggedIn) {
-            updateUI(data);
-          }
+          if (data.loggedIn) updateUI(data);
         }
 
         async function submitAuth() {
@@ -448,12 +434,11 @@ app.get('/', (req, res) => {
               updateUI({ loggedIn: true, username: data.username, balance: data.balance, inventory: data.inventory });
             }
           } catch(err) {
-            alert("Hálózati hiba történt a csatlakozás során!");
+            alert("Hálózati hiba történt!");
           }
         }
 
         function updateUI(userData) {
-          currentUser = userData;
           document.getElementById('auth-box').classList.add('hidden');
           document.getElementById('game-box').classList.remove('hidden');
           document.getElementById('user-nav').classList.remove('hidden');
@@ -472,8 +457,11 @@ app.get('/', (req, res) => {
         function generateTrackItems() {
           const track = document.getElementById('spinner-track');
           track.innerHTML = '';
+          const currentCase = allCases[selectedCaseKey] || allCases['weapon'];
+          if(!currentCase) return;
+
           for (let i = 0; i < 60; i++) {
-            const randItem = AVAILABLE_ITEMS[Math.floor(Math.random() * AVAILABLE_ITEMS.length)];
+            const randItem = currentCase.items[Math.floor(Math.random() * currentCase.items.length)];
             const el = document.createElement('div');
             el.className = 'item-card';
             el.style.borderBottomColor = randItem.color;
@@ -487,7 +475,11 @@ app.get('/', (req, res) => {
           btn.disabled = true;
 
           try {
-            const res = await fetch('/api/open-case', { method: 'POST' });
+            const res = await fetch('/api/open-case', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ caseId: selectedCaseKey })
+            });
             const data = await res.json();
 
             if (data.error) {
@@ -496,22 +488,18 @@ app.get('/', (req, res) => {
               return;
             }
 
-            // Animáció lefuttatása
             const track = document.getElementById('spinner-track');
             track.style.transition = 'none';
             track.style.transform = 'translateX(0px)';
             
-            // Újra generáljuk, hogy a nyert elem a 45. pozícióba essen
             generateTrackItems();
             const cards = track.children;
             
-            // Beállítjuk a 45. kártyát a megnyert tárgyra
             cards[45].style.borderBottomColor = data.item.color;
             cards[45].innerHTML = \`<img src="\${data.item.img}"><div><b>\${data.item.name}</b><br>\${data.item.price}$</div>\`;
 
             setTimeout(() => {
               track.style.transition = 'transform 5s cubic-bezier(0.1, 1, 0.1, 1)';
-              // Eltolás kiszámítása középre
               const cardWidth = 150;
               const targetOffset = -(45 * cardWidth - (document.querySelector('.case-wrapper').clientWidth / 2) + 75);
               track.style.transform = \`translateX(\${targetOffset}px)\`;
@@ -581,7 +569,6 @@ app.get('/', (req, res) => {
   `);
 });
 
-// Szerver indítása
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`>>> Szerver elindult a ${PORT} porton! <<<`);
 });
