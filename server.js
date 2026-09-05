@@ -10,7 +10,7 @@ app.get('/', (req, res) => {
     <html lang="hu">
     <head>
       <meta charset="UTF-8">
-      <title>LUXDROP STYLE - CS2 Case & Battle</title>
+      <title>PACKDROP - CS2 Case & Battle</title>
       <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background: #0b0e14; color: #fff; text-align: center; padding-bottom: 50px; }
@@ -28,7 +28,7 @@ app.get('/', (req, res) => {
         .cases-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 40px; }
         .case-card { background: #151a23; border: 1px solid #222936; border-radius: 12px; padding: 20px; transition: 0.3s; position: relative; overflow: hidden; }
         .case-card:hover { border-color: #ffb400; transform: translateY(-5px); box-shadow: 0 10px 20px rgba(255, 180, 0, 0.15); }
-        .case-img { width: 120px; height: 120px; object-fit: contain; margin: 15px 0; }
+        .case-img { width: 140px; height: 110px; object-fit: contain; margin: 10px 0; }
         .case-title { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
         .case-price { color: #00e5ff; font-weight: bold; font-size: 16px; margin-bottom: 15px; }
         
@@ -39,15 +39,17 @@ app.get('/', (req, res) => {
         .btn-battle:hover { background: #ff3838; }
 
         /* Pörgető (Case Spinner) */
-        .spinner-wrapper { position: relative; width: 100%; max-width: 700px; height: 130px; margin: 20px auto; overflow: hidden; border: 3px solid #ffb400; border-radius: 12px; background: #07090d; display: none; }
+        .spinner-wrapper { position: relative; width: 100%; max-width: 700px; height: 160px; margin: 20px auto; overflow: hidden; border: 3px solid #ffb400; border-radius: 12px; background: #07090d; display: none; }
         .pointer { position: absolute; left: 50%; top: 0; bottom: 0; width: 4px; background: #00e5ff; z-index: 10; transform: translateX(-50%); box-shadow: 0 0 10px #00e5ff; }
-        .spinner-track { display: flex; position: absolute; left: 0; top: 15px; transition: transform 5s cubic-bezier(0.15, 0.9, 0.2, 1); }
-        .item-card { width: 100px; height: 100px; background: #151a23; margin: 0 5px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; border-bottom: 4px solid #fff; }
+        .spinner-track { display: flex; position: absolute; left: 0; top: 10px; transition: transform 5s cubic-bezier(0.15, 0.9, 0.2, 1); }
+        .item-card { width: 120px; height: 135px; background: #151a23; margin: 0 5px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; border-bottom: 4px solid #fff; padding: 5px; }
+        .item-card img { width: 80px; height: 60px; object-fit: contain; margin-bottom: 5px; }
 
         /* Battle Aréna */
         .battle-arena { display: none; background: #151a23; padding: 25px; border-radius: 12px; border: 1px solid #222936; margin-top: 30px; }
         .battle-players { display: flex; justify-content: space-around; margin-top: 20px; }
         .player-box { background: #0b0e14; padding: 20px; border-radius: 10px; width: 45%; border: 1px solid #222936; }
+        .skin-drop-img { width: 100px; height: 70px; object-fit: contain; margin-top: 10px; }
       </style>
     </head>
     <body>
@@ -68,18 +70,24 @@ app.get('/', (req, res) => {
 
         <!-- BATTLE ARÉNA -->
         <div id="battle-arena" class="battle-arena">
-          <h2>⚔️ CASE BATTLE (Mód: Játékos vs Bot)</h2>
+          <h2>⚔️ CASE BATTLE (Játékos vs Bot)</h2>
           <div class="battle-players">
             <div class="player-box">
               <h3>TE</h3>
               <p id="p1-score" style="font-size: 20px; color: #00e5ff; margin-top: 10px;">$0.00</p>
-              <p id="p1-drop" style="margin-top: 10px; font-size: 14px; color: #aaa;">Várakozás...</p>
+
+              <div id="p1-container">
+                <p id="p1-drop" style="margin-top: 10px; font-size: 14px; color: #aaa;">Várakozás...</p>
+              </div>
             </div>
             <div style="font-size: 30px; align-self: center; font-weight: bold; color: #e02424;">VS</div>
             <div class="player-box">
               <h3>BOT ALEX</h3>
               <p id="p2-score" style="font-size: 20px; color: #00e5ff; margin-top: 10px;">$0.00</p>
-              <p id="p2-drop" style="margin-top: 10px; font-size: 14px; color: #aaa;">Várakozás...</p>
+
+              <div id="p2-container">
+                <p id="p2-drop" style="margin-top: 10px; font-size: 14px; color: #aaa;">Várakozás...</p>
+              </div>
             </div>
           </div>
         </div>
@@ -90,7 +98,7 @@ app.get('/', (req, res) => {
           
           <!-- LÁDA 1 -->
           <div class="case-card">
-            <div class="case-title">Covert Case</div>
+            <div class="case-title">Weapon Case #1</div>
             <div class="case-price">$5.00</div>
             <img src="https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb0703120f2b55edd1f8e86356defc5c752143c328c3070227b48d35f3066d1234a9386348ef5c19d4b6df00" class="case-img">
             <button class="btn" onclick="startSpin(5.00)">NYITÁS</button>
@@ -99,7 +107,7 @@ app.get('/', (req, res) => {
 
           <!-- LÁDA 2 -->
           <div class="case-card">
-            <div class="case-title">Knife / Glove</div>
+            <div class="case-title">Glove Case</div>
             <div class="case-price">$25.00</div>
             <img src="https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb0703120f2b55edd1f8e86356defc5c752143c328c3070227b48d35f3066d1234a9388f6b0f1fa44f33b1e39a3f" class="case-img">
             <button class="btn" onclick="startSpin(25.00)">NYITÁS</button>
@@ -108,7 +116,7 @@ app.get('/', (req, res) => {
 
           <!-- LÁDA 3 -->
           <div class="case-card">
-            <div class="case-title">Wild Case</div>
+            <div class="case-title">Operation Wildfire</div>
             <div class="case-price">$50.00</div>
             <img src="https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb0703120f2b55edd1f8e86356defc5c752143c328c3070227b48d35f3066d1234a9386242ef5c19d4b6df00" class="case-img">
             <button class="btn" onclick="startSpin(50.00)">NYITÁS</button>
@@ -120,15 +128,17 @@ app.get('/', (req, res) => {
 
       <script>
         let balance = 100.00;
+        
+        // KÉPES SKIN LISTA
         const items = [
-          { name: "P250 | Sand Dune", price: 0.10, color: "#b0c3d9" },
-          { name: "AK-47 | Redline", price: 15.00, color: "#e4ae39" },
-          { name: "USP-S | Kill Confirmed", price: 50.00, color: "#d32ce6" },
-          { name: "M4A4 | Howl", price: 1200.00, color: "#eb4b4b" },
-          { name: "Butterfly Knife", price: 1800.00, color: "#eb4b4b" }
+          { name: "P250 | Sand Dune", price: 0.10, color: "#b0c3d9", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb0703120f2b55edd1f8e86356defc5c752143c328c3070227b41b4353a42e1215b22b102ef5c19d4b6df00" },
+          { name: "AK-47 | Redline", price: 15.00, color: "#e4ae39", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb0703120f2b55edd1f8e86356defc5c752143c328c3070227b41b4352a1215b28d0113c2ef5c19d4b6df00" },
+          { name: "USP-S | Kill Confirmed", price: 50.00, color: "#d32ce6", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb0703120f2b55edd1f8e86356defc5c752143c328c3070227b41b4352a1215b2f2d12382ef5c19d4b6df00" },
+          { name: "M4A4 | Howl", price: 1200.00, color: "#eb4b4b", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb0703120f2b55edd1f8e86356defc5c752143c328c3070227b41b4352a1215b28d8233f2ef5c19d4b6df00" },
+          { name: "Karambit | Fade", price: 1800.00, color: "#eb4b4b", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb0703120f2b55edd1f8e86356defc5c752143c328c3070227b41b4352a1215b2a0c23312ef5c19d4b6df00" }
         ];
 
-        // LÁDANYITÁS ANIMÁCIÓVAL
+        // LÁDANYITÁS ANIMÁCIÓVAL ÉS KÉPEKKEL
         function startSpin(cost) {
           if (balance < cost) return alert("Nincs elég egyenleged!");
           balance -= cost;
@@ -144,7 +154,7 @@ app.get('/', (req, res) => {
           track.style.transition = 'none';
           track.style.transform = 'translateX(0)';
 
-          // Kártyák szimulálása
+          // Kártyák generálása képekkel
           track.innerHTML = '';
           let winningItem = items[Math.floor(Math.random() * items.length)];
           
@@ -153,17 +163,17 @@ app.get('/', (req, res) => {
             let div = document.createElement('div');
             div.className = 'item-card';
             div.style.borderColor = randItem.color;
-            div.innerHTML = '<b style="margin-top:20px; color:'+randItem.color+'">' + randItem.name + '</b><br>$' + randItem.price;
+            div.innerHTML = '<img src="' + randItem.img + '"><b style="color:'+randItem.color+'">' + randItem.name + '</b>$' + randItem.price;
             track.appendChild(div);
           }
 
-          // Animáció indítása
+          // Animáció
           setTimeout(() => {
             track.style.transition = 'transform 5s cubic-bezier(0.15, 0.9, 0.2, 1)';
-            track.style.transform = 'translateX(-4300px)';
+            track.style.transform = 'translateX(-4900px)';
           }, 50);
 
-          // Eredmény kihirdetése
+          // Eredmény kiírása
           setTimeout(() => {
             balance += winningItem.price;
             updateBalance();
@@ -171,7 +181,7 @@ app.get('/', (req, res) => {
           }, 5200);
         }
 
-        // CASE BATTLE MÓD
+        // BATTLE MÓD KÉPEKKEL
         function startBattle(cost) {
           if (balance < cost) return alert("Nincs elég egyenleged a Battle-re!");
           balance -= cost;
@@ -181,30 +191,30 @@ app.get('/', (req, res) => {
           const arena = document.getElementById('battle-arena');
           arena.style.display = 'block';
 
-          document.getElementById('p1-drop').innerText = "Nyitás...";
-          document.getElementById('p2-drop').innerText = "Nyitás...";
+          document.getElementById('p1-container').innerHTML = '<p id="p1-drop">Nyitás...</p>';
+          document.getElementById('p2-container').innerHTML = '<p id="p2-drop">Nyitás...</p>';
 
           setTimeout(() => {
             let p1Item = items[Math.floor(Math.random() * items.length)];
             let p2Item = items[Math.floor(Math.random() * items.length)];
 
             document.getElementById('p1-score').innerText = '$' + p1Item.price;
-            document.getElementById('p1-drop').innerText = p1Item.name;
-            document.getElementById('p1-drop').style.color = p1Item.color;
+            document.getElementById('p1-container').innerHTML = '<img src="' + p1Item.img + '" class="skin-drop-img"><br><b style="color:' + p1Item.color + '">' + p1Item.name + '</b>';
 
             document.getElementById('p2-score').innerText = '$' + p2Item.price;
-            document.getElementById('p2-drop').innerText = p2Item.name;
-            document.getElementById('p2-drop').style.color = p2Item.color;
+            document.getElementById('p2-container').innerHTML = '<img src="' + p2Item.img + '" class="skin-drop-img"><br><b style="color:' + p2Item.color + '">' + p2Item.name + '</b>';
 
-            if (p1Item.price >= p2Item.price) {
-              let winAmount = p1Item.price + p2Item.price;
-              balance += winAmount;
-              alert("NYERTÉL A BATTLE-BEN! A te nyereményed: $" + winAmount);
-            } else {
-              alert("A Bot nyert! Próbáld újra.");
-            }
-            updateBalance();
-          }, 2000);
+            setTimeout(() => {
+              if (p1Item.price >= p2Item.price) {
+                let winAmount = p1Item.price + p2Item.price;
+                balance += winAmount;
+                alert("NYERTÉL A BATTLE-BEN! Nyereményed: $" + winAmount);
+              } else {
+                alert("A Bot nyert! Próbáld újra.");
+              }
+              updateBalance();
+            }, 500);
+          }, 1500);
         }
 
         function updateBalance() {
