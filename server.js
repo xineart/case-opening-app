@@ -636,101 +636,131 @@ app.get('/', (req, res) => {
       inventory.forEach((item, index) => {
         const el = document.createElement('div');
         el.className = 'inv-item';
-        el.style.borderBottomColor = item.color || '#fff';
-        el.innerHTML = '<div style="font-size:12px; font-weight:bold;">' + item.name + '</div>' +
-          '<div style="color:#ffb400; font-size:12px; margin: 10px 0;">' + item.price.toFixed(2) + ' $</div>' +
-          '<button onclick="sellItem(' + index + ')" class="btn-danger" style="font-size: 11px; padding: 6px 10px; width: 100%;">ELADÁS (' + item.price.toFixed(2) + '$)</button>';
-        grid.appendChild(el);
-      });
+        el.style.borderBottomColor = item.color || '#fff';const express = require('express');
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
+const session = require('express-session');
+const path = require('path');
+
+const app = express();
+
+// 1. Middleware-ek beállítása
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Statikus fájlok kiszolgálása a 'public' mappából (html, css, js)
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Session beállítása
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'titkos_kulcs_ide',
+    resave: false,
+    saveUninitialized: false,
+    cookie: { 
+        secure: false, // HTTPS esetén állítsd true-ra
+        maxAge: 1000 * 60 * 60 * 24 // 1 nap
     }
+}));
 
-    function toggleAdminPanel() {
-      const gameBox = document.getElementById('game-box');
-      const adminBox = document.getElementById('admin-box');
+// 2. MongoDB Csatlakozás
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/packdropDB';
 
-      if (adminBox.classList.contains('hidden')) {
-        adminBox.classList.remove('hidden');
-        gameBox.classList.add('hidden');
-        loadAdminUsers();
-      } else {
-        adminBox.classList.add('hidden');
-        gameBox.classList.remove('hidden');
-      }
-    }
+mongoose.connect(MONGO_URI)
+    .then(() => console.log('>>> Sikeres MongoDB csatlakozás! <<<'))
+    .catch(err => console.error('MongoDB csatlakozási hiba:', err));
 
-    function showAdminSection(section) {
-      document.getElementById('admin-users-section').classList.toggle('hidden', section !== 'users');
-      document.getElementById('admin-cases-section').classList.toggle('hidden', section !== 'cases');
-    }
-
-    async function loadAdminUsers() {
-      const res = await fetch('/api/admin/users');
-      const users = await res.json();
-      
-      const tbody = document.getElementById('admin-users-list');
-      tbody.innerHTML = '';
-
-      users.forEach(u => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = '<td>' + u.username + '</td>' +
-          '<td>' + u.balance.toFixed(2) + ' $</td>' +
-          '<td>' + (u.isAdmin ? 'Igen' : 'Nem') + '</td>' +
-          '<td><input type="number" id="bal-' + u._id + '" value="' + u.balance + '" style="width: 100px; margin:0;"></td>' +
-          '<td><button onclick="updateUserBalance(\'' + u._id + '\')" class="btn-primary" style="padding: 5px 10px;">Mentés</button></td>';
-        tbody.appendChild(tr);
-      });
-    }
-
-    async function updateUserBalance(userId) {
-      const val = document.getElementById('bal-' + userId).value;
-      const res = await fetch('/api/admin/update-balance', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, newBalance: val })
-      });
-      const data = await res.json();
-      if (data.success) {
-        alert('Egyenleg frissítve!');
-        loadAdminUsers();
-      } else {
-        alert(data.error);
-      }
-    }
-
-    async function saveCase() {
-      const caseId = document.getElementById('admin-case-id').value;
-      const name = document.getElementById('admin-case-name').value;
-      const price = document.getElementById('admin-case-price').value;
-
-      if(!caseId || !name || !price) {
-        alert('Kérjük töltsd ki az összes mezőt!');
-        return;
-      }
-
-      const defaultItems = [
-        { id: caseId + '_1', name: 'Ritka Skin', price: 100.00, color: '#ffd700', chance: 10.0, img: '' },
-        { id: caseId + '_2', name: 'Közepes Skin', price: 20.00, color: '#d32ce6', chance: 30.0, img: '' },
-        { id: caseId + '_3', name: 'Gyakori Skin', price: 2.00, color: '#4b69ff', chance: 60.0, img: '' }
-      ];
-
-      const res = await fetch('/api/admin/save-case', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ caseId, name, price, items: defaultItems })
-      });
-      const data = await res.json();
-      if (data.success) {
-        alert('Láda sikeresen elmentve!');
-        await fetchCases();
-      } else {
-        alert(data.error);
-      }
-    }
-  </script>
-</body>
-</html>`);
+// 3. User Modell (Séma)
+const userSchema = new mongoose.Schema({
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true }
 });
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`>>> Szerver elindult a ${PORT} porton! <<<`);
+const User = mongoose.model('User', userSchema);
+
+// 4. API Útvonalak (Endpoints)
+
+// REGISZTRÁCIÓ
+app.post('/api/register', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({ error: 'Minden mezőt ki kell tölteni!' });
+        }
+
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ error: 'Ez az email cím már regisztrálva van!' });
+        }
+
+        // Jelszó hashelése
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const newUser = new User({
+            email,
+            password: hashedPassword
+        });
+
+        await newUser.save();
+        res.status(201).json({ message: 'Sikeres regisztráció!' });
+    } catch (err) {
+        console.error('Regisztrációs hiba:', err);
+        res.status(500).json({ error: 'Szerver hiba a regisztráció során.' });
+    }
+});
+
+// BEJELENTKEZÉS
+app.post('/api/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({ error: 'Minden mezőt ki kell tölteni!' });
+        }
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ error: 'Hibás email vagy jelszó!' });
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ error: 'Hibás email vagy jelszó!' });
+        }
+
+        // Session mentése
+        req.session.userId = user._id;
+        req.session.email = user.email;
+
+        res.json({ message: 'Sikeres bejelentkezés!', user: { email: user.email } });
+    } catch (err) {
+        console.error('Bejelentkezési hiba:', err);
+        res.status(500).json({ error: 'Szerver hiba a bejelentkezés során.' });
+    }
+});
+
+// KIJELENTKEZÉS
+app.post('/api/logout', (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            return res.status(500).json({ error: 'Nem sikerült a kijelentkezés.' });
+        }
+        res.clearCookie('connect.sid');
+        res.json({ message: 'Sikeres kijelentkezés!' });
+    });
+});
+
+// FELHASZNÁLÓI STATUS LEKÉRDEZÉSE
+app.get('/api/me', (req, res) => {
+    if (req.session.userId) {
+        res.json({ loggedIn: true, email: req.session.email });
+    } else {
+        res.json({ loggedIn: false });
+    }
+});
+
+// 5. Szerver Indítása
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, () => {
+    console.log(`>>> Szerver elindult a ${PORT} porton! <<<`);
 });
