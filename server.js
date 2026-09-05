@@ -520,8 +520,8 @@ app.get('/', (req, res) => {
       Object.keys(allCases).forEach(key => {
         const c = allCases[key];
         const btn = document.createElement('button');
-        btn.className = 'btn-case ' + (key === selectedCaseKey ? 'active' : '');
-        btn.innerText = c.name + ' (' + c.price + '$)';
+        btn.className = \`btn-case \${key === selectedCaseKey ? 'active' : ''}\`;
+        btn.innerText = \`\${c.name} (\${c.price}$)\`;
         btn.onclick = () => selectCase(key);
         container.appendChild(btn);
       });
@@ -534,7 +534,7 @@ app.get('/', (req, res) => {
       const c = allCases[key];
       if (c) {
         document.getElementById('case-title').innerText = c.name;
-        document.getElementById('case-price').innerText = c.price.toFixed(2) + ' $';
+        document.getElementById('case-price').innerText = \`\${c.price.toFixed(2)} $\`;
         generateTrackItems();
       }
     }
@@ -570,7 +570,7 @@ app.get('/', (req, res) => {
         const el = document.createElement('div');
         el.className = 'item-card';
         el.style.borderBottomColor = randItem.color || '#ffb400';
-        el.innerHTML = '<div><b>' + randItem.name + '</b><br>' + randItem.price + '$</div>';
+        el.innerHTML = \`<div><b>\${randItem.name}</b><br>\${randItem.price}$</div>\`;
         track.appendChild(el);
       }
     }
@@ -601,17 +601,17 @@ app.get('/', (req, res) => {
         const cards = track.children;
         
         cards[45].style.borderBottomColor = data.item.color;
-        cards[45].innerHTML = '<div><b>' + data.item.name + '</b><br>' + data.item.price + '$</div>';
+        cards[45].innerHTML = \`<div><b>\${data.item.name}</b><br>\${data.item.price}$</div>\`;
 
         setTimeout(() => {
           track.style.transition = 'transform 5s cubic-bezier(0.1, 1, 0.1, 1)';
           const cardWidth = 150;
           const targetOffset = -(45 * cardWidth - (document.querySelector('.case-wrapper').clientWidth / 2) + 75);
-          track.style.transform = 'translateX(' + targetOffset + 'px)';
+          track.style.transform = \`translateX(\${targetOffset}px)\`;
         }, 50);
 
         setTimeout(() => {
-          alert('Nyeremény: ' + data.item.name + ' (' + data.item.price + ' $)');
+          alert(\`Nyeremény: \${data.item.name} (\${data.item.price} $)\`);
           document.getElementById('display-balance').innerText = data.newBalance.toFixed(2);
           renderInventory(data.inventory);
           btn.disabled = false;
@@ -636,9 +636,11 @@ app.get('/', (req, res) => {
         const el = document.createElement('div');
         el.className = 'inv-item';
         el.style.borderBottomColor = item.color || '#fff';
-        el.innerHTML = '<div style="font-size:12px; font-weight:bold;">' + item.name + '</div>' +
-          '<div style="color:#ffb400; font-size:12px; margin: 10px 0;">' + item.price.toFixed(2) + ' $</div>' +
-          '<button onclick="sellItem(' + index + ')" class="btn-danger" style="font-size: 11px; padding: 6px 10px; width: 100%;">ELADÁS (' + item.price.toFixed(2) + '$)</button>';
+        el.innerHTML = \`
+          <div style="font-size:12px; font-weight:bold;">\${item.name}</div>
+          <div style="color:#ffb400; font-size:12px; margin: 10px 0;">\${item.price.toFixed(2)} $</div>
+          <button onclick="sellItem(\${index})" class="btn-danger" style="font-size: 11px; padding: 6px 10px; width: 100%;">ELADÁS (\${item.price.toFixed(2)}$)</button>
+        \`;
         grid.appendChild(el);
       });
     }
@@ -692,17 +694,19 @@ app.get('/', (req, res) => {
 
       users.forEach(u => {
         const tr = document.createElement('tr');
-        tr.innerHTML = '<td>' + u.username + '</td>' +
-          '<td>' + u.balance.toFixed(2) + ' $</td>' +
-          '<td>' + (u.isAdmin ? 'Igen' : 'Nem') + '</td>' +
-          '<td><input type="number" id="bal-' + u._id + '" value="' + u.balance + '" style="width: 100px; margin:0;"></td>' +
-          '<td><button onclick="updateUserBalance(\'' + u._id + '\')" class="btn-primary" style="padding: 5px 10px;">Mentés</button></td>';
+        tr.innerHTML = \`
+          <td>\${u.username}</td>
+          <td>\${u.balance.toFixed(2)} $</td>
+          <td>\${u.isAdmin ? 'Igen' : 'Nem'}</td>
+          <td><input type="number" id="bal-\${u._id}" value="\${u.balance}" style="width: 100px; margin:0;"></td>
+          <td><button onclick="updateUserBalance('\${u._id}')" class="btn-primary" style="padding: 5px 10px;">Mentés</button></td>
+        \`;
         tbody.appendChild(tr);
       });
     }
 
     async function updateUserBalance(userId) {
-      const val = document.getElementById('bal-' + userId).value;
+      const val = document.getElementById(\`bal-\${userId}\`).value;
       const res = await fetch('/api/admin/update-balance', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -728,9 +732,9 @@ app.get('/', (req, res) => {
       }
 
       const defaultItems = [
-        { id: caseId + '_1', name: 'Ritka Skin', price: 100.00, color: '#ffd700', chance: 10.0, img: '' },
-        { id: caseId + '_2', name: 'Közepes Skin', price: 20.00, color: '#d32ce6', chance: 30.0, img: '' },
-        { id: caseId + '_3', name: 'Gyakori Skin', price: 2.00, color: '#4b69ff', chance: 60.0, img: '' }
+        { id: \`\${caseId}_1\`, name: 'Ritka Skin', price: 100.00, color: '#ffd700', chance: 10.0, img: '' },
+        { id: \`\${caseId}_2\`, name: 'Közepes Skin', price: 20.00, color: '#d32ce6', chance: 30.0, img: '' },
+        { id: \`\${caseId}_3\`, name: 'Gyakori Skin', price: 2.00, color: '#4b69ff', chance: 60.0, img: '' }
       ];
 
       const res = await fetch('/api/admin/save-case', {
@@ -753,9 +757,4 @@ app.get('/', (req, res) => {
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`>>> Szerver elindult a ${PORT} porton! <<<`);
-});
-// 5. Szerver Indítása
-const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => {
-    console.log(`>>> Szerver elindult a ${PORT} porton! <<<`);
 });
