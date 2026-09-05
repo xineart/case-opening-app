@@ -1,3 +1,10 @@
+const express = require('express');
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// HTML tartalom kiszolgálása a gyökér útvonalon
+app.get('/', (req, res) => {
+    res.send(`
 <!DOCTYPE html>
 <html lang="hu">
 <head>
@@ -5,9 +12,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CryptoCases - Ultimate Case Opener & Casino</title>
     <style>
-        /* ==========================================
-           1. STÍLUSOK ÉS TÉMA BEÁLLÍTÁSOK
-           ========================================== */
         :root {
             --bg-main: #0b0e14;
             --bg-card: #151d2a;
@@ -21,7 +25,6 @@
             --text-muted: #94a3b8;
             --border-color: #243044;
 
-            /* Csak ritkasági színek */
             --rare-common: #b0c3d9;
             --rare-uncommon: #5e98d9;
             --rare-rare: #4b69ff;
@@ -47,7 +50,6 @@
             overflow-x: hidden;
         }
 
-        /* Navigációs Bár */
         header {
             background-color: var(--bg-darker);
             border-bottom: 1px solid var(--border-color);
@@ -110,7 +112,6 @@
             color: var(--accent-gold);
         }
 
-        /* Gombok */
         .btn {
             background: var(--bg-card);
             color: var(--text-main);
@@ -130,34 +131,11 @@
             transform: translateY(-1px);
         }
 
-        .btn-gold {
-            background: var(--accent-gold);
-            color: #000;
-            border: none;
-        }
-
-        .btn-gold:hover {
-            background: var(--accent-gold-hover);
-            transform: translateY(-1px);
-        }
-
-        .btn-blue {
-            background: var(--accent-blue);
-            color: #fff;
-            border: none;
-        }
-
-        .btn-purple {
-            background: var(--accent-purple);
-            color: #fff;
-            border: none;
-        }
-
-        .btn-green {
-            background: var(--accent-green);
-            color: #fff;
-            border: none;
-        }
+        .btn-gold { background: var(--accent-gold); color: #000; border: none; }
+        .btn-gold:hover { background: var(--accent-gold-hover); }
+        .btn-blue { background: var(--accent-blue); color: #fff; border: none; }
+        .btn-purple { background: var(--accent-purple); color: #fff; border: none; }
+        .btn-green { background: var(--accent-green); color: #fff; border: none; }
 
         .btn:disabled {
             opacity: 0.5;
@@ -165,7 +143,6 @@
             transform: none !important;
         }
 
-        /* Fő Elrendezés */
         main {
             max-width: 1400px;
             margin: 30px auto;
@@ -174,9 +151,6 @@
             width: 100%;
         }
 
-        /* ==========================================
-           2. LÁDANYITÓ SPINNER SECTION
-           ========================================== */
         .case-game-container {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -188,15 +162,8 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.4);
         }
 
-        .case-title-display {
-            font-size: 1.8rem;
-            margin-bottom: 10px;
-        }
-
-        .case-subtitle {
-            color: var(--text-muted);
-            margin-bottom: 25px;
-        }
+        .case-title-display { font-size: 1.8rem; margin-bottom: 10px; }
+        .case-subtitle { color: var(--text-muted); margin-bottom: 25px; }
 
         .spinner-wrapper {
             position: relative;
@@ -268,9 +235,6 @@
             font-weight: 700;
         }
 
-        /* ==========================================
-           3. LÁDA VÁLASZTÓ ÉS INVENTORY GRID
-           ========================================== */
         .section-header {
             display: flex;
             justify-content: space-between;
@@ -294,8 +258,6 @@
             padding: 20px;
             text-align: center;
             transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
         }
 
         .case-card:hover {
@@ -312,19 +274,9 @@
             border-radius: 8px;
         }
 
-        .case-card h3 {
-            font-size: 1.2rem;
-            margin-bottom: 5px;
-        }
+        .case-card h3 { font-size: 1.2rem; margin-bottom: 5px; }
+        .case-card .price { font-size: 1.1rem; color: var(--accent-gold); font-weight: 700; margin-bottom: 15px; }
 
-        .case-card .price {
-            font-size: 1.1rem;
-            color: var(--accent-gold);
-            font-weight: 700;
-            margin-bottom: 15px;
-        }
-
-        /* Leltár / Inventory Grid */
         .inventory-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -352,23 +304,9 @@
             border-radius: 6px;
         }
 
-        .inventory-card .name {
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-align: center;
-            margin-bottom: 5px;
-        }
+        .inventory-card .name { font-size: 0.8rem; font-weight: 600; text-align: center; margin-bottom: 5px; }
+        .inventory-card .val { font-size: 0.85rem; color: var(--accent-gold); font-weight: 700; margin-bottom: 10px; }
 
-        .inventory-card .val {
-            font-size: 0.85rem;
-            color: var(--accent-gold);
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        /* ==========================================
-           4. MODAL-OK (ADMIN & DEPOSIT)
-           ========================================== */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -413,9 +351,6 @@
             cursor: pointer;
         }
 
-        .close-btn:hover { color: var(--text-main); }
-
-        /* Admin Táblázat */
         .admin-table {
             width: 100%;
             border-collapse: collapse;
@@ -430,10 +365,7 @@
             font-size: 0.9rem;
         }
 
-        .admin-table th {
-            background: var(--bg-darker);
-            color: var(--text-muted);
-        }
+        .admin-table th { background: var(--bg-darker); color: var(--text-muted); }
 
         .admin-input {
             background: var(--bg-darker);
@@ -445,7 +377,6 @@
             font-weight: 700;
         }
 
-        /* Deposit UI */
         .qr-placeholder {
             width: 180px;
             height: 180px;
@@ -458,10 +389,7 @@
             justify-content: center;
         }
 
-        .qr-placeholder img {
-            width: 100%;
-            height: 100%;
-        }
+        .qr-placeholder img { width: 100%; height: 100%; }
 
         .crypto-address-box {
             background: var(--bg-darker);
@@ -479,7 +407,6 @@
 </head>
 <body>
 
-    <!-- NAVIGÁCIÓ -->
     <header>
         <div class="nav-container">
             <a href="#" class="logo">
@@ -500,7 +427,6 @@
     </header>
 
     <main>
-        <!-- LÁDANYITÓ JÁTÉK ZÓNA -->
         <section class="case-game-container">
             <h2 class="case-title-display" id="active-case-title">Válassz egy ládát alul!</h2>
             <p class="case-subtitle" id="active-case-subtitle">Kattints az egyik elérhető ládára az indításhoz</p>
@@ -515,14 +441,12 @@
             </button>
         </section>
 
-        <!-- ELÉRHERŐ LÁDÁK LISTÁJA -->
         <div class="section-header">
             <h2>Elérhető Ládák</h2>
             <span style="color: var(--text-muted);" id="cases-count-label">2 Láda elérhető</span>
         </div>
         <div class="cases-grid" id="cases-grid"></div>
 
-        <!-- SAJÁT LELTÁR / INVENTORY -->
         <div class="section-header">
             <h2>Saját Leltár (Inventory)</h2>
             <button class="btn btn-gold" onclick="sellAllItems()">Összes Eladása</button>
@@ -532,21 +456,19 @@
         </div>
     </main>
 
-    <!-- ADMIN PANEL MODAL -->
     <div class="modal-overlay" id="admin-modal">
         <div class="modal-body">
             <div class="modal-header">
-                <h2>⚙️ Admin Panel - Árak & Esélyek Szerkesztése</h2>
+                <h2>⚙️ Admin Panel - Árak Szerkesztése</h2>
                 <button class="close-btn" onclick="closeModal('admin-modal')">&times;</button>
             </div>
-            <p style="color: var(--text-muted); margin-bottom: 20px;">Itt valós időben átírhatod a ládák és tárgyak értékeit. A módosítások azonnal érvénybe lépnek!</p>
 
             <h3>1. Ládák Árának Módosítása</h3>
             <table class="admin-table">
                 <thead>
                     <tr>
                         <th>Láda Neve</th>
-                        <th>Jelenlegi Ár (USDT)</th>
+                        <th>Jelenlegi Ár</th>
                         <th>Új Ár Megadása</th>
                     </tr>
                 </thead>
@@ -571,7 +493,6 @@
         </div>
     </div>
 
-    <!-- KRIPTO BE- ÉS KIFIZETÉS MODAL -->
     <div class="modal-overlay" id="deposit-modal">
         <div class="modal-body" style="max-width: 500px; text-align: center;">
             <div class="modal-header">
@@ -582,7 +503,6 @@
             <p style="color: var(--text-muted);">Utalj USDT-t (TRC20 / ERC20) az alábbi tárcacímre:</p>
 
             <div class="qr-placeholder">
-                <!-- Működő QR Kód Generáló API -->
                 <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWWB" alt="QR Code">
             </div>
 
@@ -599,23 +519,18 @@
             </div>
 
             <div style="border-top: 1px solid var(--border-color); padding-top: 15px;">
-                <h4>Kifizetés (Kiutalás) Saját Tárcára</h4>
+                <h4>Kifizetés Saját Tárcára</h4>
                 <input type="text" placeholder="Saját USDT Tárcacímed" class="admin-input" style="width: 100%; margin: 10px 0;" id="withdraw-addr">
                 <button class="btn btn-green" style="width: 100%;" onclick="processWithdrawal()">Kiutalás Indítása</button>
             </div>
         </div>
     </div>
 
-    <!-- JÁTÉK ÉS RENDSZER LOGIKA -->
     <script>
-        // ==========================================
-        // 1. ADATBÁZIS ÉS ÁLLAPOT MENEZSMENT
-        // ==========================================
         let userBalance = 250.00;
         let selectedCase = null;
         let userInventory = [];
 
-        // Tárgyak Adatbázisa (Stabil Unsplash Képekkel)
         let itemsDatabase = [
             { id: 'i1', name: 'AK-47 | Neon Rider', price: 45.00, rarity: 'var(--rare-legendary)', img: 'https://images.unsplash.com/photo-1595590424283-b8f17842773f?w=300&auto=format&fit=crop&q=80' },
             { id: 'i2', name: 'M4A4 | Cyber Dragon', price: 120.00, rarity: 'var(--rare-mythical)', img: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=300&auto=format&fit=crop&q=80' },
@@ -625,16 +540,12 @@
             { id: 'i6', name: 'AWP | Dragon Lore', price: 2100.00, rarity: 'var(--rare-immortal)', img: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=300&auto=format&fit=crop&q=80' }
         ];
 
-        // Ládák Adatbázisa
         let casesDatabase = [
             { id: 'c1', name: 'Kezdő Kripto Láda', price: 15.00, img: 'https://images.unsplash.com/photo-1622979135225-d2ba269bc1bd?w=400&auto=format&fit=crop&q=80' },
             { id: 'c2', name: 'High Roller VIP Láda', price: 150.00, img: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=400&auto=format&fit=crop&q=80' },
             { id: 'c3', name: 'Legendás Kés Láda', price: 500.00, img: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=400&auto=format&fit=crop&q=80' }
         ];
 
-        // ==========================================
-        // 2. INICIALIZÁLÁS ÉS RENDERELÉS
-        // ==========================================
         function initApp() {
             renderBalance();
             renderCases();
@@ -649,17 +560,17 @@
         function renderCases() {
             const grid = document.getElementById('cases-grid');
             grid.innerHTML = '';
-            document.getElementById('cases-count-label').innerText = `${casesDatabase.length} Láda elérhető`;
+            document.getElementById('cases-count-label').innerText = \`\${casesDatabase.length} Láda elérhető\`;
 
             casesDatabase.forEach(c => {
-                grid.innerHTML += `
+                grid.innerHTML += \`
                     <div class="case-card">
-                        <img src="${c.img}" alt="${c.name}">
-                        <h3>${c.name}</h3>
-                        <div class="price">$${c.price.toFixed(2)} USDT</div>
-                        <button class="btn btn-gold" onclick="selectCase('${c.id}')">Kiválasztás</button>
+                        <img src="\${c.img}" alt="\${c.name}">
+                        <h3>\${c.name}</h3>
+                        <div class="price">$\${c.price.toFixed(2)} USDT</div>
+                        <button class="btn btn-gold" onclick="selectCase('\${c.id}')">Kiválasztás</button>
                     </div>
-                `;
+                \`;
             });
         }
 
@@ -673,27 +584,22 @@
             }
 
             userInventory.forEach((item, idx) => {
-                grid.innerHTML += `
-                    <div class="inventory-card" style="border-bottom-color: ${item.rarity};">
-                        <img src="${item.img}" alt="${item.name}">
-                        <div class="name">${item.name}</div>
-                        <div class="val">$${item.price.toFixed(2)}</div>
-                        <button class="btn btn-gold" style="padding: 4px 8px; font-size: 0.75rem;" onclick="sellItem(${idx})">Eladás</button>
+                grid.innerHTML += \`
+                    <div class="inventory-card" style="border-bottom-color: \${item.rarity};">
+                        <img src="\${item.img}" alt="\${item.name}">
+                        <div class="name">\${item.name}</div>
+                        <div class="val">$\${item.price.toFixed(2)}</div>
+                        <button class="btn btn-gold" style="padding: 4px 8px; font-size: 0.75rem;" onclick="sellItem(\${idx})">Eladás</button>
                     </div>
-                `;
+                \`;
             });
         }
 
-        // ==========================================
-        // 3. JÁTÉK KIVÁLASZTÁS ÉS SPINNER LOGIKA
-        // ==========================================
         function selectCase(caseId) {
             selectedCase = casesDatabase.find(c => c.id === caseId);
             document.getElementById('active-case-title').innerText = selectedCase.name;
-            document.getElementById('active-case-subtitle').innerText = `Nyitási ár: $${selectedCase.price.toFixed(2)} USDT`;
+            document.getElementById('active-case-subtitle').innerText = \`Nyitási ár: $\${selectedCase.price.toFixed(2)} USDT\`;
             document.getElementById('open-case-btn').disabled = false;
-
-            // Görgetés a játékterülethez
             window.scrollTo({ top: 0, behavior: 'smooth' });
             buildSpinnerTrack();
         }
@@ -704,17 +610,16 @@
             track.style.transform = 'translateX(0px)';
             track.innerHTML = '';
 
-            // Generálunk 80 véletlenszerű elemet a szalaghoz
             for (let i = 0; i < 80; i++) {
                 const randomItem = itemsDatabase[Math.floor(Math.random() * itemsDatabase.length)];
                 const card = document.createElement('div');
                 card.className = 'spinner-card';
                 card.style.borderBottomColor = randomItem.rarity;
-                card.innerHTML = `
-                    <img src="${randomItem.img}">
-                    <div class="item-name">${randomItem.name}</div>
-                    <div class="item-price">$${randomItem.price.toFixed(2)}</div>
-                `;
+                card.innerHTML = \`
+                    <img src="\${randomItem.img}">
+                    <div class="item-name">\${randomItem.name}</div>
+                    <div class="item-price">$\${randomItem.price.toFixed(2)}</div>
+                \`;
                 track.appendChild(card);
             }
         }
@@ -727,49 +632,40 @@
                 return;
             }
 
-            // Egyenleg levonása
             userBalance -= selectedCase.price;
             renderBalance();
             document.getElementById('open-case-btn').disabled = true;
 
             buildSpinnerTrack();
 
-            // Kis csúszás a zökkenőmentes animációért
             setTimeout(() => {
                 const track = document.getElementById('spinner-track');
-                const winningIndex = 55; // A nyertes tárgy pozíciója a szalagon
-                const itemWidth = 142; // Kártya szélesség + gap
-                const offset = Math.floor(Math.random() * 60) - 30; // Véletlenszerű finomhangolás
+                const winningIndex = 55;
+                const itemWidth = 142;
+                const offset = Math.floor(Math.random() * 60) - 30;
                 const targetPos = (winningIndex * itemWidth) - (document.querySelector('.spinner-wrapper').offsetWidth / 2) + offset;
 
-                // Kiválasztjuk a nyertes tárgyat az adatbázisból
                 const wonItem = itemsDatabase[Math.floor(Math.random() * itemsDatabase.length)];
-
-                // Beállítjuk a nyertes kártyát pontosan az 55. pozícióra
                 const winningCard = track.children[winningIndex];
                 winningCard.style.borderBottomColor = wonItem.rarity;
-                winningCard.innerHTML = `
-                    <img src="${wonItem.img}">
-                    <div class="item-name">${wonItem.name}</div>
-                    <div class="item-price">$${wonItem.price.toFixed(2)}</div>
-                `;
+                winningCard.innerHTML = \`
+                    <img src="\${wonItem.img}">
+                    <div class="item-name">\${wonItem.name}</div>
+                    <div class="item-price">$\${wonItem.price.toFixed(2)}</div>
+                \`;
 
                 track.style.transition = 'transform 6s cubic-bezier(0.05, 0.9, 0.1, 1)';
-                track.style.transform = `translateX(-${targetPos}px)`;
+                track.style.transform = \`translateX(-\${targetPos}px)\`;
 
-                // Amikor az animáció lejár
                 setTimeout(() => {
                     userInventory.push(wonItem);
                     renderInventory();
-                    alert(`🎉 Gratulálunk! Nyertél egy tárgyat: ${wonItem.name} ($${wonItem.price.toFixed(2)} USDT)`);
+                    alert(\`🎉 Gratulálunk! Nyertél egy tárgyat: \${wonItem.name} ($\${wonItem.price.toFixed(2)} USDT)\`);
                     document.getElementById('open-case-btn').disabled = false;
                 }, 6300);
             }, 100);
         }
 
-        // ==========================================
-        // 4. LELTÁR ELADÁSI LOGIKA
-        // ==========================================
         function sellItem(index) {
             const item = userInventory[index];
             userBalance += item.price;
@@ -785,48 +681,43 @@
             userInventory = [];
             renderBalance();
             renderInventory();
-            alert(`Minden tárgy eladva: +$${totalVal.toFixed(2)} USDT`);
+            alert(\`Minden tárgy eladva: +$\${totalVal.toFixed(2)} USDT\`);
         }
 
-        // ==========================================
-        // 5. ADMIN PANEL & ÁR SZERKESZTÉS
-        // ==========================================
         function populateAdminTables() {
             const caseTable = document.getElementById('admin-cases-table');
             caseTable.innerHTML = '';
             casesDatabase.forEach((c, i) => {
-                caseTable.innerHTML += `
+                caseTable.innerHTML += \`
                     <tr>
-                        <td><strong>${c.name}</strong></td>
-                        <td>$${c.price.toFixed(2)} USDT</td>
-                        <td>$<input type="number" class="admin-input" id="admin-case-price-${i}" value="${c.price}" step="1"></td>
+                        <td><strong>\${c.name}</strong></td>
+                        <td>$\${c.price.toFixed(2)} USDT</td>
+                        <td>$<input type="number" class="admin-input" id="admin-case-price-\${i}" value="\${c.price}" step="1"></td>
                     </tr>
-                `;
+                \`;
             });
 
             const itemTable = document.getElementById('admin-items-table');
             itemTable.innerHTML = '';
             itemsDatabase.forEach((item, i) => {
-                itemTable.innerHTML += `
+                itemTable.innerHTML += \`
                     <tr>
-                        <td>${item.name}</td>
-                        <td><span style="color:${item.rarity}; font-weight:bold;">● Ritkaság</span></td>
-                        <td>$<input type="number" class="admin-input" id="admin-item-price-${i}" value="${item.price}" step="1"></td>
+                        <td>\${item.name}</td>
+                        <td><span style="color:\${item.rarity}; font-weight:bold;">● Ritkaság</span></td>
+                        <td>$<input type="number" class="admin-input" id="admin-item-price-\${i}" value="\${item.price}" step="1"></td>
                     </tr>
-                `;
+                \`;
             });
         }
 
         function saveAdminChanges() {
-            // Ládák árainak frissítése
             casesDatabase.forEach((c, i) => {
-                const val = parseFloat(document.getElementById(`admin-case-price-${i}`).value);
+                const val = parseFloat(document.getElementById(\`admin-case-price-\${i}\`).value);
                 if (!isNaN(val) && val > 0) c.price = val;
             });
 
-            // Tárgyak értékeinek frissítése
             itemsDatabase.forEach((item, i) => {
-                const val = parseFloat(document.getElementById(`admin-item-price-${i}`).value);
+                const val = parseFloat(document.getElementById(\`admin-item-price-\${i}\`).value);
                 if (!isNaN(val) && val > 0) item.price = val;
             });
 
@@ -836,13 +727,10 @@
             alert("⚙️ Az új árak sikeresen elmentve!");
         }
 
-        // ==========================================
-        // 6. KRIPTO BEFIZETÉS & WEB3
-        // ==========================================
         function addDemoBalance(amount) {
             userBalance += amount;
             renderBalance();
-            alert(`Sikeres feltöltés: +$${amount} USDT`);
+            alert(\`Sikeres feltöltés: +$\${amount} USDT\`);
         }
 
         function processWithdrawal() {
@@ -851,7 +739,7 @@
                 alert("Kérjük adj meg egy érvényes USDT tárcacímet!");
                 return;
             }
-            alert(`Kiutalási kérelem rögzítve a(z) ${addr} címre!`);
+            alert(\`Kiutalási kérelem rögzítve a(z) \${addr} címre!\`);
             closeModal('deposit-modal');
         }
 
@@ -866,7 +754,7 @@
                 try {
                     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                     const btn = document.getElementById('web3-btn');
-                    btn.innerText = `🦊 ${accounts[0].substring(0, 6)}...${accounts[0].substring(38)}`;
+                    btn.innerText = \`🦊 \${accounts[0].substring(0, 6)}...\${accounts[0].substring(38)}\`;
                     btn.classList.remove('btn-purple');
                     btn.classList.add('btn-green');
                     alert("Sikeresen csatlakoztál a MetaMask tárcáddal!");
@@ -874,140 +762,21 @@
                     alert("Hiba történt a tárca csatlakoztatásakor.");
                 }
             } else {
-                alert("Nem található Web3 böngészőbővítmény (pl. MetaMask). Demo módban futsz дальше!");
+                alert("Nem található Web3 bővítmény.");
             }
         }
 
-        // MODAL VEZÉRLÉS
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        // Indítás
         window.onload = initApp;
     </script>
 </body>
-</html>                   <h3>${c.name}</h3>
-                        <p style="color: var(--accent-gold); font-weight: bold;">$${c.price.toFixed(2)} USDT</p>
-                        <button class="btn-primary" onclick="selectCase('${c.id}')">Kiválasztás</button>
-                    </div>
-                `;
-            });
-        }
-
-        function selectCase(caseId) {
-            selectedCase = casesDatabase.find(c => c.id === caseId);
-            document.getElementById('selected-case-title').innerText = `${selectedCase.name} ($${selectedCase.price} USDT)`;
-            document.getElementById('open-btn').disabled = false;
-            generateSpinnerTrack();
-        }
-
-        // LÁDANYITÓ SPINNER ELEMEK GENERÁLÁSA
-        function generateSpinnerTrack() {
-            const track = document.getElementById('spinner-track');
-            track.style.transition = 'none';
-            track.style.transform = 'translateX(0px)';
-            track.innerHTML = '';
-
-            for (let i = 0; i < 60; i++) {
-                const randomItem = itemsDatabase[Math.floor(Math.random() * itemsDatabase.length)];
-                const el = document.createElement('div');
-                el.className = 'spinner-item';
-                el.style.borderBottomColor = randomItem.color;
-                el.innerHTML = `
-                    <img src="${randomItem.img}" />
-                    <span>${randomItem.name}</span>
-                    <small>$${randomItem.price}</small>
-                `;
-                track.appendChild(el);
-            }
-        }
-
-        // NYITÁSI ANIMÁCIÓ LOGIKA
-        function openCase() {
-            if (!selectedCase) return;
-            if (userBalance < selectedCase.price) {
-                alert("Nincs elég egyenleged!");
-                return;
-            }
-
-            userBalance -= selectedCase.price;
-            updateBalanceDisplay();
-            document.getElementById('open-btn').disabled = true;
-
-            generateSpinnerTrack();
-
-            setTimeout(() => {
-                const track = document.getElementById('spinner-track');
-                const winningIndex = 45; // Fix állomás
-                const itemWidth = 130; // 120px szélesség + 10px gap
-                const randomOffset = Math.floor(Math.random() * 80) - 40; // Véletlenszerű eltolás
-                const targetPosition = (winningIndex * itemWidth) - (document.querySelector('.spinner-container').offsetWidth / 2) + randomOffset;
-
-                track.style.transition = 'transform 5s cubic-bezier(0.1, 1, 0.1, 1)';
-                track.style.transform = `translateX(-${targetPosition}px)`;
-
-                setTimeout(() => {
-                    alert("Gratulálunk! Nyertél egy értékes tárgyat!");
-                    document.getElementById('open-btn').disabled = false;
-                }, 5200);
-            }, 100);
-        }
-
-        // ADMIN PANEL LOGIKA (Árok szerkesztése)
-        function setupAdminPanel() {
-            const casesTbody = document.getElementById('admin-cases-list');
-            casesTbody.innerHTML = '';
-            casesDatabase.forEach((c, index) => {
-                casesTbody.innerHTML += `
-                    <tr>
-                        <td>${c.name}</td>
-                        <td><input type="number" id="case-price-${index}" value="${c.price}" step="0.5"> USDT</td>
-                    </tr>
-                `;
-            });
-
-            const itemsTbody = document.getElementById('admin-items-list');
-            itemsTbody.innerHTML = '';
-            itemsDatabase.forEach((item, index) => {
-                itemsTbody.innerHTML += `
-                    <tr>
-                        <td>${item.name}</td>
-                        <td style="color: ${item.color}">● Érték</td>
-                        <td>$<input type="number" id="item-price-${index}" value="${item.price}" step="1"></td>
-                    </tr>
-                `;
-            });
-        }
-
-        function saveAdminSettings() {
-            casesDatabase.forEach((c, index) => {
-                const val = parseFloat(document.getElementById(`case-price-${index}`).value);
-                if (!isNaN(val)) c.price = val;
-            });
-
-            itemsDatabase.forEach((item, index) => {
-                const val = parseFloat(document.getElementById(`item-price-${index}`).value);
-                if (!isNaN(val)) item.price = val;
-            });
-
-            renderCases();
-            closeModal('admin-modal');
-            alert("Beállítások sikeresen elmentve!");
-        }
-
-        // KREPTÓ BEFIZETÉS TESZT
-        function addFunds(amount) {
-            userBalance += amount;
-            updateBalanceDisplay();
-            alert(`Sikeres befizetés: +${amount} USDT`);
-        }
-
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-        window.onload = init;
-    </script>
-</body>
 </html>
-  console.log(`>>> TerBDrop Szerver elindult a ${PORT} porton! <<<`);
+    `);
+});
+
+// Szerver elindítása a megadott porton
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
