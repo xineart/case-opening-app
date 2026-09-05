@@ -14,27 +14,21 @@ const PORT = process.env.PORT || 10000;
 const MONGO_URI = process.env.MONGO_URI;
 
 // --- ADATBÁZIS KAPCSOLÓDÁS ---
-let dbStatus = "Csatlakozás folyamatban...";
-
 if (MONGO_URI) {
   mongoose.connect(MONGO_URI)
     .then(async () => {
-      dbStatus = "SIKERES_CSATLAKOZÁS";
       console.log('>>> Sikeres MongoDB csatlakozás! <<<');
       await initAdminUser();
       await initDefaultCases();
     })
     .catch(err => {
-      dbStatus = "CSATLAKOZÁSI_HIBA";
       console.error('MongoDB csatlakozási hiba:', err);
     });
 } else {
-  dbStatus = "HIÁNYZÓ_MONGO_URI";
   console.error("KRITIKUS: A MONGO_URI környezeti változó hiányzik!");
 }
 
 // --- ADATBÁZIS SCHEMÁK ---
-
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
@@ -76,7 +70,7 @@ app.use(session({
   cookie: { secure: false, maxAge: 7 * 24 * 60 * 60 * 1000 }
 }));
 
-// --- KEZDŐ ADATOK FELTÖLTÉSE (ADMIN ÉS ALAP LÁDÁK) ---
+// --- KEZDŐ ADATOK ---
 async function initAdminUser() {
   try {
     const adminExists = await User.findOne({ username: 'admin' });
@@ -111,22 +105,21 @@ async function initDefaultCases() {
           { id: 'w_5', name: 'P250 | Sand Dune', price: 1.50, color: '#b0c3d9', chance: 50.0, img: '' }
         ]
       });
-      console.log('>>> Alapértelmezett láda létrehozva az adatbázisban! <<<');
+      console.log('>>> Alapértelmezett láda létrehozva! <<<');
     }
   } catch (err) {
     console.error('Hiba a ládák inicializálásakor:', err);
   }
 }
 
-// --- ADMIN MIDDLEWARE ---
+// --- MIDDLEWARE ---
 async function requireAdmin(req, res, next) {
   if (!req.session.userId) return res.status(401).json({ error: 'Bejelentkezés szükséges!' });
   const user = await User.findById(req.session.userId);
-  if (!user || !user.isAdmin) return res.status(403).json({ error: 'Hozzáférés megtagadva! Admin jog szükséges.' });
+  if (!user || !user.isAdmin) return res.status(403).json({ error: 'Hozzáférés megtagadva!' });
   next();
 }
 
-// --- SORSOLÁS SEGÉDFÜGGVÉNY ---
 function getRandomItemFromCase(caseData) {
   const rand = Math.random() * 100;
   let cumulative = 0;
@@ -137,21 +130,21 @@ function getRandomItemFromCase(caseData) {
   return caseData.items[caseData.items.length - 1];
 }
 
-// --- ÁTMENETI LINK AZ ADMIN JOG MEGSZERZÉSÉHEZ ---
+// --- BIZTONSÁGOS ADMIN-JOG ADÓ LINK ---
+// Csak a ?secret=TitkosAdminKod123 paraméterrel működik
 app.get('/make-me-admin', async (req, res) => {
-  if (!req.session.userId) return res.send('<h1>Először jelentkezz be a főoldalon!</h1>');
+  const secretKey = req.query.secret;
+  if (secretKey !== 'TitkosAdminKod123') {
+    return res.status(403).send('<h1>403 - Hibás titkos kód!</h1>');
+  }
+  if (!req.session.userId) {
+    return res.send('<h1>Először jelentkezz be az oldalon!</h1>');
+  }
   await User.findByIdAndUpdate(req.session.userId, { isAdmin: true });
   res.send('<h1>Sikeresen Admin lettél! Menj vissza a főoldalra és frissíts (F5).</h1>');
 });
 
-// --- PUBLIC API VÉGPONTOK ---
-
-app.get('/api/cases', async (req, res) => {
-  const cases = await Case.find();
-  const caseMap = {};
-  cases.forEach(c => { caseMap[c.caseId] = c; });
-  res.json(caseMap);
-});
+// --- AUTH API VÉGPONTOK ---
 
 app.post('/api/register', async (req, res) => {
   try {
@@ -159,7 +152,7 @@ app.post('/api/register', async (req, res) => {
     if (!username || !password) return res.status(400).json({ error: 'Minden mező kitöltése kötelező!' });
 
     const cleanUsername = username.trim();
-    const existingUser = await User.findOne({ username: new RegExp(`^${cleanUsername}$`, 'i') });
+    const existingUser = await User.findOne({ username: cleanUsername });
     if (existingUser) return res.status(400).json({ error: 'Ez a felhasználónév már foglalt!' });
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -170,14 +163,18 @@ app.post('/api/register', async (req, res) => {
 
     res.json({ success: true, username: newUser.username, balance: newUser.balance, isAdmin: newUser.isAdmin, inventory: newUser.inventory });
   } catch (err) {
-    res.status(500).json({ error: 'Szerveroldali hiba: ' + err.message });
+    console.error('Regisztrációs hiba:', err);
+    res.status(500).json({ error: 'Szerveroldali hiba történt a regisztráció során.' });
   }
 });
 
 app.post('/api/login', async (req, res) => {
   try {
     const { username, password } = req.body;
-    const user = await User.findOne({ username: username.trim() });
+    if (!username || !password) return res.status(400).json({ error: 'Felhasználónév és jelszó megadása kötelező!' });
+
+    const cleanUsername = username.trim();
+    const user = await User.findOne({ username: cleanUsername });
     if (!user) return res.status(400).json({ error: 'Hibás felhasználónév vagy jelszó!' });
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -186,7 +183,8 @@ app.post('/api/login', async (req, res) => {
     req.session.userId = user._id;
     res.json({ success: true, username: user.username, balance: user.balance, isAdmin: user.isAdmin, inventory: user.inventory });
   } catch (err) {
-    res.status(500).json({ error: 'Szerver hiba: ' + err.message });
+    console.error('Bejelentkezési hiba:', err);
+    res.status(500).json({ error: 'Szerveroldali hiba történt a bejelentkezés során.' });
   }
 });
 
@@ -203,6 +201,19 @@ app.get('/api/me', async (req, res) => {
     const user = await User.findById(req.session.userId);
     if (!user) return res.json({ loggedIn: false });
     res.json({ loggedIn: true, username: user.username, balance: user.balance, isAdmin: user.isAdmin, inventory: user.inventory });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// --- JÁTÉK API ---
+
+app.get('/api/cases', async (req, res) => {
+  try {
+    const cases = await Case.find();
+    const caseMap = {};
+    cases.forEach(c => { caseMap[c.caseId] = c; });
+    res.json(caseMap);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -231,7 +242,6 @@ app.post('/api/open-case', async (req, res) => {
     });
 
     await user.save();
-
     res.json({ success: true, item: wonItem, newBalance: user.balance, inventory: user.inventory });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -258,7 +268,7 @@ app.post('/api/sell-item', async (req, res) => {
   }
 });
 
-// --- ADMIN API VÉGPONTOK ---
+// --- ADMIN API ---
 
 app.get('/api/admin/users', requireAdmin, async (req, res) => {
   const users = await User.find({}, '-password').sort({ createdAt: -1 });
@@ -289,16 +299,6 @@ app.post('/api/admin/save-case', requireAdmin, async (req, res) => {
       await Case.create({ caseId, name, price: parseFloat(price), items });
     }
 
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-app.post('/api/admin/delete-case', requireAdmin, async (req, res) => {
-  try {
-    const { caseId } = req.body;
-    await Case.deleteOne({ caseId });
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -363,7 +363,7 @@ app.get('/', (req, res) => {
   </header>
 
   <main>
-    <!-- BEJELENTKEZÉS -->
+    <!-- BEJELENTKEZÉS / REGISZTRÁCIÓ -->
     <div id="auth-box" class="auth-container">
       <h2 id="auth-title" style="margin-bottom: 20px;">Bejelentkezés</h2>
       <input type="text" id="auth-username" placeholder="Felhasználónév">
@@ -377,7 +377,6 @@ app.get('/', (req, res) => {
 
     <!-- JÁTÉK FELÜLET -->
     <div id="game-box" class="hidden">
-      
       <div id="case-selector" style="display: flex; justify-content: center; gap: 10px; margin-bottom: 30px;"></div>
 
       <div style="text-align: center;">
@@ -396,7 +395,6 @@ app.get('/', (req, res) => {
 
       <h3 style="margin-top: 50px; border-bottom: 1px solid #222938; padding-bottom: 10px;">Saját Raktár (Inventory)</h3>
       <div class="inventory-grid" id="inventory-grid"></div>
-
     </div>
 
     <!-- ADMIN PANEL FELÜLET -->
@@ -408,7 +406,6 @@ app.get('/', (req, res) => {
         <button class="btn-case" onclick="showAdminSection('cases')">Ládák Kezelése</button>
       </div>
 
-      <!-- USER KEZELÉS -->
       <div id="admin-users-section">
         <h3>Felhasználók egyenlegének módosítása</h3>
         <table class="admin-table">
@@ -425,7 +422,6 @@ app.get('/', (req, res) => {
         </table>
       </div>
 
-      <!-- LÁDA KEZELÉS -->
       <div id="admin-cases-section" class="hidden">
         <h3>Láda Hozzáadása / Szerkesztése</h3>
         <div style="max-width: 500px; margin-top: 15px;">
@@ -435,7 +431,6 @@ app.get('/', (req, res) => {
           <button onclick="saveCase()" class="btn-primary" style="width: 100%;">Láda Mentése</button>
         </div>
       </div>
-
     </div>
   </main>
 
@@ -450,17 +445,21 @@ app.get('/', (req, res) => {
     };
 
     async function fetchCases() {
-      const res = await fetch('/api/cases');
-      allCases = await res.json();
-      
-      const keys = Object.keys(allCases);
-      if (keys.length > 0 && !selectedCaseKey) {
-        selectedCaseKey = keys[0];
-      }
+      try {
+        const res = await fetch('/api/cases');
+        allCases = await res.json();
+        
+        const keys = Object.keys(allCases);
+        if (keys.length > 0 && !selectedCaseKey) {
+          selectedCaseKey = keys[0];
+        }
 
-      renderCaseButtons();
-      if (selectedCaseKey && allCases[selectedCaseKey]) {
-        selectCase(selectedCaseKey);
+        renderCaseButtons();
+        if (selectedCaseKey && allCases[selectedCaseKey]) {
+          selectCase(selectedCaseKey);
+        }
+      } catch(e) {
+        console.error("Láda betöltési hiba", e);
       }
     }
 
@@ -498,12 +497,16 @@ app.get('/', (req, res) => {
     }
 
     async function checkSession() {
-      const res = await fetch('/api/me');
-      const data = await res.json();
-      if (data.loggedIn) {
-        currentUser = data;
-        await fetchCases();
-        updateUI(data);
+      try {
+        const res = await fetch('/api/me');
+        const data = await res.json();
+        if (data.loggedIn) {
+          currentUser = data;
+          await fetchCases();
+          updateUI(data);
+        }
+      } catch(e) {
+        console.error("Session hiba", e);
       }
     }
 
@@ -511,6 +514,11 @@ app.get('/', (req, res) => {
       const username = document.getElementById('auth-username').value;
       const password = document.getElementById('auth-password').value;
       const endpoint = isRegisterMode ? '/api/register' : '/api/login';
+
+      if (!username || !password) {
+        alert("Kérjük, töltsd ki a felhasználónevet és a jelszót!");
+        return;
+      }
 
       try {
         const res = await fetch(endpoint, {
@@ -528,7 +536,7 @@ app.get('/', (req, res) => {
           updateUI(data);
         }
       } catch(err) {
-        alert("Hálózati hiba!");
+        alert("Hálózati hiba a csatlakozás során!");
       }
     }
 
@@ -635,8 +643,6 @@ app.get('/', (req, res) => {
         grid.appendChild(el);
       });
     }
-
-    // --- ADMIN PANEL LOGIKA ---
 
     function toggleAdminPanel() {
       const gameBox = document.getElementById('game-box');
