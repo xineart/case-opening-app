@@ -14,6 +14,7 @@
             --accent-blue: #3b82f6;
             --accent-green: #10b981;
             --accent-purple: #8b5cf6;
+            --accent-red: #ef4444;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --border-color: #243044;
@@ -129,6 +130,7 @@
         .btn-blue { background: var(--accent-blue); color: #fff; border: none; }
         .btn-purple { background: var(--accent-purple); color: #fff; border: none; }
         .btn-green { background: var(--accent-green); color: #fff; border: none; }
+        .btn-red { background: var(--accent-red); color: #fff; border: none; }
 
         .btn:disabled {
             opacity: 0.5;
@@ -352,7 +354,7 @@
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: 16px;
-            max-width: 800px;
+            max-width: 600px;
             width: 100%;
             max-height: 85vh;
             overflow-y: auto;
@@ -397,10 +399,12 @@
             background: var(--bg-darker);
             border: 1px solid var(--border-color);
             color: var(--accent-gold);
-            padding: 6px 10px;
+            padding: 8px 12px;
             border-radius: 6px;
-            width: 100px;
-            font-weight: 700;
+            width: 100%;
+            font-weight: 600;
+            margin-top: 5px;
+            margin-bottom: 15px;
         }
 
         .qr-placeholder {
@@ -429,6 +433,76 @@
             align-items: center;
             margin-bottom: 20px;
         }
+
+        /* User Profile & Settings CSS */
+        .user-profile-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .user-avatar-img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid var(--accent-gold);
+            object-fit: cover;
+        }
+
+        .avatar-grid {
+            display: flex;
+            gap: 12px;
+            margin: 10px 0 20px 0;
+        }
+
+        .avatar-opt {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            background: var(--bg-darker);
+            transition: all 0.2s;
+        }
+
+        .avatar-opt:hover, .avatar-opt.selected {
+            border-color: var(--accent-gold);
+            transform: scale(1.05);
+        }
+
+        .settings-tabs {
+            display: flex;
+            gap: 10px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 10px 16px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .tab-btn.active {
+            color: var(--accent-gold);
+            border-bottom: 2px solid var(--accent-gold);
+        }
+
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
     </style>
 </head>
 <body>
@@ -439,6 +513,7 @@
                 <div class="logo-icon">⚡</div>
                 <span>CryptoCases</span>
             </a>
+
             <div class="user-stats">
                 <div class="stat-box">
                     <span>Egyenleg:</span>
@@ -446,8 +521,23 @@
                     <span style="color: var(--accent-gold); font-weight: bold;">USDT</span>
                 </div>
                 <button class="btn btn-green" onclick="openModal('deposit-modal')">💳 Be / Kifizetés</button>
-                <button class="btn btn-purple" id="web3-btn" onclick="connectWeb3()">🦊 Web3 Tárca</button>
-                <button class="btn btn-gold" onclick="openModal('admin-modal')">⚙️ Admin Panel</button>
+                <button class="btn btn-gold" onclick="openModal('admin-modal')">⚙️ Admin</button>
+
+                <!-- Guest Nav (Nem bejelentkezve) -->
+                <div id="guest-nav" style="display: flex; gap: 10px;">
+                    <button class="btn" onclick="openModal('login-modal')">Bejelentkezés</button>
+                    <button class="btn btn-gold" onclick="openModal('register-modal')">Regisztráció</button>
+                </div>
+
+                <!-- Auth Nav (Bejelentkezve) -->
+                <div id="auth-nav" style="display: none; align-items: center; gap: 10px;">
+                    <div class="user-profile-btn" onclick="openModal('settings-modal')">
+                        <img id="header-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=User" class="user-avatar-img">
+                        <span id="header-username" style="font-weight: 700;">Felhasználó</span>
+                    </div>
+                    <button class="btn btn-blue" onclick="openModal('settings-modal')" title="Beállítások">⚙️</button>
+                    <button class="btn btn-red" onclick="logout()" title="Kijelentkezés">🚪</button>
+                </div>
             </div>
         </div>
     </header>
@@ -492,6 +582,96 @@
             </div>
         </div>
     </main>
+
+    <!-- LOGIN MODAL -->
+    <div class="modal-overlay" id="login-modal">
+        <div class="modal-body" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2>Bejelentkezés</h2>
+                <button class="close-btn" onclick="closeModal('login-modal')">&times;</button>
+            </div>
+            <form onsubmit="handleLogin(event)">
+                <label>Felhasználónév</label>
+                <input type="text" id="login-username" class="admin-input" required placeholder="Add meg a neved">
+                <label>Jelszó</label>
+                <input type="password" id="login-password" class="admin-input" required placeholder="********">
+                <button type="submit" class="btn btn-gold" style="width: 100%; margin-top: 10px;">Belépés</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- REGISTER MODAL -->
+    <div class="modal-overlay" id="register-modal">
+        <div class="modal-body" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2>Regisztráció</h2>
+                <button class="close-btn" onclick="closeModal('register-modal')">&times;</button>
+            </div>
+            <form onsubmit="handleRegister(event)">
+                <label>Felhasználónév</label>
+                <input type="text" id="reg-username" class="admin-input" required placeholder="Válassz nevet">
+                <label>Email cím</label>
+                <input type="email" id="reg-email" class="admin-input" required placeholder="peldas@email.com">
+                <label>Jelszó</label>
+                <input type="password" id="reg-password" class="admin-input" required placeholder="********">
+                <button type="submit" class="btn btn-gold" style="width: 100%; margin-top: 10px;">Fiók Létrehozása</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- SETTINGS & PROFILE MODAL -->
+    <div class="modal-overlay" id="settings-modal">
+        <div class="modal-body">
+            <div class="modal-header">
+                <h2>Profil & Beállítások ⚙️</h2>
+                <button class="close-btn" onclick="closeModal('settings-modal')">&times;</button>
+            </div>
+
+            <div class="settings-tabs">
+                <button class="tab-btn active" onclick="switchTab(event, 'tab-profile')">Profil</button>
+                <button class="tab-btn" onclick="switchTab(event, 'tab-security')">Biztonság</button>
+                <button class="tab-btn" onclick="switchTab(event, 'tab-preferences')">Beállítások</button>
+            </div>
+
+            <!-- Profil Tab -->
+            <div id="tab-profile" class="tab-content">
+                <label>Profilkép kiválasztása:</label>
+                <div class="avatar-grid">
+                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Alpha" class="avatar-opt" onclick="selectAvatar(event, this.src)">
+                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Bravo" class="avatar-opt" onclick="selectAvatar(event, this.src)">
+                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Charlie" class="avatar-opt" onclick="selectAvatar(event, this.src)">
+                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Delta" class="avatar-opt" onclick="selectAvatar(event, this.src)">
+                </div>
+
+                <label>Kripto Tárcacím (Kifizetésekhez)</label>
+                <input type="text" id="settings-wallet" class="admin-input" placeholder="0x... vagy TRC20 cím">
+                <button class="btn btn-gold" style="width: 100%;" onclick="saveProfileSettings()">Profil Mentése</button>
+            </div>
+
+            <!-- Security Tab -->
+            <div id="tab-security" class="tab-content" style="display: none;">
+                <form onsubmit="handlePasswordChange(event)">
+                    <label>Jelenlegi jelszó</label>
+                    <input type="password" class="admin-input" required>
+                    <label>Új jelszó</label>
+                    <input type="password" class="admin-input" required>
+                    <button type="submit" class="btn btn-gold" style="width: 100%;">Jelszó Módosítása</button>
+                </form>
+            </div>
+
+            <!-- Preferences Tab -->
+            <div id="tab-preferences" class="tab-content" style="display: none;">
+                <div class="setting-row">
+                    <span>Hanghatások</span>
+                    <input type="checkbox" id="setting-sounds" checked onchange="savePreferences()">
+                </div>
+                <div class="setting-row">
+                    <span>Gyors Láda Animáció</span>
+                    <input type="checkbox" id="setting-fast-open" onchange="savePreferences()">
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Admin Panel Modal -->
     <div class="modal-overlay" id="admin-modal">
@@ -570,6 +750,9 @@
         let selectedCase = null;
         let userInventory = [];
 
+        let currentUser = JSON.parse(localStorage.getItem('casino_user')) || null;
+        let userPreferences = JSON.parse(localStorage.getItem('casino_prefs')) || { sounds: true, fastOpen: false };
+
         let itemsDatabase = [
             { id: 'i1', name: 'AK-47 | Neon Rider', price: 45.00, rarity: 'var(--rare-legendary)', img: 'https://images.unsplash.com/photo-1595590424283-b8f17842773f?w=300&auto=format&fit=crop&q=80' },
             { id: 'i2', name: 'M4A4 | Cyber Dragon', price: 120.00, rarity: 'var(--rare-mythical)', img: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=300&auto=format&fit=crop&q=80' },
@@ -590,8 +773,106 @@
             renderCases();
             renderInventory();
             populateAdminTables();
+            updateAuthUI();
+            loadPreferences();
         }
 
+        /* --- AUTH & PROFILE LOGIKA --- */
+        function handleRegister(e) {
+            e.preventDefault();
+            const username = document.getElementById('reg-username').value;
+            const email = document.getElementById('reg-email').value;
+
+            currentUser = {
+                username: username,
+                email: email,
+                avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=' + username,
+                wallet: ''
+            };
+
+            localStorage.setItem('casino_user', JSON.stringify(currentUser));
+            updateAuthUI();
+            closeModal('register-modal');
+            alert('Sikeres regisztráció!');
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('login-username').value;
+
+            currentUser = JSON.parse(localStorage.getItem('casino_user')) || {
+                username: username,
+                avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=' + username,
+                wallet: ''
+            };
+
+            localStorage.setItem('casino_user', JSON.stringify(currentUser));
+            updateAuthUI();
+            closeModal('login-modal');
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('casino_user');
+            updateAuthUI();
+        }
+
+        function updateAuthUI() {
+            const guestNav = document.getElementById('guest-nav');
+            const authNav = document.getElementById('auth-nav');
+
+            if (currentUser) {
+                guestNav.style.display = 'none';
+                authNav.style.display = 'flex';
+                document.getElementById('header-username').innerText = currentUser.username;
+                document.getElementById('header-avatar').src = currentUser.avatar;
+                document.getElementById('settings-wallet').value = currentUser.wallet || '';
+            } else {
+                guestNav.style.display = 'flex';
+                authNav.style.display = 'none';
+            }
+        }
+
+        function switchTab(e, tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).style.display = 'block';
+            e.target.classList.add('active');
+        }
+
+        function selectAvatar(e, src) {
+            document.querySelectorAll('.avatar-opt').forEach(img => img.classList.remove('selected'));
+            e.target.classList.add('selected');
+            if (currentUser) currentUser.avatar = src;
+        }
+
+        function saveProfileSettings() {
+            if (!currentUser) return;
+            currentUser.wallet = document.getElementById('settings-wallet').value;
+            localStorage.setItem('casino_user', JSON.stringify(currentUser));
+            updateAuthUI();
+            closeModal('settings-modal');
+            alert('Beállítások elmentve!');
+        }
+
+        function handlePasswordChange(e) {
+            e.preventDefault();
+            alert('Jelszó sikeresen megváltoztatva!');
+            closeModal('settings-modal');
+        }
+
+        function savePreferences() {
+            userPreferences.sounds = document.getElementById('setting-sounds').checked;
+            userPreferences.fastOpen = document.getElementById('setting-fast-open').checked;
+            localStorage.setItem('casino_prefs', JSON.stringify(userPreferences));
+        }
+
+        function loadPreferences() {
+            document.getElementById('setting-sounds').checked = userPreferences.sounds;
+            document.getElementById('setting-fast-open').checked = userPreferences.fastOpen;
+        }
+
+        /* --- JÁTÉK LOGIKA --- */
         function renderBalance() {
             document.getElementById('user-balance').innerText = userBalance.toFixed(2);
         }
@@ -690,6 +971,9 @@
 
             buildSpinnerTrack();
 
+            const isFast = userPreferences.fastOpen;
+            const duration = isFast ? 1.5 : 6;
+
             setTimeout(() => {
                 const track = document.getElementById('spinner-track');
                 const winningIndex = 55;
@@ -706,18 +990,17 @@
                     <div class="item-price">$${wonItem.price.toFixed(2)}</div>
                 `;
 
-                track.style.transition = 'transform 6s cubic-bezier(0.05, 0.9, 0.1, 1)';
+                track.style.transition = `transform ${duration}s cubic-bezier(0.05, 0.9, 0.1, 1)`;
                 track.style.transform = `translateX(-${targetPos}px)`;
 
                 setTimeout(() => {
                     userInventory.push(wonItem);
                     renderInventory();
-                    // Nyissuk ki a leltárt, hogy a játékos lássa a nyert tárgyat
                     document.getElementById('inventory-content').classList.add('active');
                     document.getElementById('accordion-arrow').innerText = '▲';
                     alert(`🎉 Gratulálunk! Nyertél egy tárgyat: ${wonItem.name} ($${wonItem.price.toFixed(2)} USDT)`);
                     document.getElementById('open-case-btn').disabled = false;
-                }, 6300);
+                }, (duration * 1000) + 300);
             }, 100);
         }
 
@@ -747,7 +1030,7 @@
                     <tr>
                         <td><strong>${c.name}</strong></td>
                         <td>$${c.price.toFixed(2)} USDT</td>
-                        <td>$<input type="number" class="admin-input" id="admin-case-price-${i}" value="${c.price}" step="1"></td>
+                        <td>$<input type="number" class="admin-input" id="admin-case-price-${i}" value="${c.price}" step="1" style="width:100px; margin:0;"></td>
                     </tr>
                 `;
             });
@@ -759,7 +1042,7 @@
                     <tr>
                         <td>${item.name}</td>
                         <td><span style="color:${item.rarity}; font-weight:bold;">● Ritkaság</span></td>
-                        <td>$<input type="number" class="admin-input" id="admin-item-price-${i}" value="${item.price}" step="1"></td>
+                        <td>$<input type="number" class="admin-input" id="admin-item-price-${i}" value="${item.price}" step="1" style="width:100px; margin:0;"></td>
                     </tr>
                 `;
             });
@@ -802,23 +1085,6 @@
             const addr = document.getElementById('crypto-addr').innerText;
             navigator.clipboard.writeText(addr);
             alert("Tárcacím másolva a vágólapra!");
-        }
-
-        async function connectWeb3() {
-            if (window.ethereum) {
-                try {
-                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    const btn = document.getElementById('web3-btn');
-                    btn.innerText = `🦊 ${accounts[0].substring(0, 6)}...${accounts[0].substring(38)}`;
-                    btn.classList.remove('btn-purple');
-                    btn.classList.add('btn-green');
-                    alert("Sikeresen csatlakoztál a MetaMask tárcáddal!");
-                } catch (err) {
-                    alert("Hiba történt a tárca csatlakoztatásakor.");
-                }
-            } else {
-                alert("Nem található Web3 bővítmény.");
-            }
         }
 
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
