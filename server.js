@@ -75,7 +75,6 @@ app.get('/', (req, res) => {
             <div class="player-box">
               <h3>TE</h3>
               <p id="p1-score" style="font-size: 20px; color: #00e5ff; margin-top: 10px;">$0.00</p>
-
               <div id="p1-container">
                 <p id="p1-drop" style="margin-top: 10px; font-size: 14px; color: #aaa;">Várakozás...</p>
               </div>
@@ -84,7 +83,6 @@ app.get('/', (req, res) => {
             <div class="player-box">
               <h3>BOT ALEX</h3>
               <p id="p2-score" style="font-size: 20px; color: #00e5ff; margin-top: 10px;">$0.00</p>
-
               <div id="p2-container">
                 <p id="p2-drop" style="margin-top: 10px; font-size: 14px; color: #aaa;">Várakozás...</p>
               </div>
@@ -100,7 +98,7 @@ app.get('/', (req, res) => {
           <div class="case-card">
             <div class="case-title">Weapon Case #1</div>
             <div class="case-price">$5.00</div>
-            <img src="https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb0703120f2b55edd1f8e86356defc5c752143c328c3070227b48d35f3066d1234a9386348ef5c19d4b6df00" class="case-img">
+            <img src="https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/crates/crate_csgo_1.png" class="case-img" alt="Case 1">
             <button class="btn" onclick="startSpin(5.00)">NYITÁS</button>
             <button class="btn btn-battle" onclick="startBattle(5.00)">BATTLE ($5)</button>
           </div>
@@ -109,16 +107,16 @@ app.get('/', (req, res) => {
           <div class="case-card">
             <div class="case-title">Glove Case</div>
             <div class="case-price">$25.00</div>
-            <img src="https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb0703120f2b55edd1f8e86356defc5c752143c328c3070227b48d35f3066d1234a9388f6b0f1fa44f33b1e39a3f" class="case-img">
+            <img src="https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/crates/crate_glove.png" class="case-img" alt="Glove Case">
             <button class="btn" onclick="startSpin(25.00)">NYITÁS</button>
             <button class="btn btn-battle" onclick="startBattle(25.00)">BATTLE ($25)</button>
           </div>
 
           <!-- LÁDA 3 -->
           <div class="case-card">
-            <div class="case-title">Operation Wildfire</div>
+            <div class="case-title">Kilowatt Case</div>
             <div class="case-price">$50.00</div>
-            <img src="https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb0703120f2b55edd1f8e86356defc5c752143c328c3070227b48d35f3066d1234a9386242ef5c19d4b6df00" class="case-img">
+            <img src="https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/crates/crate_kilowatt.png" class="case-img" alt="Kilowatt Case">
             <button class="btn" onclick="startSpin(50.00)">NYITÁS</button>
             <button class="btn btn-battle" onclick="startBattle(50.00)">BATTLE ($50)</button>
           </div>
@@ -129,16 +127,15 @@ app.get('/', (req, res) => {
       <script>
         let balance = 100.00;
         
-        // KÉPES SKIN LISTA
+        // KÉPES SKIN LISTA (Garantáltan működő CDN linkek)
         const items = [
-          { name: "P250 | Sand Dune", price: 0.10, color: "#b0c3d9", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb0703120f2b55edd1f8e86356defc5c752143c328c3070227b41b4353a42e1215b22b102ef5c19d4b6df00" },
-          { name: "AK-47 | Redline", price: 15.00, color: "#e4ae39", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb0703120f2b55edd1f8e86356defc5c752143c328c3070227b41b4352a1215b28d0113c2ef5c19d4b6df00" },
-          { name: "USP-S | Kill Confirmed", price: 50.00, color: "#d32ce6", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb0703120f2b55edd1f8e86356defc5c752143c328c3070227b41b4352a1215b2f2d12382ef5c19d4b6df00" },
-          { name: "M4A4 | Howl", price: 1200.00, color: "#eb4b4b", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb0703120f2b55edd1f8e86356defc5c752143c328c3070227b41b4352a1215b28d8233f2ef5c19d4b6df00" },
-          { name: "Karambit | Fade", price: 1800.00, color: "#eb4b4b", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb0703120f2b55edd1f8e86356defc5c752143c328c3070227b41b4352a1215b2a0c23312ef5c19d4b6df00" }
+          { name: "P250 | Sand Dune", price: 0.10, color: "#b0c3d9", img: "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/skins/weapon_p250_cu_p250_sand.png" },
+          { name: "AK-47 | Redline", price: 15.00, color: "#e4ae39", img: "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/skins/weapon_ak47_cu_ak47_cobra.png" },
+          { name: "USP-S | Kill Confirmed", price: 50.00, color: "#d32ce6", img: "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/skins/weapon_usp_silencer_cu_usps_kill_confirmed.png" },
+          { name: "M4A4 | Howl", price: 1200.00, color: "#eb4b4b", img: "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/skins/weapon_m4a1_cu_m4a1_howl.png" },
+          { name: "Karambit | Fade", price: 1800.00, color: "#eb4b4b", img: "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/skins/weapon_knife_karambit_an_fade.png" }
         ];
 
-        // LÁDANYITÁS ANIMÁCIÓVAL ÉS KÉPEKKEL
         function startSpin(cost) {
           if (balance < cost) return alert("Nincs elég egyenleged!");
           balance -= cost;
@@ -154,7 +151,6 @@ app.get('/', (req, res) => {
           track.style.transition = 'none';
           track.style.transform = 'translateX(0)';
 
-          // Kártyák generálása képekkel
           track.innerHTML = '';
           let winningItem = items[Math.floor(Math.random() * items.length)];
           
@@ -167,13 +163,11 @@ app.get('/', (req, res) => {
             track.appendChild(div);
           }
 
-          // Animáció
           setTimeout(() => {
             track.style.transition = 'transform 5s cubic-bezier(0.15, 0.9, 0.2, 1)';
             track.style.transform = 'translateX(-4900px)';
           }, 50);
 
-          // Eredmény kiírása
           setTimeout(() => {
             balance += winningItem.price;
             updateBalance();
@@ -181,7 +175,6 @@ app.get('/', (req, res) => {
           }, 5200);
         }
 
-        // BATTLE MÓD KÉPEKKEL
         function startBattle(cost) {
           if (balance < cost) return alert("Nincs elég egyenleged a Battle-re!");
           balance -= cost;
@@ -226,6 +219,9 @@ app.get('/', (req, res) => {
   `);
 });
 
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
