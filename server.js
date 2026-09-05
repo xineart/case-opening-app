@@ -64,7 +64,7 @@ const Case = mongoose.model('Case', caseSchema);
 
 // --- SESSION ---
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'titkos_packdrop_mindenkinek_123',
+  secret: process.env.SESSION_SECRET || 'titkos_terbdrop_mindenkinek_123',
   resave: false,
   saveUninitialized: false,
   cookie: { secure: false, maxAge: 7 * 24 * 60 * 60 * 1000 }
@@ -95,7 +95,7 @@ async function initDefaultCases() {
     if (caseCount === 0) {
       await Case.create({
         caseId: 'weapon',
-        name: 'Weapon Case v1',
+        name: 'TerBDrop Premium v1',
         price: 50.00,
         items: [
           { id: 'w_1', name: 'Karambit | Fade', price: 1200.00, color: '#ffd700', chance: 1.0, img: '' },
@@ -304,57 +304,69 @@ app.post('/api/admin/save-case', requireAdmin, async (req, res) => {
   }
 });
 
-// --- FRONTEND (HTML + CSS + CLIENT JS) ---
+// --- FRONTEND (HTML + NEW DESIGN CSS + CLIENT JS) ---
 app.get('/', (req, res) => {
   res.send(`<!DOCTYPE html>
 <html lang="hu">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PACKDROP - Multi Case Platform</title>
+  <title>TerBDrop - Premium Case Opening</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-    body { background-color: #0b0e14; color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; }
-    header { background: #151a23; border-bottom: 2px solid #222938; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
-    .logo { font-size: 24px; font-weight: 800; color: #ffb400; letter-spacing: 2px; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', 'Segoe UI', Roboto, sans-serif; }
+    body { background: #08090d; color: #f3f4f6; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+    
+    /* FEJLÉC */
+    header { background: rgba(15, 17, 26, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid #1f2430; padding: 18px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+    .logo { font-size: 26px; font-weight: 900; letter-spacing: 2px; background: linear-gradient(135deg, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 30px rgba(168, 85, 247, 0.4); }
     .user-info { display: flex; align-items: center; gap: 15px; }
-    .balance-badge { background: #1c2331; padding: 8px 16px; border-radius: 20px; border: 1px solid #ffb400; font-weight: bold; color: #ffb400; }
+    .balance-badge { background: #131722; padding: 8px 18px; border-radius: 30px; border: 1px solid #a855f7; font-weight: 700; color: #22c55e; box-shadow: 0 0 15px rgba(168, 85, 247, 0.2); }
     
-    button { cursor: pointer; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; transition: 0.2s; }
-    .btn-primary { background: #ffb400; color: #000; }
-    .btn-primary:hover { background: #e09e00; }
-    .btn-danger { background: #eb4b4b; color: #fff; }
-    .btn-admin { background: #9b59b6; color: #fff; }
-    .btn-case { background: #1c2331; color: #fff; border: 1px solid #2a354b; margin: 0 5px; }
-    .btn-case.active { background: #ffb400; color: #000; border-color: #ffb400; }
+    /* GOMBOK */
+    button { cursor: pointer; border: none; padding: 10px 22px; border-radius: 8px; font-weight: 700; transition: all 0.25s ease; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .btn-primary { background: linear-gradient(135deg, #a855f7, #7c3aed); color: #fff; box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4); }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(168, 85, 247, 0.6); }
+    .btn-danger { background: #ef4444; color: #fff; }
+    .btn-danger:hover { background: #dc2626; }
+    .btn-admin { background: #3b82f6; color: #fff; }
+    .btn-case { background: #131722; color: #9ca3af; border: 1px solid #1f2430; margin: 0 5px; }
+    .btn-case:hover, .btn-case.active { background: rgba(168, 85, 247, 0.15); color: #a855f7; border-color: #a855f7; }
     
-    input, select { background: #1c2331; border: 1px solid #2a354b; padding: 10px; color: #fff; border-radius: 6px; margin-bottom: 10px; width: 100%; }
-    main { flex: 1; padding: 30px; max-width: 1200px; margin: 0 auto; width: 100%; }
-    .auth-container { max-width: 400px; margin: 50px auto; background: #151a23; padding: 30px; border-radius: 12px; border: 1px solid #222938; text-align: center; }
+    /* INPUTOK */
+    input, select { background: #131722; border: 1px solid #1f2430; padding: 12px; color: #fff; border-radius: 8px; margin-bottom: 12px; width: 100%; transition: 0.2s; }
+    input:focus { outline: none; border-color: #a855f7; box-shadow: 0 0 10px rgba(168, 85, 247, 0.3); }
+
+    /* LAYOUT */
+    main { flex: 1; padding: 40px; max-width: 1250px; margin: 0 auto; width: 100%; }
+    .auth-container { max-width: 420px; margin: 60px auto; background: #0f111a; padding: 40px; border-radius: 16px; border: 1px solid #1f2430; text-align: center; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6); }
     
-    .case-wrapper { position: relative; width: 100%; height: 180px; background: #151a23; border-radius: 12px; overflow: hidden; border: 2px solid #222938; margin: 20px 0; }
-    .pointer { position: absolute; top: 0; bottom: 0; left: 50%; width: 4px; background: #ffb400; z-index: 10; transform: translateX(-50%); box-shadow: 0 0 10px #ffb400; }
-    .spinner-track { display: flex; position: absolute; left: 0; top: 15px; height: 150px; transition: transform 5s cubic-bezier(0.1, 1, 0.1, 1); }
+    /* LÁDANYITÓ SPINNER */
+    .case-wrapper { position: relative; width: 100%; height: 200px; background: #0f111a; border-radius: 16px; overflow: hidden; border: 1px solid #1f2430; margin: 30px 0; box-shadow: inset 0 0 30px rgba(0,0,0,0.8); }
+    .pointer { position: absolute; top: 0; bottom: 0; left: 50%; width: 4px; background: #22c55e; z-index: 10; transform: translateX(-50%); box-shadow: 0 0 15px #22c55e, 0 0 30px #22c55e; }
+    .spinner-track { display: flex; position: absolute; left: 0; top: 20px; height: 160px; transition: transform 5s cubic-bezier(0.1, 1, 0.1, 1); }
     
-    .item-card { min-width: 140px; height: 150px; background: #1c2331; margin: 0 5px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-bottom: 4px solid #fff; padding: 10px; text-align: center; font-size: 12px; }
-    .inventory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; margin-top: 20px; }
-    .inv-item { background: #151a23; border-radius: 8px; padding: 15px; text-align: center; border-bottom: 4px solid #555; }
+    /* KÁRTYÁK */
+    .item-card { min-width: 150px; height: 160px; background: #131722; margin: 0 6px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-bottom: 4px solid #a855f7; padding: 12px; text-align: center; font-size: 13px; font-weight: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+    .inventory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 20px; margin-top: 25px; }
+    .inv-item { background: #0f111a; border-radius: 12px; padding: 18px; text-align: center; border: 1px solid #1f2430; border-bottom: 4px solid #a855f7; transition: transform 0.2s; }
+    .inv-item:hover { transform: translateY(-3px); }
     
-    .admin-panel { background: #151a23; border: 1px solid #222938; padding: 25px; border-radius: 12px; margin-top: 20px; }
-    .admin-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-    .admin-table th, .admin-table td { border: 1px solid #222938; padding: 10px; text-align: left; }
-    .admin-table th { background: #1c2331; }
+    /* ADMIN PANEL */
+    .admin-panel { background: #0f111a; border: 1px solid #1f2430; padding: 30px; border-radius: 16px; margin-top: 20px; }
+    .admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    .admin-table th, .admin-table td { border: 1px solid #1f2430; padding: 12px; text-align: left; }
+    .admin-table th { background: #131722; color: #a855f7; }
 
     .hidden { display: none !important; }
-    .nav-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #222938; padding-bottom: 10px; }
+    .nav-tabs { display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 1px solid #1f2430; padding-bottom: 12px; }
   </style>
 </head>
 <body>
 
   <header>
-    <div class="logo">PACKDROP</div>
+    <div class="logo">TerBDrop</div>
     <div id="user-nav" class="user-info hidden">
-      <span>Üdv, <b id="display-username"></b>!</span>
+      <span>Üdv, <b id="display-username" style="color: #a855f7;"></b>!</span>
       <div class="balance-badge"><span id="display-balance">0.00</span> $</div>
       <button id="admin-tab-btn" onclick="toggleAdminPanel()" class="btn-admin hidden">Admin Panel</button>
       <button onclick="logout()" class="btn-danger">Kijelentkezés</button>
@@ -364,23 +376,23 @@ app.get('/', (req, res) => {
   <main>
     <!-- BEJELENTKEZÉS / REGISZTRÁCIÓ -->
     <div id="auth-box" class="auth-container">
-      <h2 id="auth-title" style="margin-bottom: 20px;">Bejelentkezés</h2>
+      <h2 id="auth-title" style="margin-bottom: 25px; font-weight: 800; font-size: 28px;">Bejelentkezés</h2>
       <input type="text" id="auth-username" placeholder="Felhasználónév">
       <input type="password" id="auth-password" placeholder="Jelszó">
-      <button id="auth-btn" onclick="submitAuth()" class="btn-primary" style="width: 100%; margin-top: 10px;">Bejelentkezés</button>
-      <p style="margin-top: 20px; font-size: 13px; color: #888;">
+      <button id="auth-btn" onclick="submitAuth()" class="btn-primary" style="width: 100%; margin-top: 15px; padding: 14px;">Bejelentkezés</button>
+      <p style="margin-top: 25px; font-size: 14px; color: #6b7280;">
         <span id="auth-toggle-text">Nincs még fiókod?</span> 
-        <a href="javascript:void(0)" onclick="toggleAuthMode()" style="color: #ffb400;">Váltás regisztrációra</a>
+        <a href="javascript:void(0)" onclick="toggleAuthMode()" style="color: #a855f7; font-weight: bold; text-decoration: none;">Váltás regisztrációra</a>
       </p>
     </div>
 
     <!-- JÁTÉK FELÜLET -->
     <div id="game-box" class="hidden">
-      <div id="case-selector" style="display: flex; justify-content: center; gap: 10px; margin-bottom: 30px;"></div>
+      <div id="case-selector" style="display: flex; justify-content: center; gap: 12px; margin-bottom: 35px;"></div>
 
       <div style="text-align: center;">
-        <h2 id="case-title">-</h2>
-        <p style="color: #888;">Nyitási ár: <b id="case-price">0.00 $</b></p>
+        <h2 id="case-title" style="font-size: 32px; font-weight: 800;">-</h2>
+        <p style="color: #6b7280; font-size: 16px; margin-top: 5px;">Nyitási ár: <b id="case-price" style="color: #22c55e;">0.00 $</b></p>
       </div>
 
       <div class="case-wrapper">
@@ -389,16 +401,16 @@ app.get('/', (req, res) => {
       </div>
 
       <div style="text-align: center;">
-        <button id="open-btn" onclick="openCase()" class="btn-primary" style="font-size: 18px; padding: 15px 40px;">LÁDA NYITÁSA</button>
+        <button id="open-btn" onclick="openCase()" class="btn-primary" style="font-size: 18px; padding: 16px 50px; border-radius: 30px;">LÁDA NYITÁSA</button>
       </div>
 
-      <h3 style="margin-top: 50px; border-bottom: 1px solid #222938; padding-bottom: 10px;">Saját Raktár (Inventory)</h3>
+      <h3 style="margin-top: 60px; border-bottom: 1px solid #1f2430; padding-bottom: 12px; font-size: 22px;">Saját Raktár (Inventory)</h3>
       <div class="inventory-grid" id="inventory-grid"></div>
     </div>
 
     <!-- ADMIN PANEL FELÜLET -->
     <div id="admin-box" class="admin-panel hidden">
-      <h2>Adminisztrációs Panel</h2>
+      <h2 style="margin-bottom: 20px;">TerBDrop Adminisztráció</h2>
       
       <div class="nav-tabs">
         <button class="btn-case active" onclick="showAdminSection('users')">Felhasználók</button>
@@ -423,11 +435,11 @@ app.get('/', (req, res) => {
 
       <div id="admin-cases-section" class="hidden">
         <h3>Láda Hozzáadása / Szerkesztése</h3>
-        <div style="max-width: 500px; margin-top: 15px;">
+        <div style="max-width: 500px; margin-top: 20px;">
           <input type="text" id="admin-case-id" placeholder="Láda azonosító (pl: budget_v2)">
           <input type="text" id="admin-case-name" placeholder="Láda megjelenő neve (pl: Budget Case)">
           <input type="number" id="admin-case-price" placeholder="Ár ($)">
-          <button onclick="saveCase()" class="btn-primary" style="width: 100%;">Láda Mentése</button>
+          <button onclick="saveCase()" class="btn-primary" style="width: 100%; margin-top: 10px;">Láda Mentése</button>
         </div>
       </div>
     </div>
@@ -569,8 +581,8 @@ app.get('/', (req, res) => {
         const randItem = currentCase.items[Math.floor(Math.random() * currentCase.items.length)];
         const el = document.createElement('div');
         el.className = 'item-card';
-        el.style.borderBottomColor = randItem.color || '#ffb400';
-        el.innerHTML = \`<div><b>\${randItem.name}</b><br>\${randItem.price}$</div>\`;
+        el.style.borderBottomColor = randItem.color || '#a855f7';
+        el.innerHTML = \`<div><b>\${randItem.name}</b><br><span style="color:#22c55e; margin-top:5px; display:inline-block;">\${randItem.price}$</span></div>\`;
         track.appendChild(el);
       }
     }
@@ -601,12 +613,12 @@ app.get('/', (req, res) => {
         const cards = track.children;
         
         cards[45].style.borderBottomColor = data.item.color;
-        cards[45].innerHTML = \`<div><b>\${data.item.name}</b><br>\${data.item.price}$</div>\`;
+        cards[45].innerHTML = \`<div><b>\${data.item.name}</b><br><span style="color:#22c55e; margin-top:5px; display:inline-block;">\${data.item.price}$</span></div>\`;
 
         setTimeout(() => {
           track.style.transition = 'transform 5s cubic-bezier(0.1, 1, 0.1, 1)';
-          const cardWidth = 150;
-          const targetOffset = -(45 * cardWidth - (document.querySelector('.case-wrapper').clientWidth / 2) + 75);
+          const cardWidth = 162;
+          const targetOffset = -(45 * cardWidth - (document.querySelector('.case-wrapper').clientWidth / 2) + 81);
           track.style.transform = \`translateX(\${targetOffset}px)\`;
         }, 50);
 
@@ -628,18 +640,18 @@ app.get('/', (req, res) => {
       grid.innerHTML = '';
 
       if (!inventory || inventory.length === 0) {
-        grid.innerHTML = '<p style="color:#666;">A raktárad még üres.</p>';
+        grid.innerHTML = '<p style="color:#6b7280;">A raktárad még üres.</p>';
         return;
       }
 
       inventory.forEach((item, index) => {
         const el = document.createElement('div');
         el.className = 'inv-item';
-        el.style.borderBottomColor = item.color || '#fff';
+        el.style.borderBottomColor = item.color || '#a855f7';
         el.innerHTML = \`
-          <div style="font-size:12px; font-weight:bold;">\${item.name}</div>
-          <div style="color:#ffb400; font-size:12px; margin: 10px 0;">\${item.price.toFixed(2)} $</div>
-          <button onclick="sellItem(\${index})" class="btn-danger" style="font-size: 11px; padding: 6px 10px; width: 100%;">ELADÁS (\${item.price.toFixed(2)}$)</button>
+          <div style="font-size:13px; font-weight:bold;">\${item.name}</div>
+          <div style="color:#22c55e; font-size:14px; font-weight:bold; margin: 12px 0;">\${item.price.toFixed(2)} $</div>
+          <button onclick="sellItem(\${index})" class="btn-danger" style="font-size: 11px; padding: 8px; width: 100%;">ELADÁS (\${item.price.toFixed(2)}$)</button>
         \`;
         grid.appendChild(el);
       });
@@ -696,10 +708,10 @@ app.get('/', (req, res) => {
         const tr = document.createElement('tr');
         tr.innerHTML = \`
           <td>\${u.username}</td>
-          <td>\${u.balance.toFixed(2)} $</td>
+          <td style="color:#22c55e; font-weight:bold;">\${u.balance.toFixed(2)} $</td>
           <td>\${u.isAdmin ? 'Igen' : 'Nem'}</td>
           <td><input type="number" id="bal-\${u._id}" value="\${u.balance}" style="width: 100px; margin:0;"></td>
-          <td><button onclick="updateUserBalance('\${u._id}')" class="btn-primary" style="padding: 5px 10px;">Mentés</button></td>
+          <td><button onclick="updateUserBalance('\${u._id}')" class="btn-primary" style="padding: 6px 12px; font-size:12px;">Mentés</button></td>
         \`;
         tbody.appendChild(tr);
       });
@@ -734,7 +746,7 @@ app.get('/', (req, res) => {
       const defaultItems = [
         { id: \`\${caseId}_1\`, name: 'Ritka Skin', price: 100.00, color: '#ffd700', chance: 10.0, img: '' },
         { id: \`\${caseId}_2\`, name: 'Közepes Skin', price: 20.00, color: '#d32ce6', chance: 30.0, img: '' },
-        { id: \`\${caseId}_3\`, name: 'Gyakori Skin', price: 2.00, color: '#4b69ff', chance: 60.0, img: '' }
+        { id: \`\${caseId}_3\`, name: 'Gyakori Skin', price: 2.00, color: '#3b82f6', chance: 60.0, img: '' }
       ];
 
       const res = await fetch('/api/admin/save-case', {
@@ -756,5 +768,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`>>> Szerver elindult a ${PORT} porton! <<<`);
+  console.log(`>>> TerBDrop Szerver elindult a ${PORT} porton! <<<`);
 });
