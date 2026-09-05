@@ -1,7 +1,7 @@
 {
   "name": "crypto-cases",
   "version": "1.0.0",
-  "description": "Crypto Case Opener Server",
+  "description": "CSGO Case Opener Platform",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
