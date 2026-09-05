@@ -137,6 +137,13 @@ function getRandomItemFromCase(caseData) {
   return caseData.items[caseData.items.length - 1];
 }
 
+// --- ÁTMENETI LINK AZ ADMIN JOG MEGSZERZÉSÉHEZ ---
+app.get('/make-me-admin', async (req, res) => {
+  if (!req.session.userId) return res.send('<h1>Először jelentkezz be a főoldalon!</h1>');
+  await User.findByIdAndUpdate(req.session.userId, { isAdmin: true });
+  res.send('<h1>Sikeresen Admin lettél! Menj vissza a főoldalra és frissíts (F5).</h1>');
+});
+
 // --- PUBLIC API VÉGPONTOK ---
 
 app.get('/api/cases', async (req, res) => {
@@ -627,21 +634,6 @@ app.get('/', (req, res) => {
           '<button onclick="sellItem(' + index + ')" class="btn-danger" style="font-size: 11px; padding: 6px 10px; width: 100%;">ELADÁS (' + item.price.toFixed(2) + '$)</button>';
         grid.appendChild(el);
       });
-    }
-
-    async function sellItem(index) {
-      const res = await fetch('/api/sell-item', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ itemIndex: index })
-      });
-      const data = await res.json();
-      if (data.success) {
-        document.getElementById('display-balance').innerText = data.newBalance.toFixed(2);
-        renderInventory(data.inventory);
-      } else {
-        alert(data.error);
-      }
     }
 
     // --- ADMIN PANEL LOGIKA ---
