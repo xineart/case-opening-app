@@ -64,17 +64,18 @@ app.use(session({
 }));
 
 // --- LÁDÁK ÉS TÁRGYAK DEFINIÁLÁSA (STABIL, GARANTÁLTAN MŰKÖDŐ KÉPLINKEKKEL) ---
+// --- LÁDÁK ÉS TÁRGYAK DEFINIÁLÁSA (BEÁGYAZOTT, GARANTÁLTAN BETÖLTŐDŐ KÉPEKKEL) ---
 const CASES = {
   budget: {
     id: 'budget',
     name: 'Budget Case',
     price: 15.00,
     items: [
-      { id: 'b_1', name: 'AK-47 | Slate', price: 45.00, color: '#d32ce6', chance: 5.0, img: 'https://raw.githubusercontent.com/ByMyKel/CSGO-API/main/public/images/econ/default_generated/weapon_ak47_cu_ak47_slate_light_large.png' },
-      { id: 'b_2', name: 'AWP | Atheris', price: 18.00, color: '#8847ff', chance: 15.0, img: 'https://raw.githubusercontent.com/ByMyKel/CSGO-API/main/public/images/econ/default_generated/weapon_awp_gs_awp_viper_black_light_large.png' },
-      { id: 'b_3', name: 'M4A1-S | Nightmare', price: 12.50, color: '#4b69ff', chance: 25.0, img: 'https://raw.githubusercontent.com/ByMyKel/CSGO-API/main/public/images/econ/default_generated/weapon_m4a1_silencer_cu_m4a1_nightmare_light_large.png' },
-      { id: 'b_4', name: 'USP-S | Cyrex', price: 5.20, color: '#4b69ff', chance: 25.0, img: 'https://raw.githubusercontent.com/ByMyKel/CSGO-API/main/public/images/econ/default_generated/weapon_usp_silencer_cu_usps_cyrex_light_large.png' },
-      { id: 'b_5', name: 'P250 | Sand Dune', price: 0.50, color: '#b0c3d9', chance: 30.0, img: 'https://raw.githubusercontent.com/ByMyKel/CSGO-API/main/public/images/econ/default_generated/weapon_p250_so_sand_light_large.png' }
+      { id: 'b_1', name: 'AK-47 | Slate', price: 45.00, color: '#d32ce6', chance: 5.0, img: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="60" viewBox="0 0 100 60"><rect width="100" height="60" fill="%231a1a1a" rx="5"/><path d="M15,35 L40,35 L50,30 L85,30 L85,35 L50,38 L35,45 Z" fill="%23444"/><rect x="60" y="25" width="20" height="4" fill="%23888"/></svg>' },
+      { id: 'b_2', name: 'AWP | Atheris', price: 18.00, color: '#8847ff', chance: 15.0, img: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="60" viewBox="0 0 100 60"><rect width="100" height="60" fill="%231a1a1a" rx="5"/><path d="M10,32 L85,32 L90,30 L90,34 L85,34 L10,34 Z" fill="%232e7d32"/><circle cx="45" cy="33" r="12" fill="none" stroke="%2300e676" stroke-width="2"/></svg>' },
+      { id: 'b_3', name: 'M4A1-S | Nightmare', price: 12.50, color: '#4b69ff', chance: 25.0, img: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="60" viewBox="0 0 100 60"><rect width="100" height="60" fill="%231a1a1a" rx="5"/><path d="M20,35 L75,35 L75,30 L85,30 L85,35 Z" fill="%231565c0"/><rect x="5" y="32" width="20" height="5" fill="%23333"/></svg>' },
+      { id: 'b_4', name: 'USP-S | Cyrex', price: 5.20, color: '#4b69ff', chance: 25.0, img: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="60" viewBox="0 0 100 60"><rect width="100" height="60" fill="%231a1a1a" rx="5"/><path d="M30,30 L70,30 L70,40 L60,45 Z" fill="%23d32f2f"/><rect x="10" y="32" width="20" height="6" fill="%23888"/></svg>' },
+      { id: 'b_5', name: 'P250 | Sand Dune', price: 0.50, color: '#b0c3d9', chance: 30.0, img: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="60" viewBox="0 0 100 60"><rect width="100" height="60" fill="%231a1a1a" rx="5"/><path d="M35,32 L65,32 L65,42 L55,48 Z" fill="%23c2b280"/></svg>' }
     ]
   },
   weapon: {
@@ -82,13 +83,13 @@ const CASES = {
     name: 'Weapon Case v1',
     price: 50.00,
     items: [
-      { id: 'w_1', name: 'Karambit | Fade', price: 1200.00, color: '#ffd700', chance: 0.5, img: 'https://raw.githubusercontent.com/ByMyKel/CSGO-API/main/public/images/econ/default_generated/weapon_knife_karambit_an_fade_light_large.png' },
-      { id: 'w_2', name: 'M4A4 | Howl', price: 850.00, color: '#eb4b4b', chance: 1.5, img: 'https://raw.githubusercontent.com/ByMyKel/CSGO-API/main/public/images/econ/default_generated/weapon_m4a1_cu_m4a1_howl_light_large.png' },
-      { id: 'w_3', name: 'AK-47 | Fire Serpent', price: 400.00, color: '#eb4b4b', chance: 3.0, img: 'https://raw.githubusercontent.com/ByMyKel/CSGO-API/main/public/images/econ/default_generated/weapon_ak47_cu_fireserpent_ak47_light_large.png' },
-      { id: 'w_4', name: 'AWP | Asiimov', price: 120.00, color: '#d32ce6', chance: 10.0, img: 'https://raw.githubusercontent.com/ByMyKel/CSGO-API/main/public/images/econ/default_generated/weapon_awp_cu_awp_asimov_light_large.png' },
-      { id: 'w_5', name: 'USP-S | Kill Confirmed', price: 65.00, color: '#8847ff', chance: 20.0, img: 'https://raw.githubusercontent.com/ByMyKel/CSGO-API/main/public/images/econ/default_generated/weapon_usp_silencer_cu_usp_kill_confirmed_light_large.png' },
-      { id: 'w_6', name: 'Glock-18 | Water Elemental', price: 15.00, color: '#4b69ff', chance: 30.0, img: 'https://raw.githubusercontent.com/ByMyKel/CSGO-API/main/public/images/econ/default_generated/weapon_glock_cu_glock_water_elemental_light_large.png' },
-      { id: 'w_7', name: 'P250 | Sand Dune', price: 1.50, color: '#b0c3d9', chance: 35.0, img: 'https://raw.githubusercontent.com/ByMyKel/CSGO-API/main/public/images/econ/default_generated/weapon_p250_so_sand_light_large.png' }
+      { id: 'w_1', name: 'Karambit | Fade', price: 1200.00, color: '#ffd700', chance: 0.5, img: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="60" viewBox="0 0 100 60"><rect width="100" height="60" fill="%231a1a1a" rx="5"/><path d="M30,20 Q60,10 70,40 Q50,35 30,20 Z" fill="url(%23fade)"/><defs><linearGradient id="fade"><stop offset="0%25" stop-color="%23ff007f"/><stop offset="100%25" stop-color="%23ffaa00"/></linearGradient></defs></svg>' },
+      { id: 'w_2', name: 'M4A4 | Howl', price: 850.00, color: '#eb4b4b', chance: 1.5, img: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="60" viewBox="0 0 100 60"><rect width="100" height="60" fill="%231a1a1a" rx="5"/><path d="M20,35 L75,35 L70,28 L30,28 Z" fill="%23b71c1c"/><circle cx="50" cy="32" r="6" fill="%23ff6f00"/></svg>' },
+      { id: 'w_3', name: 'AK-47 | Fire Serpent', price: 400.00, color: '#eb4b4b', chance: 3.0, img: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="60" viewBox="0 0 100 60"><rect width="100" height="60" fill="%231a1a1a" rx="5"/><path d="M15,35 L85,35 L85,30 L50,30 Z" fill="%2333691e"/><path d="M40,30 Q50,20 60,30" stroke="%23ff6f00" stroke-width="3" fill="none"/></svg>' },
+      { id: 'w_4', name: 'AWP | Asiimov', price: 120.00, color: '#d32ce6', chance: 10.0, img: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="60" viewBox="0 0 100 60"><rect width="100" height="60" fill="%231a1a1a" rx="5"/><path d="M10,32 L85,32 L85,35 L10,35 Z" fill="%23ffffff"/><rect x="35" y="30" width="15" height="7" fill="%23ff6d00"/><rect x="60" y="30" width="10" height="7" fill="%23212121"/></svg>' },
+      { id: 'w_5', name: 'USP-S | Kill Confirmed', price: 65.00, color: '#8847ff', chance: 20.0, img: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="60" viewBox="0 0 100 60"><rect width="100" height="60" fill="%231a1a1a" rx="5"/><path d="M30,30 L70,30 L70,40 Z" fill="%23b71c1c"/><rect x="10" y="32" width="20" height="6" fill="%23212121"/></svg>' },
+      { id: 'w_6', name: 'Glock-18 | Water Elemental', price: 15.00, color: '#4b69ff', chance: 30.0, img: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="60" viewBox="0 0 100 60"><rect width="100" height="60" fill="%231a1a1a" rx="5"/><path d="M30,30 L65,30 L60,42 Z" fill="%230288d1"/></svg>' },
+      { id: 'w_7', name: 'P250 | Sand Dune', price: 1.50, color: '#b0c3d9', chance: 35.0, img: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="60" viewBox="0 0 100 60"><rect width="100" height="60" fill="%231a1a1a" rx="5"/><path d="M35,32 L65,32 L65,42 Z" fill="%23c2b280"/></svg>' }
     ]
   },
   knife: {
@@ -96,12 +97,12 @@ const CASES = {
     name: 'Knife & Glove Case',
     price: 150.00,
     items: [
-      { id: 'k_1', name: 'Butterfly Knife | Doppler', price: 2100.00, color: '#ffd700', chance: 1.0, img: 'https://raw.githubusercontent.com/ByMyKel/CSGO-API/main/public/images/econ/default_generated/weapon_knife_butterfly_am_doppler_phase2_light_large.png' },
-      { id: 'k_2', name: 'Karambit | Marble Fade', price: 1600.00, color: '#ffd700', chance: 2.5, img: 'https://raw.githubusercontent.com/ByMyKel/CSGO-API/main/public/images/econ/default_generated/weapon_knife_karambit_am_marble_fade_light_large.png' },
-      { id: 'k_3', name: 'M9 Bayonet | Tiger Tooth', price: 950.00, color: '#eb4b4b', chance: 6.5, img: 'https://raw.githubusercontent.com/ByMyKel/CSGO-API/main/public/images/econ/default_generated/weapon_knife_m9_bayonet_an_tiger_orange_light_large.png' },
-      { id: 'k_4', name: 'Sport Gloves | Vice', price: 1400.00, color: '#eb4b4b', chance: 4.0, img: 'https://raw.githubusercontent.com/ByMyKel/CSGO-API/main/public/images/econ/default_generated/sporty_gloves_stain_vice_light_large.png' },
-      { id: 'k_5', name: 'Gut Knife | Doppler', price: 180.00, color: '#d32ce6', chance: 36.0, img: 'https://raw.githubusercontent.com/ByMyKel/CSGO-API/main/public/images/econ/default_generated/weapon_knife_gut_am_doppler_phase1_light_large.png' },
-      { id: 'k_6', name: 'Navaja Knife | Safari Mesh', price: 80.00, color: '#8847ff', chance: 50.0, img: 'https://raw.githubusercontent.com/ByMyKel/CSGO-API/main/public/images/econ/default_generated/weapon_knife_gypsy_jackknife_sp_mesh_tan_light_large.png' }
+      { id: 'k_1', name: 'Butterfly Knife | Doppler', price: 2100.00, color: '#ffd700', chance: 1.0, img: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="60" viewBox="0 0 100 60"><rect width="100" height="60" fill="%231a1a1a" rx="5"/><path d="M25,25 L45,30 L75,15 Q60,35 45,35 Z" fill="%234a148c"/></svg>' },
+      { id: 'k_2', name: 'Karambit | Marble Fade', price: 1600.00, color: '#ffd700', chance: 2.5, img: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="60" viewBox="0 0 100 60"><rect width="100" height="60" fill="%231a1a1a" rx="5"/><path d="M30,20 Q60,10 70,40 Q50,35 30,20 Z" fill="%230288d1"/></svg>' },
+      { id: 'k_3', name: 'M9 Bayonet | Tiger Tooth', price: 950.00, color: '#eb4b4b', chance: 6.5, img: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="60" viewBox="0 0 100 60"><rect width="100" height="60" fill="%231a1a1a" rx="5"/><path d="M20,30 L80,25 L75,35 Z" fill="%23fbc02d"/></svg>' },
+      { id: 'k_4', name: 'Sport Gloves | Vice', price: 1400.00, color: '#eb4b4b', chance: 4.0, img: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="60" viewBox="0 0 100 60"><rect width="100" height="60" fill="%231a1a1a" rx="5"/><rect x="35" y="20" width="30" height="25" rx="5" fill="%23e91e63"/></svg>' },
+      { id: 'k_5', name: 'Gut Knife | Doppler', price: 180.00, color: '#d32ce6', chance: 36.0, img: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="60" viewBox="0 0 100 60"><rect width="100" height="60" fill="%231a1a1a" rx="5"/><path d="M30,25 L70,25 Q75,35 60,35 Z" fill="%238e24aa"/></svg>' },
+      { id: 'k_6', name: 'Navaja Knife | Safari Mesh', price: 80.00, color: '#8847ff', chance: 50.0, img: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="60" viewBox="0 0 100 60"><rect width="100" height="60" fill="%231a1a1a" rx="5"/><path d="M35,30 L65,28 L60,35 Z" fill="%23558b2f"/></svg>' }
     ]
   }
 };
