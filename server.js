@@ -49,6 +49,7 @@ const caseSchema = new mongoose.Schema({
   caseId: { type: String, required: true, unique: true },
   name: { type: String, required: true },
   price: { type: Number, required: true },
+  category: { type: String, default: 'budget' }, // budget, premium, knife
   items: [{
     id: String,
     name: String,
@@ -91,22 +92,54 @@ async function initAdminUser() {
 
 async function initDefaultCases() {
   try {
-    const caseCount = await Case.countDocuments();
-    if (caseCount === 0) {
-      await Case.create({
-        caseId: 'weapon',
-        name: 'TerBDrop Premium v1',
-        price: 50.00,
+    // Alapértelmezett ládák frissítése/létrehozása képekkel és kategóriákkal
+    const defaultCases = [
+      {
+        caseId: 'budget_v1',
+        name: 'Kezdő Budget Láda',
+        price: 15.00,
+        category: 'budget',
         items: [
-          { id: 'w_1', name: 'Karambit | Fade', price: 1200.00, color: '#ffd700', chance: 1.0, img: '' },
-          { id: 'w_2', name: 'AK-47 | Fire Serpent', price: 400.00, color: '#eb4b4b', chance: 4.0, img: '' },
-          { id: 'w_3', name: 'AWP | Asiimov', price: 120.00, color: '#d32ce6', chance: 15.0, img: '' },
-          { id: 'w_4', name: 'USP-S | Kill Confirmed', price: 65.00, color: '#8847ff', chance: 30.0, img: '' },
-          { id: 'w_5', name: 'P250 | Sand Dune', price: 1.50, color: '#b0c3d9', chance: 50.0, img: '' }
+          { id: 'b_1', name: 'AK-47 | Redline', price: 25.00, color: '#eb4b4b', chance: 5.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot7HxfDhjxszJemkV09-5lpKKqPrxN7LEmyVQ7MEp072T892m21a380A5ZW3zLYCQJwBvM1DVq1a_w-q915-1vM6ay3Vq7yR0s3_UygXbg04X_L8' },
+          { id: 'b_2', name: 'M4A4 | Evil Daimyo', price: 8.00, color: '#d32ce6', chance: 15.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpou-6kejhz2v_Nfz5H_uO1gb-Gw_alIITfn2xZ_811eunH-4P33gzkrERpMG-mcdDHJwRrZV3Xq1jrl-e81JC5vZ2fySRnsic8pL_D20A1aU8' },
+          { id: 'b_3', name: 'USP-S | Cyrex', price: 5.00, color: '#8847ff', chance: 30.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgposwlur8111Ob3fj5R09S_m4y0m_7zO6-fzj9V7cd33OrApY2si1C1-xU-Nzz7d9fHdlU5Y1nX_Va_l-u7jcfvtMufyCQw7yQgs3jUnA' },
+          { id: 'b_4', name: 'P250 | Sand Dune', price: 0.50, color: '#b0c3d9', chance: 50.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpopujwezhjxszYI18du9hiRkS0m_7zO6-fxWpTupwjjL2Uptv30A3i_BNtY231ctPHcFA3NF_R-VK_yee7g5W97Z3PznJmsyFwtn3C00A2O1I' }
         ]
-      });
-      console.log('>>> Alapértelmezett láda létrehozva! <<<');
+      },
+      {
+        caseId: 'premium_v1',
+        name: 'TerBDrop Elite Premium',
+        price: 75.00,
+        category: 'premium',
+        items: [
+          { id: 'p_1', name: 'AWP | Asiimov', price: 130.00, color: '#eb4b4b', chance: 10.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot621FAR17PLfYQJD_9W7m5a0n_L1JaKfzzoGu5Ym373ErYr03gaw8xZsM2H3dtSWJw9tNAmD-QO7wb3qgp69vcmYmyFj6yNw-z-DyP2I6_8' },
+          { id: 'p_2', name: 'AK-47 | Vulcan', price: 280.00, color: '#ffd700', chance: 5.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot7HxfDhjxszJemkV08y5mJh54ov3N4Tdn2xZ_Isp2L3C94iijA23-sBqZGrwcNTHJFc3ZwqC81K7l-fujMK87s7Mn3Yw4yR3-z-DyI4E9mVE' },
+          { id: 'p_3', name: 'M4A1-S | Player Two', price: 60.00, color: '#d32ce6', chance: 25.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpou-6kejhz2v_Nfz5H_uO1gb-Gw_alIITfn2xZ_811eunH-4P33gzkrERpMG-mcdDHJwRrZV3Xq1jrl-e81JC5vZ2fySRnsic8pL_D20A1aU8' },
+          { id: 'p_4', name: 'Desert Eagle | Printstream', price: 90.00, color: '#eb4b4b', chance: 20.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgposr-kLATLxfBN311C7d21nImFm_bLP7LWqWdY78112-vFpYmkiwC1_0c4Ym_1cI_GJg87Y1zU-AO7ku-90ZTuvpzJnHFmv2A8537bzQv330_S0S16Uw' },
+          { id: 'p_5', name: 'Glock-18 | Water Elemental', price: 12.00, color: '#8847ff', chance: 40.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgposbaqKAxf0v73fyhB49C_l4men_vxI4Tck29Y_cg_373D8Y323A21-xE5a2v3LdDDegc4ZQ7Z-Vntwbq6jJXtvJ_JznMy43Urtn3D30vgTTrB7g' }
+        ]
+      },
+      {
+        caseId: 'knife_v1',
+        name: 'Exkluzív Kés Láda',
+        price: 250.00,
+        category: 'knife',
+        items: [
+          { id: 'k_1', name: 'Karambit | Doppler', price: 1100.00, color: '#ffd700', chance: 2.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpovbSsLQJf28_3cz18492zkL-AmuP1Ia_um25V4dB8xOiW9Nis2A3t-UNrNW2mLI-cdQA7NFrYrVPvl7vmgce_6MzKn3d9-n51_y_z_5g' },
+          { id: 'k_2', name: 'Butterfly Knife | Fade', price: 1800.00, color: '#ffd700', chance: 1.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpovbSsLQJfw-beRDhR-921q5SEhfP3O4Tdn2xZ_Isg0r-U8Y-jjA3m-xA4NTj3ItCTdQ87YljV-lO8yOq6gMS_tZvAzXpquXEl537fmgv33083x9TXXg' },
+          { id: 'k_3', name: 'M9 Bayonet | Autotronic', price: 650.00, color: '#eb4b4b', chance: 7.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpovbSsLQJfw-beRDhR-_cnJ2SZm-bhI7TFhWld68p3m9aW94qjiQXsrkA4Ymv1d9fBdgJrZQyCqVm7xezmhcC6vZ7BzHRivD5iuyitvB_E0w' },
+          { id: 'k_4', name: 'Gut Knife | Safari Mesh', price: 90.00, color: '#8847ff', chance: 90.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpovbSsLQJf1Or3daFC0927q4KGhfP1Ia_um25V4dB8xOiU8dyh2AG3rhI4a2qncdOXdQRsaA7XqFC5wenohce9v5ucn3Rh6CEn-z-DyI4z5j4N' }
+        ]
+      }
+    ];
+
+    for (const cData of defaultCases) {
+      const exists = await Case.findOne({ caseId: cData.caseId });
+      if (!exists) {
+        await Case.create(cData);
+      }
     }
+    console.log('>>> Alapértelmezett kategóriájú ládák betöltve! <<<');
   } catch (err) {
     console.error('Hiba a ládák inicializálásakor:', err);
   }
@@ -144,7 +177,6 @@ app.get('/make-me-admin', async (req, res) => {
 });
 
 // --- AUTH API VÉGPONTOK ---
-
 app.post('/api/register', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -162,15 +194,14 @@ app.post('/api/register', async (req, res) => {
 
     res.json({ success: true, username: newUser.username, balance: newUser.balance, isAdmin: newUser.isAdmin, inventory: newUser.inventory });
   } catch (err) {
-    console.error('Regisztrációs hiba:', err);
-    res.status(500).json({ error: 'Szerveroldali hiba történt a regisztráció során.' });
+    res.status(500).json({ error: 'Szerveroldali hiba.' });
   }
 });
 
 app.post('/api/login', async (req, res) => {
   try {
     const { username, password } = req.body;
-    if (!username || !password) return res.status(400).json({ error: 'Felhasználónév és jelszó megadása kötelező!' });
+    if (!username || !password) return res.status(400).json({ error: 'Felhasználónév és jelszó kötelező!' });
 
     const cleanUsername = username.trim();
     const user = await User.findOne({ username: cleanUsername });
@@ -182,8 +213,7 @@ app.post('/api/login', async (req, res) => {
     req.session.userId = user._id;
     res.json({ success: true, username: user.username, balance: user.balance, isAdmin: user.isAdmin, inventory: user.inventory });
   } catch (err) {
-    console.error('Bejelentkezési hiba:', err);
-    res.status(500).json({ error: 'Szerveroldali hiba történt a bejelentkezés során.' });
+    res.status(500).json({ error: 'Szerveroldali hiba.' });
   }
 });
 
@@ -206,13 +236,10 @@ app.get('/api/me', async (req, res) => {
 });
 
 // --- JÁTÉK API ---
-
 app.get('/api/cases', async (req, res) => {
   try {
     const cases = await Case.find();
-    const caseMap = {};
-    cases.forEach(c => { caseMap[c.caseId] = c; });
-    res.json(caseMap);
+    res.json(cases);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -268,7 +295,6 @@ app.post('/api/sell-item', async (req, res) => {
 });
 
 // --- ADMIN API ---
-
 app.get('/api/admin/users', requireAdmin, async (req, res) => {
   const users = await User.find({}, '-password').sort({ createdAt: -1 });
   res.json(users);
@@ -284,27 +310,7 @@ app.post('/api/admin/update-balance', requireAdmin, async (req, res) => {
   res.json({ success: true });
 });
 
-app.post('/api/admin/save-case', requireAdmin, async (req, res) => {
-  try {
-    const { caseId, name, price, items } = req.body;
-
-    let targetCase = await Case.findOne({ caseId });
-    if (targetCase) {
-      targetCase.name = name;
-      targetCase.price = parseFloat(price);
-      targetCase.items = items;
-      await targetCase.save();
-    } else {
-      await Case.create({ caseId, name, price: parseFloat(price), items });
-    }
-
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// --- FRONTEND (HTML + NEW DESIGN CSS + CLIENT JS) ---
+// --- FRONTEND ---
 app.get('/', (req, res) => {
   res.send(`<!DOCTYPE html>
 <html lang="hu">
@@ -317,64 +323,77 @@ app.get('/', (req, res) => {
     body { background: #08090d; color: #f3f4f6; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
     
     /* FEJLÉC */
-    header { background: rgba(15, 17, 26, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid #1f2430; padding: 18px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-    .logo { font-size: 26px; font-weight: 900; letter-spacing: 2px; background: linear-gradient(135deg, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 30px rgba(168, 85, 247, 0.4); }
-    .user-info { display: flex; align-items: center; gap: 15px; }
+    header { background: rgba(15, 17, 26, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid #1f2430; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+    .logo { font-size: 26px; font-weight: 900; letter-spacing: 2px; background: linear-gradient(135deg, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 30px rgba(168, 85, 247, 0.4); cursor: pointer; }
+    .user-info { display: flex; align-items: center; gap: 15px; position: relative; }
     .balance-badge { background: #131722; padding: 8px 18px; border-radius: 30px; border: 1px solid #a855f7; font-weight: 700; color: #22c55e; box-shadow: 0 0 15px rgba(168, 85, 247, 0.2); }
     
     /* GOMBOK */
-    button { cursor: pointer; border: none; padding: 10px 22px; border-radius: 8px; font-weight: 700; transition: all 0.25s ease; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
+    button { cursor: pointer; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 700; transition: all 0.25s ease; font-size: 14px; text-transform: uppercase; }
     .btn-primary { background: linear-gradient(135deg, #a855f7, #7c3aed); color: #fff; box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4); }
     .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(168, 85, 247, 0.6); }
     .btn-danger { background: #ef4444; color: #fff; }
     .btn-danger:hover { background: #dc2626; }
-    .btn-admin { background: #3b82f6; color: #fff; }
-    .btn-case { background: #131722; color: #9ca3af; border: 1px solid #1f2430; margin: 0 5px; }
-    .btn-case:hover, .btn-case.active { background: rgba(168, 85, 247, 0.15); color: #a855f7; border-color: #a855f7; }
-    
-    /* INPUTOK */
-    input, select { background: #131722; border: 1px solid #1f2430; padding: 12px; color: #fff; border-radius: 8px; margin-bottom: 12px; width: 100%; transition: 0.2s; }
-    input:focus { outline: none; border-color: #a855f7; box-shadow: 0 0 10px rgba(168, 85, 247, 0.3); }
+    .btn-inventory { background: #1f2430; color: #a855f7; border: 1px solid #a855f7; }
+    .btn-inventory:hover { background: rgba(168, 85, 247, 0.2); }
+
+    /* KATEGÓRIÁK FÜL */
+    .category-tabs { display: flex; justify-content: center; gap: 15px; margin-bottom: 25px; }
+    .cat-tab { background: #0f111a; border: 1px solid #1f2430; padding: 12px 24px; border-radius: 10px; color: #9ca3af; cursor: pointer; font-weight: 700; transition: 0.2s; }
+    .cat-tab.active, .cat-tab:hover { background: rgba(168, 85, 247, 0.15); border-color: #a855f7; color: #a855f7; }
 
     /* LAYOUT */
     main { flex: 1; padding: 40px; max-width: 1250px; margin: 0 auto; width: 100%; }
     .auth-container { max-width: 420px; margin: 60px auto; background: #0f111a; padding: 40px; border-radius: 16px; border: 1px solid #1f2430; text-align: center; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6); }
-    
+    input { background: #131722; border: 1px solid #1f2430; padding: 12px; color: #fff; border-radius: 8px; margin-bottom: 12px; width: 100%; }
+
     /* LÁDANYITÓ SPINNER */
-    .case-wrapper { position: relative; width: 100%; height: 200px; background: #0f111a; border-radius: 16px; overflow: hidden; border: 1px solid #1f2430; margin: 30px 0; box-shadow: inset 0 0 30px rgba(0,0,0,0.8); }
+    .case-wrapper { position: relative; width: 100%; height: 210px; background: #0f111a; border-radius: 16px; overflow: hidden; border: 1px solid #1f2430; margin: 30px 0; box-shadow: inset 0 0 30px rgba(0,0,0,0.8); }
     .pointer { position: absolute; top: 0; bottom: 0; left: 50%; width: 4px; background: #22c55e; z-index: 10; transform: translateX(-50%); box-shadow: 0 0 15px #22c55e, 0 0 30px #22c55e; }
-    .spinner-track { display: flex; position: absolute; left: 0; top: 20px; height: 160px; transition: transform 5s cubic-bezier(0.1, 1, 0.1, 1); }
+    .spinner-track { display: flex; position: absolute; left: 0; top: 15px; height: 180px; transition: transform 5s cubic-bezier(0.1, 1, 0.1, 1); }
     
-    /* KÁRTYÁK */
-    .item-card { min-width: 150px; height: 160px; background: #131722; margin: 0 6px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-bottom: 4px solid #a855f7; padding: 12px; text-align: center; font-size: 13px; font-weight: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-    .inventory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 20px; margin-top: 25px; }
-    .inv-item { background: #0f111a; border-radius: 12px; padding: 18px; text-align: center; border: 1px solid #1f2430; border-bottom: 4px solid #a855f7; transition: transform 0.2s; }
-    .inv-item:hover { transform: translateY(-3px); }
-    
-    /* ADMIN PANEL */
-    .admin-panel { background: #0f111a; border: 1px solid #1f2430; padding: 30px; border-radius: 16px; margin-top: 20px; }
-    .admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    .admin-table th, .admin-table td { border: 1px solid #1f2430; padding: 12px; text-align: left; }
-    .admin-table th { background: #131722; color: #a855f7; }
+    /* KÁRTYÁK & KÉPEK */
+    .item-card { min-width: 160px; height: 180px; background: #131722; margin: 0 6px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; border-bottom: 4px solid #a855f7; padding: 12px; text-align: center; font-size: 12px; font-weight: 600; }
+    .item-card img { width: 90px; height: 70px; object-fit: contain; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5)); margin-top: 10px; }
+
+    /* LENYITHATÓ RAKTÁR FIÓK (DRAWER) */
+    .inventory-drawer { position: fixed; top: 0; right: -450px; width: 420px; height: 100vh; background: #0f111a; border-left: 1px solid #1f2430; z-index: 200; box-shadow: -10px 0 40px rgba(0,0,0,0.8); transition: right 0.3s ease; padding: 25px; display: flex; flex-direction: column; }
+    .inventory-drawer.open { right: 0; }
+    .drawer-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1f2430; padding-bottom: 15px; margin-bottom: 20px; }
+    .drawer-content { flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; align-content: start; }
+    .inv-item { background: #131722; border-radius: 12px; padding: 12px; text-align: center; border: 1px solid #1f2430; border-bottom: 4px solid #a855f7; display: flex; flex-direction: column; justify-content: space-between; align-items: center; }
+    .inv-item img { width: 80px; height: 60px; object-fit: contain; margin: 8px 0; }
+
+    .overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 150; display: none; backdrop-filter: blur(4px); }
+    .overlay.active { display: block; }
 
     .hidden { display: none !important; }
-    .nav-tabs { display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 1px solid #1f2430; padding-bottom: 12px; }
   </style>
 </head>
 <body>
 
   <header>
-    <div class="logo">TerBDrop</div>
+    <div class="logo" onclick="window.location.reload()">TerBDrop</div>
     <div id="user-nav" class="user-info hidden">
       <span>Üdv, <b id="display-username" style="color: #a855f7;"></b>!</span>
       <div class="balance-badge"><span id="display-balance">0.00</span> $</div>
-      <button id="admin-tab-btn" onclick="toggleAdminPanel()" class="btn-admin hidden">Admin Panel</button>
+      <button onclick="toggleInventoryDrawer()" class="btn-inventory">🎒 Raktáram (<span id="inv-count">0</span>)</button>
       <button onclick="logout()" class="btn-danger">Kijelentkezés</button>
     </div>
   </header>
 
+  <!-- SAJÁT RAKTÁR LENYITHATÓ PANEL (DRAWER) -->
+  <div id="overlay" class="overlay" onclick="toggleInventoryDrawer()"></div>
+  <div id="inventory-drawer" class="inventory-drawer">
+    <div class="drawer-header">
+      <h2 style="font-size: 20px; font-weight: 800;">Saját Raktár</h2>
+      <button onclick="toggleInventoryDrawer()" style="background: none; color: #9ca3af; font-size: 20px; padding: 0;">✕</button>
+    </div>
+    <div id="drawer-grid" class="drawer-content"></div>
+  </div>
+
   <main>
-    <!-- BEJELENTKEZÉS / REGISZTRÁCIÓ -->
+    <!-- AUTH -->
     <div id="auth-box" class="auth-container">
       <h2 id="auth-title" style="margin-bottom: 25px; font-weight: 800; font-size: 28px;">Bejelentkezés</h2>
       <input type="text" id="auth-username" placeholder="Felhasználónév">
@@ -388,7 +407,16 @@ app.get('/', (req, res) => {
 
     <!-- JÁTÉK FELÜLET -->
     <div id="game-box" class="hidden">
-      <div id="case-selector" style="display: flex; justify-content: center; gap: 12px; margin-bottom: 35px;"></div>
+      <!-- KATEGÓRIA VÁLASZTÓ -->
+      <div class="category-tabs">
+        <div class="cat-tab active" onclick="filterCategory('all', this)">Összes Láda</div>
+        <div class="cat-tab" onclick="filterCategory('budget', this)">Olcsó (Budget)</div>
+        <div class="cat-tab" onclick="filterCategory('premium', this)">Prémium</div>
+        <div class="cat-tab" onclick="filterCategory('knife', this)">Kések</div>
+      </div>
+
+      <!-- LÁDA VÁLASZTÓ GOMBOK -->
+      <div id="case-selector" style="display: flex; justify-content: center; gap: 12px; margin-bottom: 35px; flex-wrap: wrap;"></div>
 
       <div style="text-align: center;">
         <h2 id="case-title" style="font-size: 32px; font-weight: 800;">-</h2>
@@ -403,53 +431,15 @@ app.get('/', (req, res) => {
       <div style="text-align: center;">
         <button id="open-btn" onclick="openCase()" class="btn-primary" style="font-size: 18px; padding: 16px 50px; border-radius: 30px;">LÁDA NYITÁSA</button>
       </div>
-
-      <h3 style="margin-top: 60px; border-bottom: 1px solid #1f2430; padding-bottom: 12px; font-size: 22px;">Saját Raktár (Inventory)</h3>
-      <div class="inventory-grid" id="inventory-grid"></div>
-    </div>
-
-    <!-- ADMIN PANEL FELÜLET -->
-    <div id="admin-box" class="admin-panel hidden">
-      <h2 style="margin-bottom: 20px;">TerBDrop Adminisztráció</h2>
-      
-      <div class="nav-tabs">
-        <button class="btn-case active" onclick="showAdminSection('users')">Felhasználók</button>
-        <button class="btn-case" onclick="showAdminSection('cases')">Ládák Kezelése</button>
-      </div>
-
-      <div id="admin-users-section">
-        <h3>Felhasználók egyenlegének módosítása</h3>
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>Felhasználónév</th>
-              <th>Jelenlegi Egyenleg</th>
-              <th>Admin?</th>
-              <th>Új Egyenleg ($)</th>
-              <th>Művelet</th>
-            </tr>
-          </thead>
-          <tbody id="admin-users-list"></tbody>
-        </table>
-      </div>
-
-      <div id="admin-cases-section" class="hidden">
-        <h3>Láda Hozzáadása / Szerkesztése</h3>
-        <div style="max-width: 500px; margin-top: 20px;">
-          <input type="text" id="admin-case-id" placeholder="Láda azonosító (pl: budget_v2)">
-          <input type="text" id="admin-case-name" placeholder="Láda megjelenő neve (pl: Budget Case)">
-          <input type="number" id="admin-case-price" placeholder="Ár ($)">
-          <button onclick="saveCase()" class="btn-primary" style="width: 100%; margin-top: 10px;">Láda Mentése</button>
-        </div>
-      </div>
     </div>
   </main>
 
   <script>
     let isRegisterMode = false;
     let selectedCaseKey = '';
-    let allCases = {};
+    let allCases = [];
     let currentUser = null;
+    let currentCategory = 'all';
 
     window.onload = function() {
       checkSession();
@@ -468,7 +458,7 @@ app.get('/', (req, res) => {
       const endpoint = isRegisterMode ? '/api/register' : '/api/login';
 
       if (!username || !password) {
-        alert("Kérjük, töltsd ki a felhasználónevet és a jelszót!");
+        alert("Kérjük, töltsd ki a mezőket!");
         return;
       }
 
@@ -488,7 +478,7 @@ app.get('/', (req, res) => {
           updateUI(data);
         }
       } catch(err) {
-        alert("Hálózati hiba a csatlakozás során!");
+        alert("Hálózati hiba!");
       }
     }
 
@@ -501,49 +491,55 @@ app.get('/', (req, res) => {
           await fetchCases();
           updateUI(data);
         }
-      } catch(e) {
-        console.error("Session hiba", e);
-      }
+      } catch(e) { console.error("Session hiba", e); }
     }
 
     async function fetchCases() {
       try {
         const res = await fetch('/api/cases');
         allCases = await res.json();
-        
-        const keys = Object.keys(allCases);
-        if (keys.length > 0 && !selectedCaseKey) {
-          selectedCaseKey = keys[0];
-        }
-
         renderCaseButtons();
-        if (selectedCaseKey && allCases[selectedCaseKey]) {
-          selectCase(selectedCaseKey);
-        }
-      } catch(e) {
-        console.error("Láda betöltési hiba", e);
-      }
+      } catch(e) { console.error("Láda betöltési hiba", e); }
+    }
+
+    function filterCategory(cat, element) {
+      currentCategory = cat;
+      document.querySelectorAll('.cat-tab').forEach(el => el.classList.remove('active'));
+      element.classList.add('active');
+      renderCaseButtons();
     }
 
     function renderCaseButtons() {
       const container = document.getElementById('case-selector');
       container.innerHTML = '';
-      
-      Object.keys(allCases).forEach(key => {
-        const c = allCases[key];
+
+      const filteredCases = currentCategory === 'all' 
+        ? allCases 
+        : allCases.filter(c => c.category === currentCategory);
+
+      if (filteredCases.length > 0) {
+        if (!selectedCaseKey || !filteredCases.some(c => c.caseId === selectedCaseKey)) {
+          selectedCaseKey = filteredCases[0].caseId;
+        }
+      }
+
+      filteredCases.forEach(c => {
         const btn = document.createElement('button');
-        btn.className = \`btn-case \${key === selectedCaseKey ? 'active' : ''}\`;
+        btn.style.cssText = "background: #131722; color: #9ca3af; border: 1px solid #1f2430; padding: 10px 18px;";
+        if (c.caseId === selectedCaseKey) {
+          btn.style.cssText = "background: rgba(168, 85, 247, 0.15); color: #a855f7; border: 1px solid #a855f7;";
+        }
         btn.innerText = \`\${c.name} (\${c.price}$)\`;
-        btn.onclick = () => selectCase(key);
+        btn.onclick = () => selectCase(c.caseId);
         container.appendChild(btn);
       });
+
+      if (selectedCaseKey) selectCase(selectedCaseKey);
     }
 
-    function selectCase(key) {
-      selectedCaseKey = key;
-      renderCaseButtons();
-      
-      const c = allCases[key];
+    function selectCase(caseId) {
+      selectedCaseKey = caseId;
+      const c = allCases.find(x => x.caseId === caseId);
       if (c) {
         document.getElementById('case-title').innerText = c.name;
         document.getElementById('case-price').innerText = \`\${c.price.toFixed(2)} $\`;
@@ -558,12 +554,9 @@ app.get('/', (req, res) => {
 
       document.getElementById('display-username').innerText = userData.username;
       document.getElementById('display-balance').innerText = userData.balance.toFixed(2);
+      document.getElementById('inv-count').innerText = userData.inventory.length;
 
-      if (userData.isAdmin) {
-        document.getElementById('admin-tab-btn').classList.remove('hidden');
-      }
-
-      renderInventory(userData.inventory);
+      renderDrawerInventory(userData.inventory);
     }
 
     async function logout() {
@@ -574,7 +567,7 @@ app.get('/', (req, res) => {
     function generateTrackItems() {
       const track = document.getElementById('spinner-track');
       track.innerHTML = '';
-      const currentCase = allCases[selectedCaseKey];
+      const currentCase = allCases.find(c => c.caseId === selectedCaseKey);
       if(!currentCase || !currentCase.items || currentCase.items.length === 0) return;
 
       for (let i = 0; i < 60; i++) {
@@ -582,7 +575,11 @@ app.get('/', (req, res) => {
         const el = document.createElement('div');
         el.className = 'item-card';
         el.style.borderBottomColor = randItem.color || '#a855f7';
-        el.innerHTML = \`<div><b>\${randItem.name}</b><br><span style="color:#22c55e; margin-top:5px; display:inline-block;">\${randItem.price}$</span></div>\`;
+        el.innerHTML = \`
+          <div style="font-size:11px; font-weight:bold;">\${randItem.name}</div>
+          <img src="\${randItem.img || 'https://via.placeholder.com/90'}" alt="Skin">
+          <div style="color:#22c55e; font-weight:bold;">\${randItem.price}$</div>
+        \`;
         track.appendChild(el);
       }
     }
@@ -613,19 +610,24 @@ app.get('/', (req, res) => {
         const cards = track.children;
         
         cards[45].style.borderBottomColor = data.item.color;
-        cards[45].innerHTML = \`<div><b>\${data.item.name}</b><br><span style="color:#22c55e; margin-top:5px; display:inline-block;">\${data.item.price}$</span></div>\`;
+        cards[45].innerHTML = \`
+          <div style="font-size:11px; font-weight:bold;">\${data.item.name}</div>
+          <img src="\${data.item.img || 'https://via.placeholder.com/90'}" alt="Skin">
+          <div style="color:#22c55e; font-weight:bold;">\${data.item.price}$</div>
+        \`;
 
         setTimeout(() => {
           track.style.transition = 'transform 5s cubic-bezier(0.1, 1, 0.1, 1)';
-          const cardWidth = 162;
-          const targetOffset = -(45 * cardWidth - (document.querySelector('.case-wrapper').clientWidth / 2) + 81);
+          const cardWidth = 172;
+          const targetOffset = -(45 * cardWidth - (document.querySelector('.case-wrapper').clientWidth / 2) + 86);
           track.style.transform = \`translateX(\${targetOffset}px)\`;
         }, 50);
 
         setTimeout(() => {
           alert(\`Nyeremény: \${data.item.name} (\${data.item.price} $)\`);
           document.getElementById('display-balance').innerText = data.newBalance.toFixed(2);
-          renderInventory(data.inventory);
+          document.getElementById('inv-count').innerText = data.inventory.length;
+          renderDrawerInventory(data.inventory);
           btn.disabled = false;
         }, 5200);
 
@@ -635,12 +637,17 @@ app.get('/', (req, res) => {
       }
     }
 
-    function renderInventory(inventory) {
-      const grid = document.getElementById('inventory-grid');
+    function toggleInventoryDrawer() {
+      document.getElementById('inventory-drawer').classList.toggle('open');
+      document.getElementById('overlay').classList.toggle('active');
+    }
+
+    function renderDrawerInventory(inventory) {
+      const grid = document.getElementById('drawer-grid');
       grid.innerHTML = '';
 
       if (!inventory || inventory.length === 0) {
-        grid.innerHTML = '<p style="color:#6b7280;">A raktárad még üres.</p>';
+        grid.innerHTML = '<p style="color:#6b7280; grid-column: span 2; text-align:center;">A raktárad üres.</p>';
         return;
       }
 
@@ -649,9 +656,10 @@ app.get('/', (req, res) => {
         el.className = 'inv-item';
         el.style.borderBottomColor = item.color || '#a855f7';
         el.innerHTML = \`
-          <div style="font-size:13px; font-weight:bold;">\${item.name}</div>
-          <div style="color:#22c55e; font-size:14px; font-weight:bold; margin: 12px 0;">\${item.price.toFixed(2)} $</div>
-          <button onclick="sellItem(\${index})" class="btn-danger" style="font-size: 11px; padding: 8px; width: 100%;">ELADÁS (\${item.price.toFixed(2)}$)</button>
+          <div style="font-size:11px; font-weight:bold;">\${item.name}</div>
+          <img src="\${item.img || 'https://via.placeholder.com/80'}" alt="Skin">
+          <div style="color:#22c55e; font-size:12px; font-weight:bold; margin-bottom:8px;">\${item.price.toFixed(2)} $</div>
+          <button onclick="sellItem(\${index})" class="btn-danger" style="font-size: 10px; padding: 6px; width: 100%;">ELADÁS</button>
         \`;
         grid.appendChild(el);
       });
@@ -672,94 +680,10 @@ app.get('/', (req, res) => {
         }
 
         document.getElementById('display-balance').innerText = data.newBalance.toFixed(2);
-        renderInventory(data.inventory);
+        document.getElementById('inv-count').innerText = data.inventory.length;
+        renderDrawerInventory(data.inventory);
       } catch (err) {
         alert('Hiba a tárgy eladásakor!');
-      }
-    }
-
-    function toggleAdminPanel() {
-      const gameBox = document.getElementById('game-box');
-      const adminBox = document.getElementById('admin-box');
-
-      if (adminBox.classList.contains('hidden')) {
-        adminBox.classList.remove('hidden');
-        gameBox.classList.add('hidden');
-        loadAdminUsers();
-      } else {
-        adminBox.classList.add('hidden');
-        gameBox.classList.remove('hidden');
-      }
-    }
-
-    function showAdminSection(section) {
-      document.getElementById('admin-users-section').classList.toggle('hidden', section !== 'users');
-      document.getElementById('admin-cases-section').classList.toggle('hidden', section !== 'cases');
-    }
-
-    async function loadAdminUsers() {
-      const res = await fetch('/api/admin/users');
-      const users = await res.json();
-      
-      const tbody = document.getElementById('admin-users-list');
-      tbody.innerHTML = '';
-
-      users.forEach(u => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = \`
-          <td>\${u.username}</td>
-          <td style="color:#22c55e; font-weight:bold;">\${u.balance.toFixed(2)} $</td>
-          <td>\${u.isAdmin ? 'Igen' : 'Nem'}</td>
-          <td><input type="number" id="bal-\${u._id}" value="\${u.balance}" style="width: 100px; margin:0;"></td>
-          <td><button onclick="updateUserBalance('\${u._id}')" class="btn-primary" style="padding: 6px 12px; font-size:12px;">Mentés</button></td>
-        \`;
-        tbody.appendChild(tr);
-      });
-    }
-
-    async function updateUserBalance(userId) {
-      const val = document.getElementById(\`bal-\${userId}\`).value;
-      const res = await fetch('/api/admin/update-balance', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, newBalance: val })
-      });
-      const data = await res.json();
-      if (data.success) {
-        alert('Egyenleg frissítve!');
-        loadAdminUsers();
-      } else {
-        alert(data.error);
-      }
-    }
-
-    async function saveCase() {
-      const caseId = document.getElementById('admin-case-id').value;
-      const name = document.getElementById('admin-case-name').value;
-      const price = document.getElementById('admin-case-price').value;
-
-      if(!caseId || !name || !price) {
-        alert('Kérjük töltsd ki az összes mezőt!');
-        return;
-      }
-
-      const defaultItems = [
-        { id: \`\${caseId}_1\`, name: 'Ritka Skin', price: 100.00, color: '#ffd700', chance: 10.0, img: '' },
-        { id: \`\${caseId}_2\`, name: 'Közepes Skin', price: 20.00, color: '#d32ce6', chance: 30.0, img: '' },
-        { id: \`\${caseId}_3\`, name: 'Gyakori Skin', price: 2.00, color: '#3b82f6', chance: 60.0, img: '' }
-      ];
-
-      const res = await fetch('/api/admin/save-case', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ caseId, name, price, items: defaultItems })
-      });
-      const data = await res.json();
-      if (data.success) {
-        alert('Láda sikeresen elmentve!');
-        await fetchCases();
-      } else {
-        alert(data.error);
       }
     }
   </script>
@@ -768,5 +692,7 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, '0.0.0.0', () => {
+  console.log(`>>> TerBDrop Szerver elindult a ${PORT} porton! <<<`);
+});
   console.log(`>>> TerBDrop Szerver elindult a ${PORT} porton! <<<`);
 });
