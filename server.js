@@ -1,232 +1,205 @@
 const express = require('express');
+const session = require('express-session');
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+
 const app = express();
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 const PORT = process.env.PORT || 3000;
 
+// Munkamenet (Session) beállítása biztonságosan
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'titkos_fejlesztoi_kulcs_ChangeMe!',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 } // 1 napos munkamenet
+}));
+
+// In-Memory Felhasználói Adatbázis (Amíg a MongoDB-t be nem kötjük)
+const usersDB = [];
+
+// Játék Skinek (Szerveroldali adattár - a kliens nem tudja módosítani az árakat!)
+const items = [
+  { id: 1, name: "P250 | Sand Dune", price: 0.10, color: "#b0c3d9", img: "https://steamcdn-a.akamaihd.net/apps/730/icons/econ/default_generated/weapon_p250_cu_p250_sand_light_large.png" },
+  { id: 2, name: "AK-47 | Redline", price: 15.00, color: "#e4ae39", img: "https://steamcdn-a.akamaihd.net/apps/730/icons/econ/default_generated/weapon_ak47_cu_ak47_cobra_light_large.png" },
+  { id: 3, name: "USP-S | Kill Confirmed", price: 50.00, color: "#d32ce6", img: "https://steamcdn-a.akamaihd.net/apps/730/icons/econ/default_generated/weapon_usp_silencer_cu_usp_kill_confirmed_light_large.a3a7b8f19c9fb931b18c1edd7dd21d44e2c3c2e0.png" },
+  { id: 4, name: "M4A4 | Howl", price: 1200.00, color: "#eb4b4b", img: "https://steamcdn-a.akamaihd.net/apps/730/icons/econ/default_generated/weapon_m4a1_cu_m4a1_howl_light_large.png" }
+];
+
+// --- API VÉGPONTOK (BACKEND LOGIKA) ---
+
+// 1. Regisztráció
+app.post('/api/register', async (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password) return res.status(400).json({ error: 'Minden mező kötelező!' });
+
+  const existingUser = usersDB.find(u => u.username === username);
+  if (existingUser) return res.status(400).json({ error: 'Ez a felhasználónév már foglalt!' });
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const newUser = { id: usersDB.length + 1, username, password: hashedPassword, balance: 100.00 }; // $100 kezdő egyenleg teszteléshez
+  usersDB.push(newUser);
+
+  req.session.userId = newUser.id;
+  res.json({ success: true, username: newUser.username, balance: newUser.balance });
+});
+
+// 2. Bejelentkezés
+app.post('/api/login', async (req, res) => {
+  const { username, password } = req.body;
+  const user = usersDB.find(u => u.username === username);
+  if (!user) return res.status(400).json({ error: 'Hibás felhasználónév vagy jelszó!' });
+
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) return res.status(400).json({ error: 'Hibás felhasználónév vagy jelszó!' });
+
+  req.session.userId = user.id;
+  res.json({ success: true, username: user.username, balance: user.balance });
+});
+
+// 3. Felhasználói adatok lekérése
+app.get('/api/me', (req, res) => {
+  if (!req.session.userId) return res.json({ loggedIn: false });
+  const user = usersDB.find(u => u.id === req.session.userId);
+  if (!user) return res.json({ loggedIn: false });
+  
+  res.json({ loggedIn: true, username: user.username, balance: user.balance });
+});
+
+// 4. Szerveroldali biztonságos ládanyitás
+app.post('/api/open-case', (req, res) => {
+  if (!req.session.userId) return res.status(401).json({ error: 'Be kell jelentkezned!' });
+  const user = usersDB.find(u => u.id === req.session.userId);
+
+  const caseCost = 5.00; // Weapon Case ára
+  if (user.balance < caseCost) return res.status(400).json({ error: 'Nincs elég egyenleged!' });
+
+  // Egyenleg levonása a szerveren
+  user.balance -= caseCost;
+
+  // Sorsolás a szerveren (kliens nem tudja befolyásolni)
+  const winningItem = items[Math.floor(Math.random() * items.length)];
+  user.balance += winningItem.price; // Nyeremény jóváírása
+
+  res.json({ success: true, winningItem, newBalance: user.balance });
+});
+
+// Kijelentkezés
+app.post('/api/logout', (req, res) => {
+  req.session.destroy();
+  res.json({ success: true });
+});
+
+// --- FRONTEND RENDERING ---
 app.get('/', (req, res) => {
   res.send(`
     <!DOCTYPE html>
     <html lang="hu">
     <head>
       <meta charset="UTF-8">
-      <title>PACKDROP - Real CS2 Case Opening</title>
+      <title>PACKDROP - CS2 Platform</title>
       <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: #0b0e14; color: #fff; text-align: center; padding-bottom: 50px; }
-        
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+        body { background: #0b0e14; color: #fff; text-align: center; }
         header { background: #151a23; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #222936; }
-        .logo { font-size: 24px; font-weight: 900; color: #ffb400; letter-spacing: 2px; }
-        .balance-card { background: #1f2733; padding: 10px 20px; border-radius: 8px; border: 1px solid #00e5ff; font-weight: bold; }
-
-        .container { max-width: 1100px; margin: 30px auto; padding: 0 20px; }
-        h2 { margin-bottom: 20px; color: #8a96a3; text-transform: uppercase; font-size: 16px; letter-spacing: 1px; }
-
-        .cases-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 40px; }
-        .case-card { background: #151a23; border: 1px solid #222936; border-radius: 12px; padding: 20px; transition: 0.3s; position: relative; }
-        .case-card:hover { border-color: #ffb400; transform: translateY(-5px); box-shadow: 0 10px 20px rgba(255, 180, 0, 0.15); }
-        .case-img { width: 140px; height: 110px; object-fit: contain; margin: 10px 0; }
-        .case-title { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
-        .case-price { color: #00e5ff; font-weight: bold; font-size: 16px; margin-bottom: 15px; }
-        
-        .btn { background: #ffb400; color: #000; border: none; padding: 10px 20px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: 0.2s; width: 100%; }
-        .btn:hover { background: #ffd000; }
-        .btn-battle { background: #e02424; color: #fff; margin-top: 8px; }
-        .btn-battle:hover { background: #ff3838; }
-
-        .spinner-wrapper { position: relative; width: 100%; max-width: 700px; height: 160px; margin: 20px auto; overflow: hidden; border: 3px solid #ffb400; border-radius: 12px; background: #07090d; display: none; }
-        .pointer { position: absolute; left: 50%; top: 0; bottom: 0; width: 4px; background: #00e5ff; z-index: 10; transform: translateX(-50%); box-shadow: 0 0 10px #00e5ff; }
-        .spinner-track { display: flex; position: absolute; left: 0; top: 10px; transition: transform 5s cubic-bezier(0.15, 0.9, 0.2, 1); }
-        .item-card { width: 120px; height: 135px; background: #151a23; margin: 0 5px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; border-bottom: 4px solid #fff; padding: 5px; }
-        .item-card img { width: 80px; height: 60px; object-fit: contain; margin-bottom: 5px; }
-
-        .battle-arena { display: none; background: #151a23; padding: 25px; border-radius: 12px; border: 1px solid #222936; margin-top: 30px; }
-        .battle-players { display: flex; justify-content: space-around; margin-top: 20px; }
-        .player-box { background: #0b0e14; padding: 20px; border-radius: 10px; width: 45%; border: 1px solid #222936; }
-        .skin-drop-img { width: 100px; height: 70px; object-fit: contain; margin-top: 10px; }
+        .logo { font-size: 24px; font-weight: 900; color: #ffb400; }
+        .auth-box { display: flex; gap: 10px; align-items: center; }
+        input { padding: 8px; border-radius: 4px; border: 1px solid #333; background: #222; color: #fff; }
+        button { background: #ffb400; color: #000; border: none; padding: 8px 15px; font-weight: bold; border-radius: 4px; cursor: pointer; }
+        .container { max-width: 800px; margin: 40px auto; padding: 20px; background: #151a23; border-radius: 8px; }
       </style>
     </head>
     <body>
 
       <header>
         <div class="logo">PACKDROP</div>
-        <div class="balance-card">Egyenleg: <span id="balance" style="color: #00e5ff;">$100.00</span></div>
+        <div id="auth-section" class="auth-box">
+          <input type="text" id="username" placeholder="Felhasználónév">
+          <input type="password" id="password" placeholder="Jelszó">
+          <button onclick="login()">Bejelentkezés</button>
+          <button onclick="register()" style="background:#00e5ff;">Regisztráció</button>
+        </div>
       </header>
 
       <div class="container">
-        
-        <div id="spinner-container" class="spinner-wrapper">
-          <div class="pointer"></div>
-          <div id="spinner-track" class="spinner-track"></div>
-        </div>
-        <h3 id="win-message" style="margin-bottom: 30px; color: #ffb400; min-height: 28px;"></h3>
-
-        <div id="battle-arena" class="battle-arena">
-          <h2>⚔️ CASE BATTLE (Játékos vs Bot)</h2>
-          <div class="battle-players">
-            <div class="player-box">
-              <h3>TE</h3>
-              <p id="p1-score" style="font-size: 20px; color: #00e5ff; margin-top: 10px;">$0.00</p>
-              <div id="p1-container">
-                <p id="p1-drop" style="margin-top: 10px; font-size: 14px; color: #aaa;">Várakozás...</p>
-              </div>
-            </div>
-            <div style="font-size: 30px; align-self: center; font-weight: bold; color: #e02424;">VS</div>
-            <div class="player-box">
-              <h3>BOT ALEX</h3>
-              <p id="p2-score" style="font-size: 20px; color: #00e5ff; margin-top: 10px;">$0.00</p>
-              <div id="p2-container">
-                <p id="p2-drop" style="margin-top: 10px; font-size: 14px; color: #aaa;">Várakozás...</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <h2>Válassz ládát</h2>
-        
-        <div class="cases-grid">
-          
-          <div class="case-card">
-            <div class="case-title">Weapon Case #1</div>
-            <div class="case-price">$5.00</div>
-            <img src="https://images.ctfassets.net/nua5jmq7o9f6/54X0gSFnfoL7eyLefYZise/99cc1398ee050bb58fdb05fba6d5a0d6/Thumbnail__38_.png" class="case-img" alt="CS2 Case">
-            <button class="btn" onclick="startSpin(5.00)">NYITÁS</button>
-            <button class="btn btn-battle" onclick="startBattle(5.00)">BATTLE ($5)</button>
-          </div>
-
-          <div class="case-card">
-            <div class="case-title">Glove Case</div>
-            <div class="case-price">$25.00</div>
-            <img src="https://images.ctfassets.net/nua5jmq7o9f6/54X0gSFnfoL7eyLefYZise/99cc1398ee050bb58fdb05fba6d5a0d6/Thumbnail__38_.png" class="case-img" alt="CS2 Case">
-            <button class="btn" onclick="startSpin(25.00)">NYITÁS</button>
-            <button class="btn btn-battle" onclick="startBattle(25.00)">BATTLE ($25)</button>
-          </div>
-
-          <div class="case-card">
-            <div class="case-title">Kilowatt Case</div>
-            <div class="case-price">$50.00</div>
-            <img src="https://images.ctfassets.net/nua5jmq7o9f6/54X0gSFnfoL7eyLefYZise/99cc1398ee050bb58fdb05fba6d5a0d6/Thumbnail__38_.png" class="case-img" alt="CS2 Case">
-            <button class="btn" onclick="startSpin(50.00)">NYITÁS</button>
-            <button class="btn btn-battle" onclick="startBattle(50.00)">BATTLE ($50)</button>
-          </div>
-
-        </div>
+        <h2 id="welcome-msg">Jelentkezz be a játékhoz!</h2>
+        <h3 id="balance-msg" style="margin-top: 10px; color: #00e5ff;"></h3>
+        <br>
+        <button id="open-btn" onclick="openCase()" style="display:none; font-size: 18px; padding: 15px 30px;">
+          LÁDA NYITÁSA ($5.00)
+        </button>
+        <p id="result-msg" style="margin-top:20px; font-weight:bold;"></p>
       </div>
 
       <script>
-        let balance = 100.00;
-        
-        // Eredeti CS:GO / CS2 Skin képek
-        const items = [
-          { 
-            name: "P250 | Sand Dune", 
-            price: 0.10, 
-            color: "#b0c3d9", 
-            img: "https://steamcdn-a.akamaihd.net/apps/730/icons/econ/default_generated/weapon_p250_cu_p250_sand_light_large.png" 
-          },
-          { 
-            name: "AK-47 | Redline", 
-            price: 15.00, 
-            color: "#e4ae39", 
-            img: "https://steamcdn-a.akamaihd.net/apps/730/icons/econ/default_generated/weapon_ak47_cu_ak47_cobra_light_large.png" 
-          },
-          { 
-            name: "USP-S | Kill Confirmed", 
-            price: 50.00, 
-            color: "#d32ce6", 
-            img: "https://steamcdn-a.akamaihd.net/apps/730/icons/econ/default_generated/weapon_usp_silencer_cu_usp_kill_confirmed_light_large.a3a7b8f19c9fb931b18c1edd7dd21d44e2c3c2e0.png" 
-          },
-          { 
-            name: "M4A4 | Howl", 
-            price: 1200.00, 
-            color: "#eb4b4b", 
-            img: "https://steamcdn-a.akamaihd.net/apps/730/icons/econ/default_generated/weapon_m4a1_cu_m4a1_howl_light_large.png" 
+        async function checkAuth() {
+          const res = await fetch('/api/me');
+          const data = await res.json();
+          if (data.loggedIn) {
+            document.getElementById('auth-section').innerHTML = \`
+              <span>Üdv, <b>\${data.username}</b></span>
+              <button onclick="logout()" style="background:#e02424; color:#fff;">Kijelentkezés</button>
+            \`;
+            document.getElementById('welcome-msg').innerText = "Készen állsz a játékra!";
+            document.getElementById('balance-msg').innerText = "Szerveroldali Egyenleged: $" + data.balance.toFixed(2);
+            document.getElementById('open-btn').style.display = "inline-block";
           }
-        ];
+        }
 
-        function startSpin(cost) {
-          if (balance < cost) return alert("Nincs elég egyenleged!");
-          balance -= cost;
-          updateBalance();
+        async function register() {
+          const username = document.getElementById('username').value;
+          const password = document.getElementById('password').value;
+          const res = await fetch('/api/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+          });
+          const data = await res.json();
+          if(data.error) alert(data.error);
+          else location.reload();
+        }
 
-          const spinner = document.getElementById('spinner-container');
-          const track = document.getElementById('spinner-track');
-          const winMsg = document.getElementById('win-message');
-          document.getElementById('battle-arena').style.display = 'none';
+        async function login() {
+          const username = document.getElementById('username').value;
+          const password = document.getElementById('password').value;
+          const res = await fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+          });
+          const data = await res.json();
+          if(data.error) alert(data.error);
+          else location.reload();
+        }
 
-          spinner.style.display = 'block';
-          winMsg.innerText = "Sorsolás folyamatban...";
-          track.style.transition = 'none';
-          track.style.transform = 'translateX(0)';
+        async function logout() {
+          await fetch('/api/logout', { method: 'POST' });
+          location.reload();
+        }
 
-          track.innerHTML = '';
-          let winningItem = items[Math.floor(Math.random() * items.length)];
-          
-          for (let i = 0; i < 50; i++) {
-            let randItem = (i === 40) ? winningItem : items[Math.floor(Math.random() * items.length)];
-            let div = document.createElement('div');
-            div.className = 'item-card';
-            div.style.borderColor = randItem.color;
-            div.innerHTML = '<img src="' + randItem.img + '"><b style="color:'+randItem.color+'">' + randItem.name + '</b>$' + randItem.price;
-            track.appendChild(div);
+        async function openCase() {
+          const res = await fetch('/api/open-case', { method: 'POST' });
+          const data = await res.json();
+          if (data.error) {
+            alert(data.error);
+          } else {
+            document.getElementById('balance-msg').innerText = "Szerveroldali Egyenleged: $" + data.newBalance.toFixed(2);
+            document.getElementById('result-msg').innerHTML = 'Nyereményed: <span style="color:' + data.winningItem.color + '">' + data.winningItem.name + '</span> ($' + data.winningItem.price + ')';
           }
-
-          setTimeout(() => {
-            track.style.transition = 'transform 5s cubic-bezier(0.15, 0.9, 0.2, 1)';
-            track.style.transform = 'translateX(-4900px)';
-          }, 50);
-
-          setTimeout(() => {
-            balance += winningItem.price;
-            updateBalance();
-            winMsg.innerHTML = 'Kinyitottad: <span style="color:' + winningItem.color + '">' + winningItem.name + '</span> ($' + winningItem.price + ')';
-          }, 5200);
         }
 
-        function startBattle(cost) {
-          if (balance < cost) return alert("Nincs elég egyenleged a Battle-re!");
-          balance -= cost;
-          updateBalance();
-
-          document.getElementById('spinner-container').style.display = 'none';
-          const arena = document.getElementById('battle-arena');
-          arena.style.display = 'block';
-
-          document.getElementById('p1-container').innerHTML = '<p id="p1-drop">Nyitás...</p>';
-          document.getElementById('p2-container').innerHTML = '<p id="p2-drop">Nyitás...</p>';
-
-          setTimeout(() => {
-            let p1Item = items[Math.floor(Math.random() * items.length)];
-            let p2Item = items[Math.floor(Math.random() * items.length)];
-
-            document.getElementById('p1-score').innerText = '$' + p1Item.price;
-            document.getElementById('p1-container').innerHTML = '<img src="' + p1Item.img + '" class="skin-drop-img"><br><b style="color:' + p1Item.color + '">' + p1Item.name + '</b>';
-
-            document.getElementById('p2-score').innerText = '$' + p2Item.price;
-            document.getElementById('p2-container').innerHTML = '<img src="' + p2Item.img + '" class="skin-drop-img"><br><b style="color:' + p2Item.color + '">' + p2Item.name + '</b>';
-
-            setTimeout(() => {
-              if (p1Item.price >= p2Item.price) {
-                let winAmount = p1Item.price + p2Item.price;
-                balance += winAmount;
-                alert("NYERTÉL A BATTLE-BEN! Nyereményed: $" + winAmount);
-              } else {
-                alert("A Bot nyert! Próbáld újra.");
-              }
-              updateBalance();
-            }, 500);
-          }, 1500);
-        }
-
-        function updateBalance() {
-          document.getElementById('balance').innerText = '$' + balance.toFixed(2);
-        }
+        checkAuth();
       </script>
     </body>
     </html>
   `);
 });
 
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
