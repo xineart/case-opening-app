@@ -8,25 +8,24 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Statikus fájlok kiszolgálása a "public" mappából
 app.use(express.static(path.join(__dirname, 'public')));
 
 const PORT = process.env.PORT || 10000;
 const MONGO_URI = process.env.MONGO_URI;
 
-// --- MONGOOSE ADATBÁZIS KAPCSOLÓDÁS ---
+// --- ADATBÁZIS KAPCSOLÓDÁS ---
 let dbStatus = "Csatlakozás folyamatban...";
-let dbErrorDetails = "";
 
 if (MONGO_URI) {
   mongoose.connect(MONGO_URI)
-    .then(() => {
+    .then(async () => {
       dbStatus = "SIKERES_CSATLAKOZÁS";
       console.log('>>> Sikeres MongoDB csatlakozás! <<<');
+      await initAdminUser();
+      await initDefaultCases();
     })
     .catch(err => {
       dbStatus = "CSATLAKOZÁSI_HIBA";
-      dbErrorDetails = err.message;
       console.error('MongoDB csatlakozási hiba:', err);
     });
 } else {
@@ -34,11 +33,13 @@ if (MONGO_URI) {
   console.error("KRITIKUS: A MONGO_URI környezeti változó hiányzik!");
 }
 
-// --- ADATBÁZIS SCHEMÁK ÉS MODELL-EK ---
+// --- ADATBÁZIS SCHEMÁK ---
+
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   balance: { type: Number, default: 500.00 },
+  isAdmin: { type: Boolean, default: false },
   inventory: [{
     itemId: String,
     name: String,
@@ -50,86 +51,99 @@ const userSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
-const User = mongoose.model('User', userSchema);
+const caseSchema = new mongoose.Schema({
+  caseId: { type: String, required: true, unique: true },
+  name: { type: String, required: true },
+  price: { type: Number, required: true },
+  items: [{
+    id: String,
+    name: String,
+    price: Number,
+    color: String,
+    chance: Number,
+    img: String
+  }]
+});
 
-// --- SESSION MUNKAMENET BEÁLLÍTÁSAI ---
+const User = mongoose.model('User', userSchema);
+const Case = mongoose.model('Case', caseSchema);
+
+// --- SESSION ---
 app.use(session({
   secret: process.env.SESSION_SECRET || 'titkos_packdrop_mindenkinek_123',
   resave: false,
   saveUninitialized: false,
-  cookie: { 
-    secure: false,
-    maxAge: 7 * 24 * 60 * 60 * 1000 // 1 hét
-  }
+  cookie: { secure: false, maxAge: 7 * 24 * 60 * 60 * 1000 }
 }));
 
-// --- LÁDÁK ÉS VALÓDI CS:GO / CS2 KÉPEK DEFINIÁLÁSA ---
-const CASES = {
-  budget: {
-    id: 'budget',
-    name: 'Budget Case',
-    price: 15.00,
-    items: [
-      { id: 'b_1', name: 'AK-47 | Slate', price: 45.00, color: '#d32ce6', chance: 5.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a117ceaeefe6253bc1133f8e176462fe811802377227eb09a80eb5c202029c7d4f9f4a13f640c49f874f6764f6974d6c41b808ec13715f5c3a3721345d31d04d13f9f3ef4d7888ff45dbd4814a7e93739e1f5922c0c7' },
-      { id: 'b_2', name: 'AWP | Atheris', price: 18.00, color: '#8847ff', chance: 15.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a117ceaeefe6253bc1133f8e176462fe811802377227eb09a80eb5c202029c7d4f9f4a13f640c49f874f6764f6974d6c41b808ec13715f5c3a3721345d31d04d13f9f3e97022d4f82d2c140df95f87431e74a88fbc' },
-      { id: 'b_3', name: 'M4A1-S | Nightmare', price: 12.50, color: '#4b69ff', chance: 25.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a117ceaeefe6253bc1133f8e176462fe811802377227eb09a80eb5c202029c7d4f9f4a13f640c49f874f6764f6974d6c41b808ec13715f5c3a3721345d31d04d13f9f3e9d8e57849c66914ed03a0a38f323cddc158f0e' },
-      { id: 'b_4', name: 'USP-S | Cyrex', price: 5.20, color: '#4b69ff', chance: 25.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a117ceaeefe6253bc1133f8e176462fe811802377227eb09a80eb5c202029c7d4f9f4a13f640c49f874f6764f6974d6c41b808ec13715f5c3a3721345d31d04d13f9f3e950d2c41d1d86f4a8647c8d9df73c71cb3229b' },
-      { id: 'b_5', name: 'P250 | Sand Dune', price: 0.50, color: '#b0c3d9', chance: 30.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a117ceaeefe6253bc1133f8e176462fe811802377227eb09a80eb5c202029c7d4f9f4a13f640c49f874f6764f6974d6c41b808ec13715f5c3a3721345d31d04d13f9f3e8f8125869485e1d5eb8c9d06b12a806c9e01df' }
-    ]
-  },
-  weapon: {
-    id: 'weapon',
-    name: 'Weapon Case v1',
-    price: 50.00,
-    items: [
-      { id: 'w_1', name: 'Karambit | Fade', price: 1200.00, color: '#ffd700', chance: 0.5, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a117ceaeefe6253bc1133f8e176462fe811802377227eb09a80eb5c202029c7d4f9f4a13f640c49f874f6764f6974d6c41b808ec13715f5c3a3721345d31d04d13f9f3ee18a7c13cb81d6e58f0c9f1311de12edcdcf8d' },
-      { id: 'w_2', name: 'M4A4 | Howl', price: 850.00, color: '#eb4b4b', chance: 1.5, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a117ceaeefe6253bc1133f8e176462fe811802377227eb09a80eb5c202029c7d4f9f4a13f640c49f874f6764f6974d6c41b808ec13715f5c3a3721345d31d04d13f9f3eeb8854c8c7d6bc39a14de8b14e59df17cc43f3' },
-      { id: 'w_3', name: 'AK-47 | Fire Serpent', price: 400.00, color: '#eb4b4b', chance: 3.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a117ceaeefe6253bc1133f8e176462fe811802377227eb09a80eb5c202029c7d4f9f4a13f640c49f874f6764f6974d6c41b808ec13715f5c3a3721345d31d04d13f9f3eea822d4f82d2c140df95f874312e3dc1db0799' },
-      { id: 'w_4', name: 'AWP | Asiimov', price: 120.00, color: '#d32ce6', chance: 10.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a117ceaeefe6253bc1133f8e176462fe811802377227eb09a80eb5c202029c7d4f9f4a13f640c49f874f6764f6974d6c41b808ec13715f5c3a3721345d31d04d13f9f3ee3228c24cf1f1a1d9539d91f1a91e3e7f5379b' },
-      { id: 'w_5', name: 'USP-S | Kill Confirmed', price: 65.00, color: '#8847ff', chance: 20.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a117ceaeefe6253bc1133f8e176462fe811802377227eb09a80eb5c202029c7d4f9f4a13f640c49f874f6764f6974d6c41b808ec13715f5c3a3721345d31d04d13f9f3e980387d8d212a514d314f3261f887dc753faef' },
-      { id: 'w_6', name: 'Glock-18 | Water Elemental', price: 15.00, color: '#4b69ff', chance: 30.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a117ceaeefe6253bc1133f8e176462fe811802377227eb09a80eb5c202029c7d4f9f4a13f640c49f874f6764f6974d6c41b808ec13715f5c3a3721345d31d04d13f9f3e95082e8e9c0c8b368731b7f03eb5499cf2e431' },
-      { id: 'w_7', name: 'P250 | Sand Dune', price: 1.50, color: '#b0c3d9', chance: 35.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a117ceaeefe6253bc1133f8e176462fe811802377227eb09a80eb5c202029c7d4f9f4a13f640c49f874f6764f6974d6c41b808ec13715f5c3a3721345d31d04d13f9f3e8f8125869485e1d5eb8c9d06b12a806c9e01df' }
-    ]
-  },
-  knife: {
-    id: 'knife',
-    name: 'Knife & Glove Case',
-    price: 150.00,
-    items: [
-      { id: 'k_1', name: 'Butterfly Knife | Doppler', price: 2100.00, color: '#ffd700', chance: 1.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a117ceaeefe6253bc1133f8e176462fe811802377227eb09a80eb5c202029c7d4f9f4a13f640c49f874f6764f6974d6c41b808ec13715f5c3a3721345d31d04d13f9f3ee18a7c13cb81d6e58f0c9f13123b3790df5112' },
-      { id: 'k_2', name: 'Karambit | Marble Fade', price: 1600.00, color: '#ffd700', chance: 2.5, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a117ceaeefe6253bc1133f8e176462fe811802377227eb09a80eb5c202029c7d4f9f4a13f640c49f874f6764f6974d6c41b808ec13715f5c3a3721345d31d04d13f9f3ee18a7c13cb81d6e58f0c9f1311ce805bc9bc8e' },
-      { id: 'k_3', name: 'M9 Bayonet | Tiger Tooth', price: 950.00, color: '#eb4b4b', chance: 6.5, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a117ceaeefe6253bc1133f8e176462fe811802377227eb09a80eb5c202029c7d4f9f4a13f640c49f874f6764f6974d6c41b808ec13715f5c3a3721345d31d04d13f9f3ee18a7c13cb81d6e58f0c9f13110298d363ee00' },
-      { id: 'k_4', name: 'Sport Gloves | Vice', price: 1400.00, color: '#eb4b4b', chance: 4.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a117ceaeefe6253bc1133f8e176462fe811802377227eb09a80eb5c202029c7d4f9f4a13f640c49f874f6764f6974d6c41b808ec13715f5c3a3721345d31d04d13f9f3e908f5119cb2d2c1251fc434ff8c56e30b6e92b9' },
-      { id: 'k_5', name: 'Gut Knife | Doppler', price: 180.00, color: '#d32ce6', chance: 36.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a117ceaeefe6253bc1133f8e176462fe811802377227eb09a80eb5c202029c7d4f9f4a13f640c49f874f6764f6974d6c41b808ec13715f5c3a3721345d31d04d13f9f3ee18a7c13cb81d6e58f0c9f1312389d42858163' },
-      { id: 'k_6', name: 'Navaja Knife | Safari Mesh', price: 80.00, color: '#8847ff', chance: 50.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a117ceaeefe6253bc1133f8e176462fe811802377227eb09a80eb5c202029c7d4f9f4a13f640c49f874f6764f6974d6c41b808ec13715f5c3a3721345d31d04d13f9f3ee18a7c13cb81d6e58f0c9f1311a2f9ff4820dc' }
-    ]
-  }
-};
-
-// --- SEGÉDFÜGGVÉNY A SORSOLÁSHOZ ---
-function getRandomItemFromCase(caseKey) {
-  const selectedCase = CASES[caseKey];
-  if (!selectedCase) return null;
-
-  const rand = Math.random() * 100;
-  let cumulative = 0;
-  for (const item of selectedCase.items) {
-    cumulative += item.chance;
-    if (rand <= cumulative) {
-      return item;
+// --- KEZDŐ ADATOK FELTÖLTÉSE (ADMIN ÉS ALAP LÁDÁK) ---
+async function initAdminUser() {
+  try {
+    const adminExists = await User.findOne({ username: 'admin' });
+    if (!adminExists) {
+      const hashedPassword = await bcrypt.hash('admin123', 10);
+      await User.create({
+        username: 'admin',
+        password: hashedPassword,
+        balance: 10000.00,
+        isAdmin: true
+      });
+      console.log('>>> Alapértelmezett admin fiók létrehozva: admin / admin123 <<<');
     }
+  } catch (err) {
+    console.error('Hiba az admin fiók inicializálásakor:', err);
   }
-  return selectedCase.items[selectedCase.items.length - 1];
 }
 
-// --- API VÉGPONTOK (BACKEND) ---
+async function initDefaultCases() {
+  try {
+    const caseCount = await Case.countDocuments();
+    if (caseCount === 0) {
+      await Case.create({
+        caseId: 'weapon',
+        name: 'Weapon Case v1',
+        price: 50.00,
+        items: [
+          { id: 'w_1', name: 'Karambit | Fade', price: 1200.00, color: '#ffd700', chance: 1.0, img: '' },
+          { id: 'w_2', name: 'AK-47 | Fire Serpent', price: 400.00, color: '#eb4b4b', chance: 4.0, img: '' },
+          { id: 'w_3', name: 'AWP | Asiimov', price: 120.00, color: '#d32ce6', chance: 15.0, img: '' },
+          { id: 'w_4', name: 'USP-S | Kill Confirmed', price: 65.00, color: '#8847ff', chance: 30.0, img: '' },
+          { id: 'w_5', name: 'P250 | Sand Dune', price: 1.50, color: '#b0c3d9', chance: 50.0, img: '' }
+        ]
+      });
+      console.log('>>> Alapértelmezett láda létrehozva az adatbázisban! <<<');
+    }
+  } catch (err) {
+    console.error('Hiba a ládák inicializálásakor:', err);
+  }
+}
 
-app.get('/api/status', (req, res) => {
-  res.json({ dbStatus, dbErrorDetails, readyState: mongoose.connection.readyState });
-});
+// --- ADMIN MIDDLEWARE ---
+async function requireAdmin(req, res, next) {
+  if (!req.session.userId) return res.status(401).json({ error: 'Bejelentkezés szükséges!' });
+  const user = await User.findById(req.session.userId);
+  if (!user || !user.isAdmin) return res.status(403).json({ error: 'Hozzáférés megtagadva! Admin jog szükséges.' });
+  next();
+}
 
-app.get('/api/cases', (req, res) => {
-  res.json(CASES);
+// --- SORSOLÁS SEGÉDFÜGGVÉNY ---
+function getRandomItemFromCase(caseData) {
+  const rand = Math.random() * 100;
+  let cumulative = 0;
+  for (const item of caseData.items) {
+    cumulative += item.chance;
+    if (rand <= cumulative) return item;
+  }
+  return caseData.items[caseData.items.length - 1];
+}
+
+// --- PUBLIC API VÉGPONTOK ---
+
+app.get('/api/cases', async (req, res) => {
+  const cases = await Case.find();
+  const caseMap = {};
+  cases.forEach(c => { caseMap[c.caseId] = c; });
+  res.json(caseMap);
 });
 
 app.post('/api/register', async (req, res) => {
@@ -137,23 +151,17 @@ app.post('/api/register', async (req, res) => {
     const { username, password } = req.body;
     if (!username || !password) return res.status(400).json({ error: 'Minden mező kitöltése kötelező!' });
 
-    if (mongoose.connection.readyState !== 1) {
-      return res.status(500).json({ error: `Adatbázis csatlakozási hiba [${dbStatus}]` });
-    }
-
     const cleanUsername = username.trim();
-    if (cleanUsername.length < 3) return res.status(400).json({ error: 'Min. 3 karakteres név kell!' });
-
     const existingUser = await User.findOne({ username: new RegExp(`^${cleanUsername}$`, 'i') });
     if (existingUser) return res.status(400).json({ error: 'Ez a felhasználónév már foglalt!' });
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ username: cleanUsername, password: hashedPassword, balance: 500.00, inventory: [] });
+    const newUser = new User({ username: cleanUsername, password: hashedPassword, balance: 500.00, isAdmin: false });
 
     await newUser.save();
     req.session.userId = newUser._id;
 
-    res.json({ success: true, username: newUser.username, balance: newUser.balance, inventory: newUser.inventory });
+    res.json({ success: true, username: newUser.username, balance: newUser.balance, isAdmin: newUser.isAdmin, inventory: newUser.inventory });
   } catch (err) {
     res.status(500).json({ error: 'Szerveroldali hiba: ' + err.message });
   }
@@ -162,8 +170,6 @@ app.post('/api/register', async (req, res) => {
 app.post('/api/login', async (req, res) => {
   try {
     const { username, password } = req.body;
-    if (!username || !password) return res.status(400).json({ error: 'Adja meg a felhasználónevet és a jelszót!' });
-
     const user = await User.findOne({ username: username.trim() });
     if (!user) return res.status(400).json({ error: 'Hibás felhasználónév vagy jelszó!' });
 
@@ -171,7 +177,7 @@ app.post('/api/login', async (req, res) => {
     if (!isMatch) return res.status(400).json({ error: 'Hibás felhasználónév vagy jelszó!' });
 
     req.session.userId = user._id;
-    res.json({ success: true, username: user.username, balance: user.balance, inventory: user.inventory });
+    res.json({ success: true, username: user.username, balance: user.balance, isAdmin: user.isAdmin, inventory: user.inventory });
   } catch (err) {
     res.status(500).json({ error: 'Szerver hiba: ' + err.message });
   }
@@ -189,7 +195,7 @@ app.get('/api/me', async (req, res) => {
     if (!req.session.userId) return res.json({ loggedIn: false });
     const user = await User.findById(req.session.userId);
     if (!user) return res.json({ loggedIn: false });
-    res.json({ loggedIn: true, username: user.username, balance: user.balance, inventory: user.inventory });
+    res.json({ loggedIn: true, username: user.username, balance: user.balance, isAdmin: user.isAdmin, inventory: user.inventory });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -200,19 +206,14 @@ app.post('/api/open-case', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Kérjük, jelentkezzen be!' });
 
     const { caseId } = req.body;
-    const targetCase = CASES[caseId || 'weapon'];
-
-    if (!targetCase) return res.status(400).json({ error: 'Érvénytelen láda kategória!' });
+    const targetCase = await Case.findOne({ caseId: caseId });
+    if (!targetCase) return res.status(400).json({ error: 'Érvénytelen láda!' });
 
     const user = await User.findById(req.session.userId);
-    if (!user) return res.status(404).json({ error: 'Felhasználó nem található!' });
-
-    if (user.balance < targetCase.price) {
-      return res.status(400).json({ error: `Nincs elegendő egyenlege! (${targetCase.price} $)` });
-    }
+    if (user.balance < targetCase.price) return res.status(400).json({ error: `Nincs elegendő egyenleg! (${targetCase.price} $)` });
 
     user.balance -= targetCase.price;
-    const wonItem = getRandomItemFromCase(targetCase.id);
+    const wonItem = getRandomItemFromCase(targetCase);
 
     user.inventory.push({
       itemId: wonItem.id,
@@ -224,14 +225,9 @@ app.post('/api/open-case', async (req, res) => {
 
     await user.save();
 
-    res.json({
-      success: true,
-      item: wonItem,
-      newBalance: user.balance,
-      inventory: user.inventory
-    });
+    res.json({ success: true, item: wonItem, newBalance: user.balance, inventory: user.inventory });
   } catch (err) {
-    res.status(500).json({ error: 'Hiba a láda nyitása közben: ' + err.message });
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -242,29 +238,61 @@ app.post('/api/sell-item', async (req, res) => {
     const { itemIndex } = req.body;
     const user = await User.findById(req.session.userId);
 
-    if (!user || !user.inventory[itemIndex]) {
-      return res.status(400).json({ error: 'A tárgy nem található a raktárban!' });
-    }
+    if (!user || !user.inventory[itemIndex]) return res.status(400).json({ error: 'A tárgy nem található!' });
 
     const itemToSell = user.inventory[itemIndex];
     user.balance += itemToSell.price;
     user.inventory.splice(itemIndex, 1);
 
     await user.save();
-
     res.json({ success: true, newBalance: user.balance, inventory: user.inventory });
   } catch (err) {
-    res.status(500).json({ error: 'Eladási hiba: ' + err.message });
+    res.status(500).json({ error: err.message });
   }
 });
 
-app.post('/api/add-funds', async (req, res) => {
+// --- ADMIN API VÉGPONTOK ---
+
+app.get('/api/admin/users', requireAdmin, async (req, res) => {
+  const users = await User.find({}, '-password').sort({ createdAt: -1 });
+  res.json(users);
+});
+
+app.post('/api/admin/update-balance', requireAdmin, async (req, res) => {
+  const { userId, newBalance } = req.body;
+  const user = await User.findById(userId);
+  if (!user) return res.status(404).json({ error: 'Felhasználó nem található!' });
+
+  user.balance = parseFloat(newBalance);
+  await user.save();
+  res.json({ success: true });
+});
+
+app.post('/api/admin/save-case', requireAdmin, async (req, res) => {
   try {
-    if (!req.session.userId) return res.status(401).json({ error: 'Nincs munkamenet.' });
-    const user = await User.findById(req.session.userId);
-    user.balance += 250.00;
-    await user.save();
-    res.json({ success: true, newBalance: user.balance });
+    const { caseId, name, price, items } = req.body;
+
+    let targetCase = await Case.findOne({ caseId });
+    if (targetCase) {
+      targetCase.name = name;
+      targetCase.price = parseFloat(price);
+      targetCase.items = items;
+      await targetCase.save();
+    } else {
+      await Case.create({ caseId, name, price: parseFloat(price), items });
+    }
+
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/admin/delete-case', requireAdmin, async (req, res) => {
+  try {
+    const { caseId } = req.body;
+    await Case.deleteOne({ caseId });
+    res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -280,39 +308,40 @@ app.get('/', (req, res) => {
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>PACKDROP - Multi Case Platform</title>
       <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
         body { background-color: #0b0e14; color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; }
         header { background: #151a23; border-bottom: 2px solid #222938; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
         .logo { font-size: 24px; font-weight: 800; color: #ffb400; letter-spacing: 2px; }
-        .user-info { display: flex; align-items: center; gap: 20px; }
+        .user-info { display: flex; align-items: center; gap: 15px; }
         .balance-badge { background: #1c2331; padding: 8px 16px; border-radius: 20px; border: 1px solid #ffb400; font-weight: bold; color: #ffb400; }
         
         button { cursor: pointer; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; transition: 0.2s; }
         .btn-primary { background: #ffb400; color: #000; }
         .btn-primary:hover { background: #e09e00; }
         .btn-danger { background: #eb4b4b; color: #fff; }
-        .btn-success { background: #2ecc71; color: #fff; }
+        .btn-admin { background: #9b59b6; color: #fff; }
         .btn-case { background: #1c2331; color: #fff; border: 1px solid #2a354b; margin: 0 5px; }
         .btn-case.active { background: #ffb400; color: #000; border-color: #ffb400; }
         
-        input { background: #1c2331; border: 1px solid #2a354b; padding: 10px; color: #fff; border-radius: 6px; margin-bottom: 10px; width: 100%; }
-        main { flex: 1; padding: 40px; max-width: 1200px; margin: 0 auto; width: 100%; }
+        input, select { background: #1c2331; border: 1px solid #2a354b; padding: 10px; color: #fff; border-radius: 6px; margin-bottom: 10px; width: 100%; }
+        main { flex: 1; padding: 30px; max-width: 1200px; margin: 0 auto; width: 100%; }
         .auth-container { max-width: 400px; margin: 50px auto; background: #151a23; padding: 30px; border-radius: 12px; border: 1px solid #222938; text-align: center; }
         
-        .case-wrapper { position: relative; width: 100%; height: 200px; background: #151a23; border-radius: 12px; overflow: hidden; border: 2px solid #222938; margin: 20px 0; }
+        .case-wrapper { position: relative; width: 100%; height: 180px; background: #151a23; border-radius: 12px; overflow: hidden; border: 2px solid #222938; margin: 20px 0; }
         .pointer { position: absolute; top: 0; bottom: 0; left: 50%; width: 4px; background: #ffb400; z-index: 10; transform: translateX(-50%); box-shadow: 0 0 10px #ffb400; }
-        .spinner-track { display: flex; position: absolute; left: 0; top: 20px; height: 160px; transition: transform 5s cubic-bezier(0.1, 1, 0.1, 1); }
+        .spinner-track { display: flex; position: absolute; left: 0; top: 15px; height: 150px; transition: transform 5s cubic-bezier(0.1, 1, 0.1, 1); }
         
-        .item-card { min-width: 140px; height: 160px; background: #1c2331; margin: 0 5px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-bottom: 4px solid #fff; padding: 10px; text-align: center; font-size: 12px; }
-        .item-card img { width: 110px; height: 80px; object-fit: contain; margin-bottom: 10px; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.5)); }
-        
+        .item-card { min-width: 140px; height: 150px; background: #1c2331; margin: 0 5px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-bottom: 4px solid #fff; padding: 10px; text-align: center; font-size: 12px; }
         .inventory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; margin-top: 20px; }
-        .inv-item { background: #151a23; border-radius: 8px; padding: 15px; text-align: center; position: relative; border-bottom: 4px solid #555; }
-        .inv-item img { width: 120px; height: 90px; object-fit: contain; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.5)); }
-        .inv-item .sell-btn { margin-top: 10px; font-size: 11px; padding: 6px 10px; width: 100%; }
+        .inv-item { background: #151a23; border-radius: 8px; padding: 15px; text-align: center; border-bottom: 4px solid #555; }
+        
+        .admin-panel { background: #151a23; border: 1px solid #222938; padding: 25px; border-radius: 12px; margin-top: 20px; }
+        .admin-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .admin-table th, .admin-table td { border: 1px solid #222938; padding: 10px; text-align: left; }
+        .admin-table th { background: #1c2331; }
 
         .hidden { display: none !important; }
-        .case-selector { display: flex; justify-content: center; gap: 10px; margin-bottom: 30px; }
+        .nav-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #222938; padding-bottom: 10px; }
       </style>
     </head>
     <body>
@@ -322,12 +351,13 @@ app.get('/', (req, res) => {
         <div id="user-nav" class="user-info hidden">
           <span>Üdv, <b id="display-username"></b>!</span>
           <div class="balance-badge"><span id="display-balance">0.00</span> $</div>
-          <button onclick="addFunds()" class="btn-success" style="font-size: 11px; padding: 6px 10px;">+250$ Teszt</button>
+          <button id="admin-tab-btn" onclick="toggleAdminPanel()" class="btn-admin hidden">Admin Panel</button>
           <button onclick="logout()" class="btn-danger">Kijelentkezés</button>
         </div>
       </header>
 
       <main>
+        <!-- BEJELENTKEZÉS -->
         <div id="auth-box" class="auth-container">
           <h2 id="auth-title" style="margin-bottom: 20px;">Bejelentkezés</h2>
           <input type="text" id="auth-username" placeholder="Felhasználónév">
@@ -339,17 +369,14 @@ app.get('/', (req, res) => {
           </p>
         </div>
 
+        <!-- JÁTÉK FELÜLET -->
         <div id="game-box" class="hidden">
           
-          <div class="case-selector">
-            <button class="btn-case" id="btn-budget" onclick="selectCase('budget')">Budget Case (15$)</button>
-            <button class="btn-case active" id="btn-weapon" onclick="selectCase('weapon')">Weapon Case (50$)</button>
-            <button class="btn-case" id="btn-knife" onclick="selectCase('knife')">Knife & Glove (150$)</button>
-          </div>
+          <div id="case-selector" style="display: flex; justify-content: center; gap: 10px; margin-bottom: 30px;"></div>
 
           <div style="text-align: center;">
-            <h2 id="case-title">Weapon Case v1</h2>
-            <p style="color: #888;">Nyitási ár: <b id="case-price">50.00 $</b></p>
+            <h2 id="case-title">-</h2>
+            <p style="color: #888;">Nyitási ár: <b id="case-price">0.00 $</b></p>
           </div>
 
           <div class="case-wrapper">
@@ -365,33 +392,96 @@ app.get('/', (req, res) => {
           <div class="inventory-grid" id="inventory-grid"></div>
 
         </div>
+
+        <!-- ADMIN PANEL FELÜLET -->
+        <div id="admin-box" class="admin-panel hidden">
+          <h2>Adminisztrációs Panel</h2>
+          
+          <div class="nav-tabs">
+            <button class="btn-case active" onclick="showAdminSection('users')">Felhasználók</button>
+            <button class="btn-case" onclick="showAdminSection('cases')">Ládák Kezelése</button>
+          </div>
+
+          <!-- USER KEZELÉS -->
+          <div id="admin-users-section">
+            <h3>Felhasználók egyenlegének módosítása</h3>
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Felhasználónév</th>
+                  <th>Jelenlegi Egyenleg</th>
+                  <th>Admin?</th>
+                  <th>Új Egyenleg ($)</th>
+                  <th>Művelet</th>
+                </tr>
+              </thead>
+              <tbody id="admin-users-list"></tbody>
+            </table>
+          </div>
+
+          <!-- LÁDA KEZELÉS -->
+          <div id="admin-cases-section" class="hidden">
+            <h3>Láda Hozzáadása / Szerkesztése</h3>
+            <div style="max-width: 500px; margin-top: 15px;">
+              <input type="text" id="admin-case-id" placeholder="Láda azonosító (pl: budget_v2)">
+              <input type="text" id="admin-case-name" placeholder="Láda megjelenő neve (pl: Budget Case)">
+              <input type="number" id="admin-case-price" placeholder="Ár ($)">
+              <button onclick="saveCase()" class="btn-primary" style="width: 100%;">Láda Mentése</button>
+            </div>
+          </div>
+
+        </div>
       </main>
 
       <script>
         let isRegisterMode = false;
-        let selectedCaseKey = 'weapon';
+        let selectedCaseKey = '';
         let allCases = {};
+        let currentUser = null;
 
         window.onload = async () => {
-          await fetchCases();
           checkSession();
         };
 
         async function fetchCases() {
           const res = await fetch('/api/cases');
           allCases = await res.json();
-          generateTrackItems();
+          
+          const keys = Object.keys(allCases);
+          if (keys.length > 0 && !selectedCaseKey) {
+            selectedCaseKey = keys[0];
+          }
+
+          renderCaseButtons();
+          if (selectedCaseKey && allCases[selectedCaseKey]) {
+            selectCase(selectedCaseKey);
+          }
+        }
+
+        function renderCaseButtons() {
+          const container = document.getElementById('case-selector');
+          container.innerHTML = '';
+          
+          Object.keys(allCases).forEach(key => {
+            const c = allCases[key];
+            const btn = document.createElement('button');
+            btn.className = \`btn-case \${key === selectedCaseKey ? 'active' : ''}\`;
+            btn.innerText = \`\${c.name} (\${c.price}$)\`;
+            btn.onclick = () => selectCase(key);
+            container.appendChild(btn);
+          });
         }
 
         function selectCase(key) {
           selectedCaseKey = key;
-          document.querySelectorAll('.btn-case').forEach(b => b.classList.remove('active'));
-          document.getElementById('btn-' + key).classList.add('active');
+          renderCaseButtons();
           
           const c = allCases[key];
-          document.getElementById('case-title').innerText = c.name;
-          document.getElementById('case-price').innerText = c.price.toFixed(2) + ' $';
-          generateTrackItems();
+          if (c) {
+            document.getElementById('case-title').innerText = c.name;
+            document.getElementById('case-price').innerText = c.price.toFixed(2) + ' $';
+            generateTrackItems();
+          }
         }
 
         function toggleAuthMode() {
@@ -404,7 +494,11 @@ app.get('/', (req, res) => {
         async function checkSession() {
           const res = await fetch('/api/me');
           const data = await res.json();
-          if (data.loggedIn) updateUI(data);
+          if (data.loggedIn) {
+            currentUser = data;
+            await fetchCases();
+            updateUI(data);
+          }
         }
 
         async function submitAuth() {
@@ -423,10 +517,12 @@ app.get('/', (req, res) => {
             if (data.error) {
               alert(data.error);
             } else {
-              updateUI({ loggedIn: true, username: data.username, balance: data.balance, inventory: data.inventory });
+              currentUser = data;
+              await fetchCases();
+              updateUI(data);
             }
           } catch(err) {
-            alert("Hálózati hiba történt!");
+            alert("Hálózati hiba!");
           }
         }
 
@@ -437,6 +533,10 @@ app.get('/', (req, res) => {
 
           document.getElementById('display-username').innerText = userData.username;
           document.getElementById('display-balance').innerText = userData.balance.toFixed(2);
+
+          if (userData.isAdmin) {
+            document.getElementById('admin-tab-btn').classList.remove('hidden');
+          }
 
           renderInventory(userData.inventory);
         }
@@ -449,15 +549,15 @@ app.get('/', (req, res) => {
         function generateTrackItems() {
           const track = document.getElementById('spinner-track');
           track.innerHTML = '';
-          const currentCase = allCases[selectedCaseKey] || allCases['weapon'];
-          if(!currentCase) return;
+          const currentCase = allCases[selectedCaseKey];
+          if(!currentCase || !currentCase.items || currentCase.items.length === 0) return;
 
           for (let i = 0; i < 60; i++) {
             const randItem = currentCase.items[Math.floor(Math.random() * currentCase.items.length)];
             const el = document.createElement('div');
             el.className = 'item-card';
-            el.style.borderBottomColor = randItem.color;
-            el.innerHTML = \`<img src="\${randItem.img}" alt="\${randItem.name}"><div><b>\${randItem.name}</b><br>\${randItem.price}$</div>\`;
+            el.style.borderBottomColor = randItem.color || '#ffb400';
+            el.innerHTML = \`<div><b>\${randItem.name}</b><br>\${randItem.price}$</div>\`;
             track.appendChild(el);
           }
         }
@@ -488,7 +588,7 @@ app.get('/', (req, res) => {
             const cards = track.children;
             
             cards[45].style.borderBottomColor = data.item.color;
-            cards[45].innerHTML = \`<img src="\${data.item.img}" alt="\${data.item.name}"><div><b>\${data.item.name}</b><br>\${data.item.price}$</div>\`;
+            cards[45].innerHTML = \`<div><b>\${data.item.name}</b><br>\${data.item.price}$</div>\`;
 
             setTimeout(() => {
               track.style.transition = 'transform 5s cubic-bezier(0.1, 1, 0.1, 1)';
@@ -498,7 +598,7 @@ app.get('/', (req, res) => {
             }, 50);
 
             setTimeout(() => {
-              alert(\`Gratulálunk! Megnyerted: \${data.item.name} (\${data.item.price} $)\`);
+              alert(\`Nyeremény: \${data.item.name} (\${data.item.price} $)\`);
               document.getElementById('display-balance').innerText = data.newBalance.toFixed(2);
               renderInventory(data.inventory);
               btn.disabled = false;
@@ -524,10 +624,9 @@ app.get('/', (req, res) => {
             el.className = 'inv-item';
             el.style.borderBottomColor = item.color || '#fff';
             el.innerHTML = \`
-              <img src="\${item.img}" alt="\${item.name}">
-              <div style="font-size:12px; font-weight:bold; margin-top:5px;">\${item.name}</div>
-              <div style="color:#ffb400; font-size:12px;">\${item.price.toFixed(2)} $</div>
-              <button onclick="sellItem(\${index})" class="btn-danger sell-btn">ELADÁS (\${item.price.toFixed(2)}$)</button>
+              <div style="font-size:12px; font-weight:bold;">\${item.name}</div>
+              <div style="color:#ffb400; font-size:12px; margin: 10px 0;">\${item.price.toFixed(2)} $</div>
+              <button onclick="sellItem(\${index})" class="btn-danger" style="font-size: 11px; padding: 6px 10px; width: 100%;">ELADÁS (\${item.price.toFixed(2)}$)</button>
             \`;
             grid.appendChild(el);
           });
@@ -548,11 +647,91 @@ app.get('/', (req, res) => {
           }
         }
 
-        async function addFunds() {
-          const res = await fetch('/api/add-funds', { method: 'POST' });
+        // --- ADMIN PANEL LOGIKA ---
+
+        function toggleAdminPanel() {
+          const gameBox = document.getElementById('game-box');
+          const adminBox = document.getElementById('admin-box');
+
+          if (adminBox.classList.contains('hidden')) {
+            adminBox.classList.remove('hidden');
+            gameBox.classList.add('hidden');
+            loadAdminUsers();
+          } else {
+            adminBox.classList.add('hidden');
+            gameBox.classList.remove('hidden');
+          }
+        }
+
+        function showAdminSection(section) {
+          document.getElementById('admin-users-section').classList.toggle('hidden', section !== 'users');
+          document.getElementById('admin-cases-section').classList.toggle('hidden', section !== 'cases');
+        }
+
+        async function loadAdminUsers() {
+          const res = await fetch('/api/admin/users');
+          const users = await res.json();
+          
+          const tbody = document.getElementById('admin-users-list');
+          tbody.innerHTML = '';
+
+          users.forEach(u => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = \`
+              <td>\${u.username}</td>
+              <td>\${u.balance.toFixed(2)} $</td>
+              <td>\${u.isAdmin ? 'Igen' : 'Nem'}</td>
+              <td><input type="number" id="bal-\${u._id}" value="\${u.balance}" style="width: 100px; margin:0;"></td>
+              <td><button onclick="updateUserBalance('\${u._id}')" class="btn-primary" style="padding: 5px 10px;">Mentés</button></td>
+            \`;
+            tbody.appendChild(tr);
+          });
+        }
+
+        async function updateUserBalance(userId) {
+          const val = document.getElementById('bal-' + userId).value;
+          const res = await fetch('/api/admin/update-balance', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, newBalance: val })
+          });
           const data = await res.json();
           if (data.success) {
-            document.getElementById('display-balance').innerText = data.newBalance.toFixed(2);
+            alert('Egyenleg frissítve!');
+            loadAdminUsers();
+          } else {
+            alert(data.error);
+          }
+        }
+
+        async function saveCase() {
+          const caseId = document.getElementById('admin-case-id').value;
+          const name = document.getElementById('admin-case-name').value;
+          const price = document.getElementById('admin-case-price').value;
+
+          if(!caseId || !name || !price) {
+            alert('Kérjük töltsd ki az összes mezőt!');
+            return;
+          }
+
+          // Alapértelmezett tárgyak az új ládához
+          const defaultItems = [
+            { id: caseId + '_1', name: 'Ritka Skin', price: 100.00, color: '#ffd700', chance: 10.0, img: '' },
+            { id: caseId + '_2', name: 'Közepes Skin', price: 20.00, color: '#d32ce6', chance: 30.0, img: '' },
+            { id: caseId + '_3', name: 'Gyakori Skin', price: 2.00, color: '#4b69ff', chance: 60.0, img: '' }
+          ];
+
+          const res = await fetch('/api/admin/save-case', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ caseId, name, price, items: defaultItems })
+          });
+          const data = await res.json();
+          if (data.success) {
+            alert('Láda sikeresen elmentve!');
+            await fetchCases();
+          } else {
+            alert(data.error);
           }
         }
       </script>
@@ -562,5 +741,7 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, '0.0.0.0', () => {
+  console.log(`>>> Szerver elindult a ${PORT} porton! <<<`);
+});
   console.log(`>>> Szerver elindult a ${PORT} porton! <<<`);
 });
