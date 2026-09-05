@@ -300,448 +300,439 @@ app.post('/api/admin/delete-case', requireAdmin, async (req, res) => {
 
 // --- FRONTEND ---
 app.get('/', (req, res) => {
-  res.send(`
-    <!DOCTYPE html>
-    <html lang="hu">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>PACKDROP - Multi Case Platform</title>
-      <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: #0b0e14; color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; }
-        header { background: #151a23; border-bottom: 2px solid #222938; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 24px; font-weight: 800; color: #ffb400; letter-spacing: 2px; }
-        .user-info { display: flex; align-items: center; gap: 15px; }
-        .balance-badge { background: #1c2331; padding: 8px 16px; border-radius: 20px; border: 1px solid #ffb400; font-weight: bold; color: #ffb400; }
-        
-        button { cursor: pointer; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; transition: 0.2s; }
-        .btn-primary { background: #ffb400; color: #000; }
-        .btn-primary:hover { background: #e09e00; }
-        .btn-danger { background: #eb4b4b; color: #fff; }
-        .btn-admin { background: #9b59b6; color: #fff; }
-        .btn-case { background: #1c2331; color: #fff; border: 1px solid #2a354b; margin: 0 5px; }
-        .btn-case.active { background: #ffb400; color: #000; border-color: #ffb400; }
-        
-        input, select { background: #1c2331; border: 1px solid #2a354b; padding: 10px; color: #fff; border-radius: 6px; margin-bottom: 10px; width: 100%; }
-        main { flex: 1; padding: 30px; max-width: 1200px; margin: 0 auto; width: 100%; }
-        .auth-container { max-width: 400px; margin: 50px auto; background: #151a23; padding: 30px; border-radius: 12px; border: 1px solid #222938; text-align: center; }
-        
-        .case-wrapper { position: relative; width: 100%; height: 180px; background: #151a23; border-radius: 12px; overflow: hidden; border: 2px solid #222938; margin: 20px 0; }
-        .pointer { position: absolute; top: 0; bottom: 0; left: 50%; width: 4px; background: #ffb400; z-index: 10; transform: translateX(-50%); box-shadow: 0 0 10px #ffb400; }
-        .spinner-track { display: flex; position: absolute; left: 0; top: 15px; height: 150px; transition: transform 5s cubic-bezier(0.1, 1, 0.1, 1); }
-        
-        .item-card { min-width: 140px; height: 150px; background: #1c2331; margin: 0 5px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-bottom: 4px solid #fff; padding: 10px; text-align: center; font-size: 12px; }
-        .inventory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; margin-top: 20px; }
-        .inv-item { background: #151a23; border-radius: 8px; padding: 15px; text-align: center; border-bottom: 4px solid #555; }
-        
-        .admin-panel { background: #151a23; border: 1px solid #222938; padding: 25px; border-radius: 12px; margin-top: 20px; }
-        .admin-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        .admin-table th, .admin-table td { border: 1px solid #222938; padding: 10px; text-align: left; }
-        .admin-table th { background: #1c2331; }
+  res.send(`<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PACKDROP - Multi Case Platform</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+    body { background-color: #0b0e14; color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; }
+    header { background: #151a23; border-bottom: 2px solid #222938; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+    .logo { font-size: 24px; font-weight: 800; color: #ffb400; letter-spacing: 2px; }
+    .user-info { display: flex; align-items: center; gap: 15px; }
+    .balance-badge { background: #1c2331; padding: 8px 16px; border-radius: 20px; border: 1px solid #ffb400; font-weight: bold; color: #ffb400; }
+    
+    button { cursor: pointer; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; transition: 0.2s; }
+    .btn-primary { background: #ffb400; color: #000; }
+    .btn-primary:hover { background: #e09e00; }
+    .btn-danger { background: #eb4b4b; color: #fff; }
+    .btn-admin { background: #9b59b6; color: #fff; }
+    .btn-case { background: #1c2331; color: #fff; border: 1px solid #2a354b; margin: 0 5px; }
+    .btn-case.active { background: #ffb400; color: #000; border-color: #ffb400; }
+    
+    input, select { background: #1c2331; border: 1px solid #2a354b; padding: 10px; color: #fff; border-radius: 6px; margin-bottom: 10px; width: 100%; }
+    main { flex: 1; padding: 30px; max-width: 1200px; margin: 0 auto; width: 100%; }
+    .auth-container { max-width: 400px; margin: 50px auto; background: #151a23; padding: 30px; border-radius: 12px; border: 1px solid #222938; text-align: center; }
+    
+    .case-wrapper { position: relative; width: 100%; height: 180px; background: #151a23; border-radius: 12px; overflow: hidden; border: 2px solid #222938; margin: 20px 0; }
+    .pointer { position: absolute; top: 0; bottom: 0; left: 50%; width: 4px; background: #ffb400; z-index: 10; transform: translateX(-50%); box-shadow: 0 0 10px #ffb400; }
+    .spinner-track { display: flex; position: absolute; left: 0; top: 15px; height: 150px; transition: transform 5s cubic-bezier(0.1, 1, 0.1, 1); }
+    
+    .item-card { min-width: 140px; height: 150px; background: #1c2331; margin: 0 5px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-bottom: 4px solid #fff; padding: 10px; text-align: center; font-size: 12px; }
+    .inventory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; margin-top: 20px; }
+    .inv-item { background: #151a23; border-radius: 8px; padding: 15px; text-align: center; border-bottom: 4px solid #555; }
+    
+    .admin-panel { background: #151a23; border: 1px solid #222938; padding: 25px; border-radius: 12px; margin-top: 20px; }
+    .admin-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    .admin-table th, .admin-table td { border: 1px solid #222938; padding: 10px; text-align: left; }
+    .admin-table th { background: #1c2331; }
 
-        .hidden { display: none !important; }
-        .nav-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #222938; padding-bottom: 10px; }
-      </style>
-    </head>
-    <body>
+    .hidden { display: none !important; }
+    .nav-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #222938; padding-bottom: 10px; }
+  </style>
+</head>
+<body>
 
-      <header>
-        <div class="logo">PACKDROP</div>
-        <div id="user-nav" class="user-info hidden">
-          <span>Üdv, <b id="display-username"></b>!</span>
-          <div class="balance-badge"><span id="display-balance">0.00</span> $</div>
-          <button id="admin-tab-btn" onclick="toggleAdminPanel()" class="btn-admin hidden">Admin Panel</button>
-          <button onclick="logout()" class="btn-danger">Kijelentkezés</button>
+  <header>
+    <div class="logo">PACKDROP</div>
+    <div id="user-nav" class="user-info hidden">
+      <span>Üdv, <b id="display-username"></b>!</span>
+      <div class="balance-badge"><span id="display-balance">0.00</span> $</div>
+      <button id="admin-tab-btn" onclick="toggleAdminPanel()" class="btn-admin hidden">Admin Panel</button>
+      <button onclick="logout()" class="btn-danger">Kijelentkezés</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- BEJELENTKEZÉS -->
+    <div id="auth-box" class="auth-container">
+      <h2 id="auth-title" style="margin-bottom: 20px;">Bejelentkezés</h2>
+      <input type="text" id="auth-username" placeholder="Felhasználónév">
+      <input type="password" id="auth-password" placeholder="Jelszó">
+      <button id="auth-btn" onclick="submitAuth()" class="btn-primary" style="width: 100%; margin-top: 10px;">Bejelentkezés</button>
+      <p style="margin-top: 20px; font-size: 13px; color: #888;">
+        <span id="auth-toggle-text">Nincs még fiókod?</span> 
+        <a href="#" onclick="toggleAuthMode()" style="color: #ffb400;">Váltás regisztrációra</a>
+      </p>
+    </div>
+
+    <!-- JÁTÉK FELÜLET -->
+    <div id="game-box" class="hidden">
+      
+      <div id="case-selector" style="display: flex; justify-content: center; gap: 10px; margin-bottom: 30px;"></div>
+
+      <div style="text-align: center;">
+        <h2 id="case-title">-</h2>
+        <p style="color: #888;">Nyitási ár: <b id="case-price">0.00 $</b></p>
+      </div>
+
+      <div class="case-wrapper">
+        <div class="pointer"></div>
+        <div class="spinner-track" id="spinner-track"></div>
+      </div>
+
+      <div style="text-align: center;">
+        <button id="open-btn" onclick="openCase()" class="btn-primary" style="font-size: 18px; padding: 15px 40px;">LÁDA NYITÁSA</button>
+      </div>
+
+      <h3 style="margin-top: 50px; border-bottom: 1px solid #222938; padding-bottom: 10px;">Saját Raktár (Inventory)</h3>
+      <div class="inventory-grid" id="inventory-grid"></div>
+
+    </div>
+
+    <!-- ADMIN PANEL FELÜLET -->
+    <div id="admin-box" class="admin-panel hidden">
+      <h2>Adminisztrációs Panel</h2>
+      
+      <div class="nav-tabs">
+        <button class="btn-case active" onclick="showAdminSection('users')">Felhasználók</button>
+        <button class="btn-case" onclick="showAdminSection('cases')">Ládák Kezelése</button>
+      </div>
+
+      <!-- USER KEZELÉS -->
+      <div id="admin-users-section">
+        <h3>Felhasználók egyenlegének módosítása</h3>
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Felhasználónév</th>
+              <th>Jelenlegi Egyenleg</th>
+              <th>Admin?</th>
+              <th>Új Egyenleg ($)</th>
+              <th>Művelet</th>
+            </tr>
+          </thead>
+          <tbody id="admin-users-list"></tbody>
+        </table>
+      </div>
+
+      <!-- LÁDA KEZELÉS -->
+      <div id="admin-cases-section" class="hidden">
+        <h3>Láda Hozzáadása / Szerkesztése</h3>
+        <div style="max-width: 500px; margin-top: 15px;">
+          <input type="text" id="admin-case-id" placeholder="Láda azonosító (pl: budget_v2)">
+          <input type="text" id="admin-case-name" placeholder="Láda megjelenő neve (pl: Budget Case)">
+          <input type="number" id="admin-case-price" placeholder="Ár ($)">
+          <button onclick="saveCase()" class="btn-primary" style="width: 100%;">Láda Mentése</button>
         </div>
-      </header>
+      </div>
 
-      <main>
-        <!-- BEJELENTKEZÉS -->
-        <div id="auth-box" class="auth-container">
-          <h2 id="auth-title" style="margin-bottom: 20px;">Bejelentkezés</h2>
-          <input type="text" id="auth-username" placeholder="Felhasználónév">
-          <input type="password" id="auth-password" placeholder="Jelszó">
-          <button id="auth-btn" onclick="submitAuth()" class="btn-primary" style="width: 100%; margin-top: 10px;">Bejelentkezés</button>
-          <p style="margin-top: 20px; font-size: 13px; color: #888;">
-            <span id="auth-toggle-text">Nincs még fiókod?</span> 
-            <a href="#" onclick="toggleAuthMode()" style="color: #ffb400;">Váltás regisztrációra</a>
-          </p>
-        </div>
+    </div>
+  </main>
 
-        <!-- JÁTÉK FELÜLET -->
-        <div id="game-box" class="hidden">
-          
-          <div id="case-selector" style="display: flex; justify-content: center; gap: 10px; margin-bottom: 30px;"></div>
+  <script>
+    let isRegisterMode = false;
+    let selectedCaseKey = '';
+    let allCases = {};
+    let currentUser = null;
 
-          <div style="text-align: center;">
-            <h2 id="case-title">-</h2>
-            <p style="color: #888;">Nyitási ár: <b id="case-price">0.00 $</b></p>
-          </div>
+    window.onload = async () => {
+      checkSession();
+    };
 
-          <div class="case-wrapper">
-            <div class="pointer"></div>
-            <div class="spinner-track" id="spinner-track"></div>
-          </div>
+    async function fetchCases() {
+      const res = await fetch('/api/cases');
+      allCases = await res.json();
+      
+      const keys = Object.keys(allCases);
+      if (keys.length > 0 && !selectedCaseKey) {
+        selectedCaseKey = keys[0];
+      }
 
-          <div style="text-align: center;">
-            <button id="open-btn" onclick="openCase()" class="btn-primary" style="font-size: 18px; padding: 15px 40px;">LÁDA NYITÁSA</button>
-          </div>
+      renderCaseButtons();
+      if (selectedCaseKey && allCases[selectedCaseKey]) {
+        selectCase(selectedCaseKey);
+      }
+    }
 
-          <h3 style="margin-top: 50px; border-bottom: 1px solid #222938; padding-bottom: 10px;">Saját Raktár (Inventory)</h3>
-          <div class="inventory-grid" id="inventory-grid"></div>
+    function renderCaseButtons() {
+      const container = document.getElementById('case-selector');
+      container.innerHTML = '';
+      
+      Object.keys(allCases).forEach(key => {
+        const c = allCases[key];
+        const btn = document.createElement('button');
+        btn.className = 'btn-case ' + (key === selectedCaseKey ? 'active' : '');
+        btn.innerText = c.name + ' (' + c.price + '$)';
+        btn.onclick = () => selectCase(key);
+        container.appendChild(btn);
+      });
+    }
 
-        </div>
+    function selectCase(key) {
+      selectedCaseKey = key;
+      renderCaseButtons();
+      
+      const c = allCases[key];
+      if (c) {
+        document.getElementById('case-title').innerText = c.name;
+        document.getElementById('case-price').innerText = c.price.toFixed(2) + ' $';
+        generateTrackItems();
+      }
+    }
 
-        <!-- ADMIN PANEL FELÜLET -->
-        <div id="admin-box" class="admin-panel hidden">
-          <h2>Adminisztrációs Panel</h2>
-          
-          <div class="nav-tabs">
-            <button class="btn-case active" onclick="showAdminSection('users')">Felhasználók</button>
-            <button class="btn-case" onclick="showAdminSection('cases')">Ládák Kezelése</button>
-          </div>
+    function toggleAuthMode() {
+      isRegisterMode = !isRegisterMode;
+      document.getElementById('auth-title').innerText = isRegisterMode ? 'Regisztráció' : 'Bejelentkezés';
+      document.getElementById('auth-btn').innerText = isRegisterMode ? 'Regisztráció' : 'Bejelentkezés';
+      document.getElementById('auth-toggle-text').innerText = isRegisterMode ? 'Már van fiókod?' : 'Nincs még fiókod?';
+    }
 
-          <!-- USER KEZELÉS -->
-          <div id="admin-users-section">
-            <h3>Felhasználók egyenlegének módosítása</h3>
-            <table class="admin-table">
-              <thead>
-                <tr>
-                  <th>Felhasználónév</th>
-                  <th>Jelenlegi Egyenleg</th>
-                  <th>Admin?</th>
-                  <th>Új Egyenleg ($)</th>
-                  <th>Művelet</th>
-                </tr>
-              </thead>
-              <tbody id="admin-users-list"></tbody>
-            </table>
-          </div>
+    async function checkSession() {
+      const res = await fetch('/api/me');
+      const data = await res.json();
+      if (data.loggedIn) {
+        currentUser = data;
+        await fetchCases();
+        updateUI(data);
+      }
+    }
 
-          <!-- LÁDA KEZELÉS -->
-          <div id="admin-cases-section" class="hidden">
-            <h3>Láda Hozzáadása / Szerkesztése</h3>
-            <div style="max-width: 500px; margin-top: 15px;">
-              <input type="text" id="admin-case-id" placeholder="Láda azonosító (pl: budget_v2)">
-              <input type="text" id="admin-case-name" placeholder="Láda megjelenő neve (pl: Budget Case)">
-              <input type="number" id="admin-case-price" placeholder="Ár ($)">
-              <button onclick="saveCase()" class="btn-primary" style="width: 100%;">Láda Mentése</button>
-            </div>
-          </div>
+    async function submitAuth() {
+      const username = document.getElementById('auth-username').value;
+      const password = document.getElementById('auth-password').value;
+      const endpoint = isRegisterMode ? '/api/register' : '/api/login';
 
-        </div>
-      </main>
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
 
-      <script>
-        let isRegisterMode = false;
-        let selectedCaseKey = '';
-        let allCases = {};
-        let currentUser = null;
+        if (data.error) {
+          alert(data.error);
+        } else {
+          currentUser = data;
+          await fetchCases();
+          updateUI(data);
+        }
+      } catch(err) {
+        alert("Hálózati hiba!");
+      }
+    }
 
-        window.onload = async () => {
-          checkSession();
-        };
+    function updateUI(userData) {
+      document.getElementById('auth-box').classList.add('hidden');
+      document.getElementById('game-box').classList.remove('hidden');
+      document.getElementById('user-nav').classList.remove('hidden');
 
-        async function fetchCases() {
-          const res = await fetch('/api/cases');
-          allCases = await res.json();
-          
-          const keys = Object.keys(allCases);
-          if (keys.length > 0 && !selectedCaseKey) {
-            selectedCaseKey = keys[0];
-          }
+      document.getElementById('display-username').innerText = userData.username;
+      document.getElementById('display-balance').innerText = userData.balance.toFixed(2);
 
-          renderCaseButtons();
-          if (selectedCaseKey && allCases[selectedCaseKey]) {
-            selectCase(selectedCaseKey);
-          }
+      if (userData.isAdmin) {
+        document.getElementById('admin-tab-btn').classList.remove('hidden');
+      }
+
+      renderInventory(userData.inventory);
+    }
+
+    async function logout() {
+      await fetch('/api/logout', { method: 'POST' });
+      window.location.reload();
+    }
+
+    function generateTrackItems() {
+      const track = document.getElementById('spinner-track');
+      track.innerHTML = '';
+      const currentCase = allCases[selectedCaseKey];
+      if(!currentCase || !currentCase.items || currentCase.items.length === 0) return;
+
+      for (let i = 0; i < 60; i++) {
+        const randItem = currentCase.items[Math.floor(Math.random() * currentCase.items.length)];
+        const el = document.createElement('div');
+        el.className = 'item-card';
+        el.style.borderBottomColor = randItem.color || '#ffb400';
+        el.innerHTML = '<div><b>' + randItem.name + '</b><br>' + randItem.price + '$</div>';
+        track.appendChild(el);
+      }
+    }
+
+    async function openCase() {
+      const btn = document.getElementById('open-btn');
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/open-case', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ caseId: selectedCaseKey })
+        });
+        const data = await res.json();
+
+        if (data.error) {
+          alert(data.error);
+          btn.disabled = false;
+          return;
         }
 
-        function renderCaseButtons() {
-          const container = document.getElementById('case-selector');
-          container.innerHTML = '';
-          
-          Object.keys(allCases).forEach(key => {
-            const c = allCases[key];
-            const btn = document.createElement('button');
-            btn.className = \`btn-case \${key === selectedCaseKey ? 'active' : ''}\`;
-            btn.innerText = \`\${c.name} (\${c.price}$)\`;
-            btn.onclick = () => selectCase(key);
-            container.appendChild(btn);
-          });
-        }
+        const track = document.getElementById('spinner-track');
+        track.style.transition = 'none';
+        track.style.transform = 'translateX(0px)';
+        
+        generateTrackItems();
+        const cards = track.children;
+        
+        cards[45].style.borderBottomColor = data.item.color;
+        cards[45].innerHTML = '<div><b>' + data.item.name + '</b><br>' + data.item.price + '$</div>';
 
-        function selectCase(key) {
-          selectedCaseKey = key;
-          renderCaseButtons();
-          
-          const c = allCases[key];
-          if (c) {
-            document.getElementById('case-title').innerText = c.name;
-            document.getElementById('case-price').innerText = c.price.toFixed(2) + ' $';
-            generateTrackItems();
-          }
-        }
+        setTimeout(() => {
+          track.style.transition = 'transform 5s cubic-bezier(0.1, 1, 0.1, 1)';
+          const cardWidth = 150;
+          const targetOffset = -(45 * cardWidth - (document.querySelector('.case-wrapper').clientWidth / 2) + 75);
+          track.style.transform = 'translateX(' + targetOffset + 'px)';
+        }, 50);
 
-        function toggleAuthMode() {
-          isRegisterMode = !isRegisterMode;
-          document.getElementById('auth-title').innerText = isRegisterMode ? 'Regisztráció' : 'Bejelentkezés';
-          document.getElementById('auth-btn').innerText = isRegisterMode ? 'Regisztráció' : 'Bejelentkezés';
-          document.getElementById('auth-toggle-text').innerText = isRegisterMode ? 'Már van fiókod?' : 'Nincs még fiókod?';
-        }
+        setTimeout(() => {
+          alert('Nyeremény: ' + data.item.name + ' (' + data.item.price + ' $)');
+          document.getElementById('display-balance').innerText = data.newBalance.toFixed(2);
+          renderInventory(data.inventory);
+          btn.disabled = false;
+        }, 5200);
 
-        async function checkSession() {
-          const res = await fetch('/api/me');
-          const data = await res.json();
-          if (data.loggedIn) {
-            currentUser = data;
-            await fetchCases();
-            updateUI(data);
-          }
-        }
+      } catch (err) {
+        alert('Hiba történt!');
+        btn.disabled = false;
+      }
+    }
 
-        async function submitAuth() {
-          const username = document.getElementById('auth-username').value;
-          const password = document.getElementById('auth-password').value;
-          const endpoint = isRegisterMode ? '/api/register' : '/api/login';
+    function renderInventory(inventory) {
+      const grid = document.getElementById('inventory-grid');
+      grid.innerHTML = '';
 
-          try {
-            const res = await fetch(endpoint, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ username, password })
-            });
-            const data = await res.json();
+      if (!inventory || inventory.length === 0) {
+        grid.innerHTML = '<p style="color:#666;">A raktárad még üres.</p>';
+        return;
+      }
 
-            if (data.error) {
-              alert(data.error);
-            } else {
-              currentUser = data;
-              await fetchCases();
-              updateUI(data);
-            }
-          } catch(err) {
-            alert("Hálózati hiba!");
-          }
-        }
+      inventory.forEach((item, index) => {
+        const el = document.createElement('div');
+        el.className = 'inv-item';
+        el.style.borderBottomColor = item.color || '#fff';
+        el.innerHTML = '<div style="font-size:12px; font-weight:bold;">' + item.name + '</div>' +
+          '<div style="color:#ffb400; font-size:12px; margin: 10px 0;">' + item.price.toFixed(2) + ' $</div>' +
+          '<button onclick="sellItem(' + index + ')" class="btn-danger" style="font-size: 11px; padding: 6px 10px; width: 100%;">ELADÁS (' + item.price.toFixed(2) + '$)</button>';
+        grid.appendChild(el);
+      });
+    }
 
-        function updateUI(userData) {
-          document.getElementById('auth-box').classList.add('hidden');
-          document.getElementById('game-box').classList.remove('hidden');
-          document.getElementById('user-nav').classList.remove('hidden');
+    async function sellItem(index) {
+      const res = await fetch('/api/sell-item', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ itemIndex: index })
+      });
+      const data = await res.json();
+      if (data.success) {
+        document.getElementById('display-balance').innerText = data.newBalance.toFixed(2);
+        renderInventory(data.inventory);
+      } else {
+        alert(data.error);
+      }
+    }
 
-          document.getElementById('display-username').innerText = userData.username;
-          document.getElementById('display-balance').innerText = userData.balance.toFixed(2);
+    // --- ADMIN PANEL LOGIKA ---
 
-          if (userData.isAdmin) {
-            document.getElementById('admin-tab-btn').classList.remove('hidden');
-          }
+    function toggleAdminPanel() {
+      const gameBox = document.getElementById('game-box');
+      const adminBox = document.getElementById('admin-box');
 
-          renderInventory(userData.inventory);
-        }
+      if (adminBox.classList.contains('hidden')) {
+        adminBox.classList.remove('hidden');
+        gameBox.classList.add('hidden');
+        loadAdminUsers();
+      } else {
+        adminBox.classList.add('hidden');
+        gameBox.classList.remove('hidden');
+      }
+    }
 
-        async function logout() {
-          await fetch('/api/logout', { method: 'POST' });
-          window.location.reload();
-        }
+    function showAdminSection(section) {
+      document.getElementById('admin-users-section').classList.toggle('hidden', section !== 'users');
+      document.getElementById('admin-cases-section').classList.toggle('hidden', section !== 'cases');
+    }
 
-        function generateTrackItems() {
-          const track = document.getElementById('spinner-track');
-          track.innerHTML = '';
-          const currentCase = allCases[selectedCaseKey];
-          if(!currentCase || !currentCase.items || currentCase.items.length === 0) return;
+    async function loadAdminUsers() {
+      const res = await fetch('/api/admin/users');
+      const users = await res.json();
+      
+      const tbody = document.getElementById('admin-users-list');
+      tbody.innerHTML = '';
 
-          for (let i = 0; i < 60; i++) {
-            const randItem = currentCase.items[Math.floor(Math.random() * currentCase.items.length)];
-            const el = document.createElement('div');
-            el.className = 'item-card';
-            el.style.borderBottomColor = randItem.color || '#ffb400';
-            el.innerHTML = \`<div><b>\${randItem.name}</b><br>\${randItem.price}$</div>\`;
-            track.appendChild(el);
-          }
-        }
+      users.forEach(u => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = '<td>' + u.username + '</td>' +
+          '<td>' + u.balance.toFixed(2) + ' $</td>' +
+          '<td>' + (u.isAdmin ? 'Igen' : 'Nem') + '</td>' +
+          '<td><input type="number" id="bal-' + u._id + '" value="' + u.balance + '" style="width: 100px; margin:0;"></td>' +
+          '<td><button onclick="updateUserBalance(\'' + u._id + '\')" class="btn-primary" style="padding: 5px 10px;">Mentés</button></td>';
+        tbody.appendChild(tr);
+      });
+    }
 
-        async function openCase() {
-          const btn = document.getElementById('open-btn');
-          btn.disabled = true;
+    async function updateUserBalance(userId) {
+      const val = document.getElementById('bal-' + userId).value;
+      const res = await fetch('/api/admin/update-balance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, newBalance: val })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('Egyenleg frissítve!');
+        loadAdminUsers();
+      } else {
+        alert(data.error);
+      }
+    }
 
-          try {
-            const res = await fetch('/api/open-case', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ caseId: selectedCaseKey })
-            });
-            const data = await res.json();
+    async function saveCase() {
+      const caseId = document.getElementById('admin-case-id').value;
+      const name = document.getElementById('admin-case-name').value;
+      const price = document.getElementById('admin-case-price').value;
 
-            if (data.error) {
-              alert(data.error);
-              btn.disabled = false;
-              return;
-            }
+      if(!caseId || !name || !price) {
+        alert('Kérjük töltsd ki az összes mezőt!');
+        return;
+      }
 
-            const track = document.getElementById('spinner-track');
-            track.style.transition = 'none';
-            track.style.transform = 'translateX(0px)';
-            
-            generateTrackItems();
-            const cards = track.children;
-            
-            cards[45].style.borderBottomColor = data.item.color;
-            cards[45].innerHTML = \`<div><b>\${data.item.name}</b><br>\${data.item.price}$</div>\`;
+      const defaultItems = [
+        { id: caseId + '_1', name: 'Ritka Skin', price: 100.00, color: '#ffd700', chance: 10.0, img: '' },
+        { id: caseId + '_2', name: 'Közepes Skin', price: 20.00, color: '#d32ce6', chance: 30.0, img: '' },
+        { id: caseId + '_3', name: 'Gyakori Skin', price: 2.00, color: '#4b69ff', chance: 60.0, img: '' }
+      ];
 
-            setTimeout(() => {
-              track.style.transition = 'transform 5s cubic-bezier(0.1, 1, 0.1, 1)';
-              const cardWidth = 150;
-              const targetOffset = -(45 * cardWidth - (document.querySelector('.case-wrapper').clientWidth / 2) + 75);
-              track.style.transform = \`translateX(\${targetOffset}px)\`;
-            }, 50);
-
-            setTimeout(() => {
-              alert(\`Nyeremény: \${data.item.name} (\${data.item.price} $)\`);
-              document.getElementById('display-balance').innerText = data.newBalance.toFixed(2);
-              renderInventory(data.inventory);
-              btn.disabled = false;
-            }, 5200);
-
-          } catch (err) {
-            alert('Hiba történt!');
-            btn.disabled = false;
-          }
-        }
-
-        function renderInventory(inventory) {
-          const grid = document.getElementById('inventory-grid');
-          grid.innerHTML = '';
-
-          if (!inventory || inventory.length === 0) {
-            grid.innerHTML = '<p style="color:#666;">A raktárad még üres.</p>';
-            return;
-          }
-
-          inventory.forEach((item, index) => {
-            const el = document.createElement('div');
-            el.className = 'inv-item';
-            el.style.borderBottomColor = item.color || '#fff';
-            el.innerHTML = \`
-              <div style="font-size:12px; font-weight:bold;">\${item.name}</div>
-              <div style="color:#ffb400; font-size:12px; margin: 10px 0;">\${item.price.toFixed(2)} $</div>
-              <button onclick="sellItem(\${index})" class="btn-danger" style="font-size: 11px; padding: 6px 10px; width: 100%;">ELADÁS (\${item.price.toFixed(2)}$)</button>
-            \`;
-            grid.appendChild(el);
-          });
-        }
-
-        async function sellItem(index) {
-          const res = await fetch('/api/sell-item', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ itemIndex: index })
-          });
-          const data = await res.json();
-          if (data.success) {
-            document.getElementById('display-balance').innerText = data.newBalance.toFixed(2);
-            renderInventory(data.inventory);
-          } else {
-            alert(data.error);
-          }
-        }
-
-        // --- ADMIN PANEL LOGIKA ---
-
-        function toggleAdminPanel() {
-          const gameBox = document.getElementById('game-box');
-          const adminBox = document.getElementById('admin-box');
-
-          if (adminBox.classList.contains('hidden')) {
-            adminBox.classList.remove('hidden');
-            gameBox.classList.add('hidden');
-            loadAdminUsers();
-          } else {
-            adminBox.classList.add('hidden');
-            gameBox.classList.remove('hidden');
-          }
-        }
-
-        function showAdminSection(section) {
-          document.getElementById('admin-users-section').classList.toggle('hidden', section !== 'users');
-          document.getElementById('admin-cases-section').classList.toggle('hidden', section !== 'cases');
-        }
-
-        async function loadAdminUsers() {
-          const res = await fetch('/api/admin/users');
-          const users = await res.json();
-          
-          const tbody = document.getElementById('admin-users-list');
-          tbody.innerHTML = '';
-
-          users.forEach(u => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = \`
-              <td>\${u.username}</td>
-              <td>\${u.balance.toFixed(2)} $</td>
-              <td>\${u.isAdmin ? 'Igen' : 'Nem'}</td>
-              <td><input type="number" id="bal-\${u._id}" value="\${u.balance}" style="width: 100px; margin:0;"></td>
-              <td><button onclick="updateUserBalance('\${u._id}')" class="btn-primary" style="padding: 5px 10px;">Mentés</button></td>
-            \`;
-            tbody.appendChild(tr);
-          });
-        }
-
-        async function updateUserBalance(userId) {
-          const val = document.getElementById('bal-' + userId).value;
-          const res = await fetch('/api/admin/update-balance', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId, newBalance: val })
-          });
-          const data = await res.json();
-          if (data.success) {
-            alert('Egyenleg frissítve!');
-            loadAdminUsers();
-          } else {
-            alert(data.error);
-          }
-        }
-
-        async function saveCase() {
-          const caseId = document.getElementById('admin-case-id').value;
-          const name = document.getElementById('admin-case-name').value;
-          const price = document.getElementById('admin-case-price').value;
-
-          if(!caseId || !name || !price) {
-            alert('Kérjük töltsd ki az összes mezőt!');
-            return;
-          }
-
-          // Alapértelmezett tárgyak az új ládához
-          const defaultItems = [
-            { id: caseId + '_1', name: 'Ritka Skin', price: 100.00, color: '#ffd700', chance: 10.0, img: '' },
-            { id: caseId + '_2', name: 'Közepes Skin', price: 20.00, color: '#d32ce6', chance: 30.0, img: '' },
-            { id: caseId + '_3', name: 'Gyakori Skin', price: 2.00, color: '#4b69ff', chance: 60.0, img: '' }
-          ];
-
-          const res = await fetch('/api/admin/save-case', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ caseId, name, price, items: defaultItems })
-          });
-          const data = await res.json();
-          if (data.success) {
-            alert('Láda sikeresen elmentve!');
-            await fetchCases();
-          } else {
-            alert(data.error);
-          }
-        }
-      </script>
-    </body>
-    </html>
-  `);
+      const res = await fetch('/api/admin/save-case', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ caseId, name, price, items: defaultItems })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('Láda sikeresen elmentve!');
+        await fetchCases();
+      } else {
+        alert(data.error);
+      }
+    }
+  </script>
+</body>
+</html>`);
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`>>> Szerver elindult a ${PORT} porton! <<<`);
-});
   console.log(`>>> Szerver elindult a ${PORT} porton! <<<`);
 });
