@@ -63,25 +63,18 @@ app.use(session({
   }
 }));
 
-// --- BEÁGYAZOTT BASE64 SVG KÉPEK (GARANTÁLTAN BE TÖLTŐDIK MINDEN BÖNGÉSZŐBEN) ---
-const SVG_AK = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgNjAiPjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iNjAiIGZpbGw9IiMxYTFhMWEiIHJ4PSI1Ii8+PHBhdGggZD0iTTE1LDM1IEw0MCwzNSBMNTAsMzAgTDg1LDMw LDg1LDM1IEw1MCwzOCBMMzUsNDUgWiIgZmlsbD0iIzQ0NCIvPjxyZWN0IHg9IjYwIiB5PSIyNSIgd2lkdGg9IjIwIiBoZWlnaHQ9IjQiIGZpbGw9IiM4ODgiLz48L3N2Zz4=';
-const SVG_AWP = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgNjAiPjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iNjAiIGZpbGw9IiMxYTFhMWEiIHJ4PSI1Ii8+PHBhdGggZD0iTTEwLDMy LDg1LDMy LDkwLDMw LDkwLDM0 LDg1LDM0 LDEwLDM0 ZCIgZmlsbD0iIzJlN2QzMiIvPjxjaXJjbGUgY3g9IjQ1IiBjeT0iMzMiIHI9IjEyIiBmaWxsPSJub25lIiBzdHJva2U9IiMwMGU2NzYiIHN0cm9rZS13aWR0aD0iMiIvPjwvc3ZnPg==';
-const SVG_M4 = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgNjAiPjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iNjAiIGZpbGw9IiMxYTFhMWEiIHJ4PSI1Ii8+PHBhdGggZD0iTTIwLDM1 LDc1LDM1 LDc1LDMw LDg1LDMw LDg1LDM1IFoiIGZpbGw9IiMxNTY1YzAiLz48cmVjdCB4PSI1IiB5PSIzMiIgd2lkdGg9IjIwIiBoZWlnaHQ9IjUiIGZpbGw9IiMzMzMiLz48L3N2Zz4=';
-const SVG_PISTOL = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgNjAiPjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iNjAiIGZpbGw9IiMxYTFhMWEiIHJ4PSI1Ii8+PHBhdGggZD0iTTMwLDMw LDcwLDMw LDcwLDQw LDYwLDQ1IFoiIGZpbGw9IiNkMzJmMmYiLz48cmVjdCB4PSIxMCIgeT0iMzIiIHdpZHRoPSIyMCIgaGVpZ2h0PSI2IiBmaWxsPSIjODg4Ii8+PC9zdmc+';
-const SVG_KNIFE = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgNjAiPjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iNjAiIGZpbGw9IiMxYTFhMWEiIHJ4PSI1Ii8+PHBhdGggZD0iTTMwLDIwIFE2MCwxMCA3MCw0MCBRNTAsMzUgMzAsMjAgWiIgZmlsbD0iI2ZmYTAwIi8+PC9zdmc+';
-
-// --- LÁDÁK ÉS TÁRGYAK DEFINIÁLÁSA ---
+// --- LÁDÁK ÉS VALÓDI CS:GO / CS2 KÉPEK DEFINIÁLÁSA ---
 const CASES = {
   budget: {
     id: 'budget',
     name: 'Budget Case',
     price: 15.00,
     items: [
-      { id: 'b_1', name: 'AK-47 | Slate', price: 45.00, color: '#d32ce6', chance: 5.0, img: SVG_AK },
-      { id: 'b_2', name: 'AWP | Atheris', price: 18.00, color: '#8847ff', chance: 15.0, img: SVG_AWP },
-      { id: 'b_3', name: 'M4A1-S | Nightmare', price: 12.50, color: '#4b69ff', chance: 25.0, img: SVG_M4 },
-      { id: 'b_4', name: 'USP-S | Cyrex', price: 5.20, color: '#4b69ff', chance: 25.0, img: SVG_PISTOL },
-      { id: 'b_5', name: 'P250 | Sand Dune', price: 0.50, color: '#b0c3d9', chance: 30.0, img: SVG_PISTOL }
+      { id: 'b_1', name: 'AK-47 | Slate', price: 45.00, color: '#d32ce6', chance: 5.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a117ceaeefe6253bc1133f8e176462fe811802377227eb09a80eb5c202029c7d4f9f4a13f640c49f874f6764f6974d6c41b808ec13715f5c3a3721345d31d04d13f9f3ef4d7888ff45dbd4814a7e93739e1f5922c0c7' },
+      { id: 'b_2', name: 'AWP | Atheris', price: 18.00, color: '#8847ff', chance: 15.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a117ceaeefe6253bc1133f8e176462fe811802377227eb09a80eb5c202029c7d4f9f4a13f640c49f874f6764f6974d6c41b808ec13715f5c3a3721345d31d04d13f9f3e97022d4f82d2c140df95f87431e74a88fbc' },
+      { id: 'b_3', name: 'M4A1-S | Nightmare', price: 12.50, color: '#4b69ff', chance: 25.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a117ceaeefe6253bc1133f8e176462fe811802377227eb09a80eb5c202029c7d4f9f4a13f640c49f874f6764f6974d6c41b808ec13715f5c3a3721345d31d04d13f9f3e9d8e57849c66914ed03a0a38f323cddc158f0e' },
+      { id: 'b_4', name: 'USP-S | Cyrex', price: 5.20, color: '#4b69ff', chance: 25.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a117ceaeefe6253bc1133f8e176462fe811802377227eb09a80eb5c202029c7d4f9f4a13f640c49f874f6764f6974d6c41b808ec13715f5c3a3721345d31d04d13f9f3e950d2c41d1d86f4a8647c8d9df73c71cb3229b' },
+      { id: 'b_5', name: 'P250 | Sand Dune', price: 0.50, color: '#b0c3d9', chance: 30.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a117ceaeefe6253bc1133f8e176462fe811802377227eb09a80eb5c202029c7d4f9f4a13f640c49f874f6764f6974d6c41b808ec13715f5c3a3721345d31d04d13f9f3e8f8125869485e1d5eb8c9d06b12a806c9e01df' }
     ]
   },
   weapon: {
@@ -89,13 +82,13 @@ const CASES = {
     name: 'Weapon Case v1',
     price: 50.00,
     items: [
-      { id: 'w_1', name: 'Karambit | Fade', price: 1200.00, color: '#ffd700', chance: 0.5, img: SVG_KNIFE },
-      { id: 'w_2', name: 'M4A4 | Howl', price: 850.00, color: '#eb4b4b', chance: 1.5, img: SVG_M4 },
-      { id: 'w_3', name: 'AK-47 | Fire Serpent', price: 400.00, color: '#eb4b4b', chance: 3.0, img: SVG_AK },
-      { id: 'w_4', name: 'AWP | Asiimov', price: 120.00, color: '#d32ce6', chance: 10.0, img: SVG_AWP },
-      { id: 'w_5', name: 'USP-S | Kill Confirmed', price: 65.00, color: '#8847ff', chance: 20.0, img: SVG_PISTOL },
-      { id: 'w_6', name: 'Glock-18 | Water Elemental', price: 15.00, color: '#4b69ff', chance: 30.0, img: SVG_PISTOL },
-      { id: 'w_7', name: 'P250 | Sand Dune', price: 1.50, color: '#b0c3d9', chance: 35.0, img: SVG_PISTOL }
+      { id: 'w_1', name: 'Karambit | Fade', price: 1200.00, color: '#ffd700', chance: 0.5, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a117ceaeefe6253bc1133f8e176462fe811802377227eb09a80eb5c202029c7d4f9f4a13f640c49f874f6764f6974d6c41b808ec13715f5c3a3721345d31d04d13f9f3ee18a7c13cb81d6e58f0c9f1311de12edcdcf8d' },
+      { id: 'w_2', name: 'M4A4 | Howl', price: 850.00, color: '#eb4b4b', chance: 1.5, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a117ceaeefe6253bc1133f8e176462fe811802377227eb09a80eb5c202029c7d4f9f4a13f640c49f874f6764f6974d6c41b808ec13715f5c3a3721345d31d04d13f9f3eeb8854c8c7d6bc39a14de8b14e59df17cc43f3' },
+      { id: 'w_3', name: 'AK-47 | Fire Serpent', price: 400.00, color: '#eb4b4b', chance: 3.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a117ceaeefe6253bc1133f8e176462fe811802377227eb09a80eb5c202029c7d4f9f4a13f640c49f874f6764f6974d6c41b808ec13715f5c3a3721345d31d04d13f9f3eea822d4f82d2c140df95f874312e3dc1db0799' },
+      { id: 'w_4', name: 'AWP | Asiimov', price: 120.00, color: '#d32ce6', chance: 10.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a117ceaeefe6253bc1133f8e176462fe811802377227eb09a80eb5c202029c7d4f9f4a13f640c49f874f6764f6974d6c41b808ec13715f5c3a3721345d31d04d13f9f3ee3228c24cf1f1a1d9539d91f1a91e3e7f5379b' },
+      { id: 'w_5', name: 'USP-S | Kill Confirmed', price: 65.00, color: '#8847ff', chance: 20.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a117ceaeefe6253bc1133f8e176462fe811802377227eb09a80eb5c202029c7d4f9f4a13f640c49f874f6764f6974d6c41b808ec13715f5c3a3721345d31d04d13f9f3e980387d8d212a514d314f3261f887dc753faef' },
+      { id: 'w_6', name: 'Glock-18 | Water Elemental', price: 15.00, color: '#4b69ff', chance: 30.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a117ceaeefe6253bc1133f8e176462fe811802377227eb09a80eb5c202029c7d4f9f4a13f640c49f874f6764f6974d6c41b808ec13715f5c3a3721345d31d04d13f9f3e95082e8e9c0c8b368731b7f03eb5499cf2e431' },
+      { id: 'w_7', name: 'P250 | Sand Dune', price: 1.50, color: '#b0c3d9', chance: 35.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a117ceaeefe6253bc1133f8e176462fe811802377227eb09a80eb5c202029c7d4f9f4a13f640c49f874f6764f6974d6c41b808ec13715f5c3a3721345d31d04d13f9f3e8f8125869485e1d5eb8c9d06b12a806c9e01df' }
     ]
   },
   knife: {
@@ -103,12 +96,12 @@ const CASES = {
     name: 'Knife & Glove Case',
     price: 150.00,
     items: [
-      { id: 'k_1', name: 'Butterfly Knife | Doppler', price: 2100.00, color: '#ffd700', chance: 1.0, img: SVG_KNIFE },
-      { id: 'k_2', name: 'Karambit | Marble Fade', price: 1600.00, color: '#ffd700', chance: 2.5, img: SVG_KNIFE },
-      { id: 'k_3', name: 'M9 Bayonet | Tiger Tooth', price: 950.00, color: '#eb4b4b', chance: 6.5, img: SVG_KNIFE },
-      { id: 'k_4', name: 'Sport Gloves | Vice', price: 1400.00, color: '#eb4b4b', chance: 4.0, img: SVG_KNIFE },
-      { id: 'k_5', name: 'Gut Knife | Doppler', price: 180.00, color: '#d32ce6', chance: 36.0, img: SVG_KNIFE },
-      { id: 'k_6', name: 'Navaja Knife | Safari Mesh', price: 80.00, color: '#8847ff', chance: 50.0, img: SVG_KNIFE }
+      { id: 'k_1', name: 'Butterfly Knife | Doppler', price: 2100.00, color: '#ffd700', chance: 1.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a117ceaeefe6253bc1133f8e176462fe811802377227eb09a80eb5c202029c7d4f9f4a13f640c49f874f6764f6974d6c41b808ec13715f5c3a3721345d31d04d13f9f3ee18a7c13cb81d6e58f0c9f13123b3790df5112' },
+      { id: 'k_2', name: 'Karambit | Marble Fade', price: 1600.00, color: '#ffd700', chance: 2.5, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a117ceaeefe6253bc1133f8e176462fe811802377227eb09a80eb5c202029c7d4f9f4a13f640c49f874f6764f6974d6c41b808ec13715f5c3a3721345d31d04d13f9f3ee18a7c13cb81d6e58f0c9f1311ce805bc9bc8e' },
+      { id: 'k_3', name: 'M9 Bayonet | Tiger Tooth', price: 950.00, color: '#eb4b4b', chance: 6.5, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a117ceaeefe6253bc1133f8e176462fe811802377227eb09a80eb5c202029c7d4f9f4a13f640c49f874f6764f6974d6c41b808ec13715f5c3a3721345d31d04d13f9f3ee18a7c13cb81d6e58f0c9f13110298d363ee00' },
+      { id: 'k_4', name: 'Sport Gloves | Vice', price: 1400.00, color: '#eb4b4b', chance: 4.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a117ceaeefe6253bc1133f8e176462fe811802377227eb09a80eb5c202029c7d4f9f4a13f640c49f874f6764f6974d6c41b808ec13715f5c3a3721345d31d04d13f9f3e908f5119cb2d2c1251fc434ff8c56e30b6e92b9' },
+      { id: 'k_5', name: 'Gut Knife | Doppler', price: 180.00, color: '#d32ce6', chance: 36.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a117ceaeefe6253bc1133f8e176462fe811802377227eb09a80eb5c202029c7d4f9f4a13f640c49f874f6764f6974d6c41b808ec13715f5c3a3721345d31d04d13f9f3ee18a7c13cb81d6e58f0c9f1312389d42858163' },
+      { id: 'k_6', name: 'Navaja Knife | Safari Mesh', price: 80.00, color: '#8847ff', chance: 50.0, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a117ceaeefe6253bc1133f8e176462fe811802377227eb09a80eb5c202029c7d4f9f4a13f640c49f874f6764f6974d6c41b808ec13715f5c3a3721345d31d04d13f9f3ee18a7c13cb81d6e58f0c9f1311a2f9ff4820dc' }
     ]
   }
 };
@@ -311,11 +304,11 @@ app.get('/', (req, res) => {
         .spinner-track { display: flex; position: absolute; left: 0; top: 20px; height: 160px; transition: transform 5s cubic-bezier(0.1, 1, 0.1, 1); }
         
         .item-card { min-width: 140px; height: 160px; background: #1c2331; margin: 0 5px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-bottom: 4px solid #fff; padding: 10px; text-align: center; font-size: 12px; }
-        .item-card img { width: 100px; height: 80px; object-fit: contain; margin-bottom: 10px; }
+        .item-card img { width: 110px; height: 80px; object-fit: contain; margin-bottom: 10px; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.5)); }
         
         .inventory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; margin-top: 20px; }
         .inv-item { background: #151a23; border-radius: 8px; padding: 15px; text-align: center; position: relative; border-bottom: 4px solid #555; }
-        .inv-item img { width: 110px; height: 80px; object-fit: contain; }
+        .inv-item img { width: 120px; height: 90px; object-fit: contain; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.5)); }
         .inv-item .sell-btn { margin-top: 10px; font-size: 11px; padding: 6px 10px; width: 100%; }
 
         .hidden { display: none !important; }
@@ -464,7 +457,7 @@ app.get('/', (req, res) => {
             const el = document.createElement('div');
             el.className = 'item-card';
             el.style.borderBottomColor = randItem.color;
-            el.innerHTML = \`<img src="\${randItem.img}"><div><b>\${randItem.name}</b><br>\${randItem.price}$</div>\`;
+            el.innerHTML = \`<img src="\${randItem.img}" alt="\${randItem.name}"><div><b>\${randItem.name}</b><br>\${randItem.price}$</div>\`;
             track.appendChild(el);
           }
         }
@@ -495,7 +488,7 @@ app.get('/', (req, res) => {
             const cards = track.children;
             
             cards[45].style.borderBottomColor = data.item.color;
-            cards[45].innerHTML = \`<img src="\${data.item.img}"><div><b>\${data.item.name}</b><br>\${data.item.price}$</div>\`;
+            cards[45].innerHTML = \`<img src="\${data.item.img}" alt="\${data.item.name}"><div><b>\${data.item.name}</b><br>\${data.item.price}$</div>\`;
 
             setTimeout(() => {
               track.style.transition = 'transform 5s cubic-bezier(0.1, 1, 0.1, 1)';
@@ -531,7 +524,7 @@ app.get('/', (req, res) => {
             el.className = 'inv-item';
             el.style.borderBottomColor = item.color || '#fff';
             el.innerHTML = \`
-              <img src="\${item.img}">
+              <img src="\${item.img}" alt="\${item.name}">
               <div style="font-size:12px; font-weight:bold; margin-top:5px;">\${item.name}</div>
               <div style="color:#ffb400; font-size:12px;">\${item.price.toFixed(2)} $</div>
               <button onclick="sellItem(\${index})" class="btn-danger sell-btn">ELADÁS (\${item.price.toFixed(2)}$)</button>
