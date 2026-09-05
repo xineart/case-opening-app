@@ -197,15 +197,31 @@ app.get('/', (req, res) => {
   `);
 });
 
-const server = app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+// --- BIZTONSÁGOS SZERVER INDÍTÁS & PORT KEZELÉS ---
+const PORT = process.env.PORT || 10000;
+
+const server = app.listen(PORT, '0.0.0.0', () => {
+  console.log(`>>> A szerver sikeresen elindult a ${PORT} porton! <<<`);
 });
 
-process.on('SIGTERM', () => {
-  server.close(() => {
-    console.log('Szerver leállítva, port felszabadítva.');
-  });
+// Port beragadás (EADDRINUSE) megelőzése
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.log('A port beragadt, újrapróbálkozás...');
+    setTimeout(() => {
+      server.close();
+      server.listen(PORT, '0.0.0.0');
+    }, 1000);
+  } else {
+    console.error('Szerver indítási hiba:', err);
+  }
 });
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+
+// Tiszta leállás Render újraindításkor
+process.on('SIGTERM', () => {
+  console.log('SIGTERM jel érkezett. Szerver leállítása...');
+  server.close(() => {
+    console.log('Szerver leállt, port felszabadítva.');
+    process.exit(0);
+  });
 });
