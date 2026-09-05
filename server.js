@@ -92,7 +92,6 @@ async function initAdminUser() {
 
 async function initDefaultCases() {
   try {
-    // Alapértelmezett ládák frissítése/létrehozása képekkel és kategóriákkal
     const defaultCases = [
       {
         caseId: 'budget_v1',
@@ -139,7 +138,7 @@ async function initDefaultCases() {
         await Case.create(cData);
       }
     }
-    console.log('>>> Alapértelmezett kategóriájú ládák betöltve! <<<');
+    console.log('>>> Alapértelmezett ládák betöltve! <<<');
   } catch (err) {
     console.error('Hiba a ládák inicializálásakor:', err);
   }
@@ -325,7 +324,12 @@ app.get('/', (req, res) => {
     /* FEJLÉC */
     header { background: rgba(15, 17, 26, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid #1f2430; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
     .logo { font-size: 26px; font-weight: 900; letter-spacing: 2px; background: linear-gradient(135deg, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 30px rgba(168, 85, 247, 0.4); cursor: pointer; }
-    .user-info { display: flex; align-items: center; gap: 15px; position: relative; }
+    
+    .nav-tabs { display: flex; gap: 10px; }
+    .nav-btn { background: #131722; border: 1px solid #1f2430; color: #9ca3af; padding: 10px 20px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+    .nav-btn.active, .nav-btn:hover { background: rgba(168, 85, 247, 0.15); border-color: #a855f7; color: #a855f7; }
+
+    .user-info { display: flex; align-items: center; gap: 15px; }
     .balance-badge { background: #131722; padding: 8px 18px; border-radius: 30px; border: 1px solid #a855f7; font-weight: 700; color: #22c55e; box-shadow: 0 0 15px rgba(168, 85, 247, 0.2); }
     
     /* GOMBOK */
@@ -334,10 +338,8 @@ app.get('/', (req, res) => {
     .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(168, 85, 247, 0.6); }
     .btn-danger { background: #ef4444; color: #fff; }
     .btn-danger:hover { background: #dc2626; }
-    .btn-inventory { background: #1f2430; color: #a855f7; border: 1px solid #a855f7; }
-    .btn-inventory:hover { background: rgba(168, 85, 247, 0.2); }
 
-    /* KATEGÓRIÁK FÜL */
+    /* KATEGÓRIÁK FÜL A LÁDÁKNÁL */
     .category-tabs { display: flex; justify-content: center; gap: 15px; margin-bottom: 25px; }
     .cat-tab { background: #0f111a; border: 1px solid #1f2430; padding: 12px 24px; border-radius: 10px; color: #9ca3af; cursor: pointer; font-weight: 700; transition: 0.2s; }
     .cat-tab.active, .cat-tab:hover { background: rgba(168, 85, 247, 0.15); border-color: #a855f7; color: #a855f7; }
@@ -356,16 +358,10 @@ app.get('/', (req, res) => {
     .item-card { min-width: 160px; height: 180px; background: #131722; margin: 0 6px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; border-bottom: 4px solid #a855f7; padding: 12px; text-align: center; font-size: 12px; font-weight: 600; }
     .item-card img { width: 90px; height: 70px; object-fit: contain; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5)); margin-top: 10px; }
 
-    /* LENYITHATÓ RAKTÁR FIÓK (DRAWER) */
-    .inventory-drawer { position: fixed; top: 0; right: -450px; width: 420px; height: 100vh; background: #0f111a; border-left: 1px solid #1f2430; z-index: 200; box-shadow: -10px 0 40px rgba(0,0,0,0.8); transition: right 0.3s ease; padding: 25px; display: flex; flex-direction: column; }
-    .inventory-drawer.open { right: 0; }
-    .drawer-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1f2430; padding-bottom: 15px; margin-bottom: 20px; }
-    .drawer-content { flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; align-content: start; }
-    .inv-item { background: #131722; border-radius: 12px; padding: 12px; text-align: center; border: 1px solid #1f2430; border-bottom: 4px solid #a855f7; display: flex; flex-direction: column; justify-content: space-between; align-items: center; }
-    .inv-item img { width: 80px; height: 60px; object-fit: contain; margin: 8px 0; }
-
-    .overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 150; display: none; backdrop-filter: blur(4px); }
-    .overlay.active { display: block; }
+    /* RAKTÁR GRID */
+    .inventory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; margin-top: 25px; }
+    .inv-card { background: #0f111a; border: 1px solid #1f2430; border-bottom: 4px solid #a855f7; border-radius: 14px; padding: 20px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
+    .inv-card img { width: 120px; height: 90px; object-fit: contain; margin: 15px 0; }
 
     .hidden { display: none !important; }
   </style>
@@ -373,27 +369,22 @@ app.get('/', (req, res) => {
 <body>
 
   <header>
-    <div class="logo" onclick="window.location.reload()">TerBDrop</div>
+    <div class="logo" onclick="switchPage('game')">TerBDrop</div>
+    
+    <div id="nav-tabs" class="nav-tabs hidden">
+      <button id="nav-game" onclick="switchPage('game')" class="nav-btn active">🎮 Láda Nyitás</button>
+      <button id="nav-inv" onclick="switchPage('inventory')" class="nav-btn">🎒 Saját Raktár (<span id="inv-count">0</span>)</button>
+    </div>
+
     <div id="user-nav" class="user-info hidden">
       <span>Üdv, <b id="display-username" style="color: #a855f7;"></b>!</span>
       <div class="balance-badge"><span id="display-balance">0.00</span> $</div>
-      <button onclick="toggleInventoryDrawer()" class="btn-inventory">🎒 Raktáram (<span id="inv-count">0</span>)</button>
-      <button onclick="logout()" class="btn-danger">Kijelentkezés</button>
+      <button onclick="logout()" class="btn-danger" style="padding: 8px 14px;">Kijelentkezés</button>
     </div>
   </header>
 
-  <!-- SAJÁT RAKTÁR LENYITHATÓ PANEL (DRAWER) -->
-  <div id="overlay" class="overlay" onclick="toggleInventoryDrawer()"></div>
-  <div id="inventory-drawer" class="inventory-drawer">
-    <div class="drawer-header">
-      <h2 style="font-size: 20px; font-weight: 800;">Saját Raktár</h2>
-      <button onclick="toggleInventoryDrawer()" style="background: none; color: #9ca3af; font-size: 20px; padding: 0;">✕</button>
-    </div>
-    <div id="drawer-grid" class="drawer-content"></div>
-  </div>
-
   <main>
-    <!-- AUTH -->
+    <!-- AUTH NÉZET -->
     <div id="auth-box" class="auth-container">
       <h2 id="auth-title" style="margin-bottom: 25px; font-weight: 800; font-size: 28px;">Bejelentkezés</h2>
       <input type="text" id="auth-username" placeholder="Felhasználónév">
@@ -405,8 +396,8 @@ app.get('/', (req, res) => {
       </p>
     </div>
 
-    <!-- JÁTÉK FELÜLET -->
-    <div id="game-box" class="hidden">
+    <!-- JÁTÉK (LÁDANYITÓ) FÜL -->
+    <div id="page-game" class="hidden">
       <!-- KATEGÓRIA VÁLASZTÓ -->
       <div class="category-tabs">
         <div class="cat-tab active" onclick="filterCategory('all', this)">Összes Láda</div>
@@ -432,6 +423,15 @@ app.get('/', (req, res) => {
         <button id="open-btn" onclick="openCase()" class="btn-primary" style="font-size: 18px; padding: 16px 50px; border-radius: 30px;">LÁDA NYITÁSA</button>
       </div>
     </div>
+
+    <!-- RAKTÁR FÜL -->
+    <div id="page-inventory" class="hidden">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1f2430; padding-bottom: 15px;">
+        <h2 style="font-size: 28px; font-weight: 800;">Saját Raktárad</h2>
+        <p style="color: #9ca3af;">Kattints az eladás gombra az egyenleged feltöltéséhez.</p>
+      </div>
+      <div id="inventory-grid" class="inventory-grid"></div>
+    </div>
   </main>
 
   <script>
@@ -444,6 +444,21 @@ app.get('/', (req, res) => {
     window.onload = function() {
       checkSession();
     };
+
+    function switchPage(page) {
+      if (page === 'game') {
+        document.getElementById('page-game').classList.remove('hidden');
+        document.getElementById('page-inventory').classList.add('hidden');
+        document.getElementById('nav-game').classList.add('active');
+        document.getElementById('nav-inv').classList.remove('active');
+      } else if (page === 'inventory') {
+        document.getElementById('page-game').classList.add('hidden');
+        document.getElementById('page-inventory').classList.remove('hidden');
+        document.getElementById('nav-game').classList.remove('active');
+        document.getElementById('nav-inv').classList.add('active');
+        renderInventoryPage(currentUser ? currentUser.inventory : []);
+      }
+    }
 
     function toggleAuthMode() {
       isRegisterMode = !isRegisterMode;
@@ -549,14 +564,14 @@ app.get('/', (req, res) => {
 
     function updateUI(userData) {
       document.getElementById('auth-box').classList.add('hidden');
-      document.getElementById('game-box').classList.remove('hidden');
+      document.getElementById('nav-tabs').classList.remove('hidden');
       document.getElementById('user-nav').classList.remove('hidden');
 
       document.getElementById('display-username').innerText = userData.username;
       document.getElementById('display-balance').innerText = userData.balance.toFixed(2);
       document.getElementById('inv-count').innerText = userData.inventory.length;
 
-      renderDrawerInventory(userData.inventory);
+      switchPage('game');
     }
 
     async function logout() {
@@ -602,6 +617,9 @@ app.get('/', (req, res) => {
           return;
         }
 
+        currentUser.inventory = data.inventory;
+        currentUser.balance = data.newBalance;
+
         const track = document.getElementById('spinner-track');
         track.style.transition = 'none';
         track.style.transform = 'translateX(0px)';
@@ -627,7 +645,6 @@ app.get('/', (req, res) => {
           alert(\`Nyeremény: \${data.item.name} (\${data.item.price} $)\`);
           document.getElementById('display-balance').innerText = data.newBalance.toFixed(2);
           document.getElementById('inv-count').innerText = data.inventory.length;
-          renderDrawerInventory(data.inventory);
           btn.disabled = false;
         }, 5200);
 
@@ -637,29 +654,24 @@ app.get('/', (req, res) => {
       }
     }
 
-    function toggleInventoryDrawer() {
-      document.getElementById('inventory-drawer').classList.toggle('open');
-      document.getElementById('overlay').classList.toggle('active');
-    }
-
-    function renderDrawerInventory(inventory) {
-      const grid = document.getElementById('drawer-grid');
+    function renderInventoryPage(inventory) {
+      const grid = document.getElementById('inventory-grid');
       grid.innerHTML = '';
 
       if (!inventory || inventory.length === 0) {
-        grid.innerHTML = '<p style="color:#6b7280; grid-column: span 2; text-align:center;">A raktárad üres.</p>';
+        grid.innerHTML = '<p style="color:#6b7280; grid-column: 1 / -1; text-align:center; padding: 40px;">A raktárad jelenleg üres. Nyiss egy ládát!</p>';
         return;
       }
 
       inventory.forEach((item, index) => {
         const el = document.createElement('div');
-        el.className = 'inv-item';
+        el.className = 'inv-card';
         el.style.borderBottomColor = item.color || '#a855f7';
         el.innerHTML = \`
-          <div style="font-size:11px; font-weight:bold;">\${item.name}</div>
-          <img src="\${item.img || 'https://via.placeholder.com/80'}" alt="Skin">
-          <div style="color:#22c55e; font-size:12px; font-weight:bold; margin-bottom:8px;">\${item.price.toFixed(2)} $</div>
-          <button onclick="sellItem(\${index})" class="btn-danger" style="font-size: 10px; padding: 6px; width: 100%;">ELADÁS</button>
+          <div style="font-size:14px; font-weight:bold;">\${item.name}</div>
+          <img src="\${item.img || 'https://via.placeholder.com/120'}" alt="Skin">
+          <div style="color:#22c55e; font-size:16px; font-weight:bold; margin-bottom:12px;">\${item.price.toFixed(2)} $</div>
+          <button onclick="sellItem(\${index})" class="btn-danger" style="width: 100%;">ELADÁS</button>
         \`;
         grid.appendChild(el);
       });
@@ -679,9 +691,12 @@ app.get('/', (req, res) => {
           return;
         }
 
+        currentUser.inventory = data.inventory;
+        currentUser.balance = data.newBalance;
+
         document.getElementById('display-balance').innerText = data.newBalance.toFixed(2);
         document.getElementById('inv-count').innerText = data.inventory.length;
-        renderDrawerInventory(data.inventory);
+        renderInventoryPage(data.inventory);
       } catch (err) {
         alert('Hiba a tárgy eladásakor!');
       }
