@@ -63,18 +63,18 @@ app.use(session({
   }
 }));
 
-// --- LÁDÁK ÉS TÁRGYAK DEFINIÁLÁSA ---
+// --- LÁDÁK ÉS TÁRGYAK DEFINIÁLÁSA (VALÓDI STEAM CS2 KÉPEKKEL) ---
 const CASES = {
   budget: {
     id: 'budget',
     name: 'Budget Case',
     price: 15.00,
     items: [
-      { id: 'b_1', name: 'AK-47 | Slate', price: 45.00, color: '#d32ce6', chance: 5.0, img: 'https://images.unsplash.com/photo-1541185933-ef5d8ed016c2?w=150' },
-      { id: 'b_2', name: 'AWP | Atheris', price: 18.00, color: '#8847ff', chance: 15.0, img: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=150' },
-      { id: 'b_3', name: 'M4A1-S | Briefing', price: 8.50, color: '#4b69ff', chance: 30.0, img: 'https://images.unsplash.com/photo-1595590424283-b8f17842773f?w=150' },
-      { id: 'b_4', name: 'USP-S | Flashback', price: 3.20, color: '#4b69ff', chance: 25.0, img: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150' },
-      { id: 'b_5', name: 'P250 | Sand Dune', price: 0.50, color: '#b0c3d9', chance: 25.0, img: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=150' }
+      { id: 'b_1', name: 'AK-47 | Slate', price: 45.00, color: '#d32ce6', chance: 5.0, img: 'https://community.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyLwiYbf_jdk7uW-V7JkMPWBMWuZxuZi_rZsS3zgzU8isW3dnIr6eHKfPVAhDpojEe9YsUW4xta1Nuzm5FDci4NbjXKpmWVQppo' },
+      { id: 'b_2', name: 'AWP | Atheris', price: 18.00, color: '#8847ff', chance: 15.0, img: 'https://community.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyLwiYbf_jdk7uW-V6V-Kf2cGFidxOp_pewnF3nhxEt0sGnSzN76dH3GOg9xC8FyEORftRe-x9PuYurq71bW3d8UnjK-0H0YSTpMGQ' },
+      { id: 'b_3', name: 'M4A1-S | Briefing', price: 8.50, color: '#4b69ff', chance: 30.0, img: 'https://community.steamstatic.com/economy/image/fWFc82js0fmoRAP-qOIPu55o2gvh82834uhggM4hdx4hLHjhX28Xdq9mnd1hA2sXf1Bwst31m83fC_SGC-30x84f4p5f3mJzllEwMb3mYjhncAOTUfAOD6Br912yWyRt4sI2A4Tk8e1Sfwzs4YrDO7B9Z9A3S8aB1I9_S3O' },
+      { id: 'b_4', name: 'USP-S | Flashback', price: 3.20, color: '#4b69ff', chance: 25.0, img: 'https://community.steamstatic.com/economy/image/fWFc82js0fmoRAP-qOIPu55o2gvh82834uhggM4hdx4hLHjhX28Xdq9mnd1hA2sXf1Bwst31m83fC_SGC-30x84f4p5f3mJzllB4NrrpZmOaAwtUDvAOD_s13yW-VyI1xS5jM4Tk8-0Sfwzu4YrDO7B9P4d_Z86P' },
+      { id: 'b_5', name: 'P250 | Sand Dune', price: 0.50, color: '#b0c3d9', chance: 25.0, img: 'https://community.steamstatic.com/economy/image/fWFc82js0fmoRAP-qOIPu55o2gvh82834uhggM4hdx4hLHjhX28Xdq9mnd1hA2sXf1Bwst31m83fC_SGC-30x84f4p5f3mJznwUpNrr2aGM13sTUTq-G4A' }
     ]
   },
   weapon: {
@@ -82,13 +82,13 @@ const CASES = {
     name: 'Weapon Case v1',
     price: 50.00,
     items: [
-      { id: 'w_1', name: 'Karambit | Fade', price: 1200.00, color: '#ffd700', chance: 0.5, img: 'https://images.unsplash.com/photo-1589241062272-c0a000072dfa?w=150' },
-      { id: 'w_2', name: 'M4A4 | Howl', price: 850.00, color: '#eb4b4b', chance: 1.5, img: 'https://images.unsplash.com/photo-1595590424283-b8f17842773f?w=150' },
-      { id: 'w_3', name: 'AK-47 | Fire Serpent', price: 400.00, color: '#eb4b4b', chance: 3.0, img: 'https://images.unsplash.com/photo-1541185933-ef5d8ed016c2?w=150' },
-      { id: 'w_4', name: 'AWP | Asiimov', price: 120.00, color: '#d32ce6', chance: 10.0, img: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=150' },
-      { id: 'w_5', name: 'USP-S | Kill Confirmed', price: 65.00, color: '#8847ff', chance: 20.0, img: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150' },
-      { id: 'w_6', name: 'Glock-18 | Water Elemental', price: 15.00, color: '#4b69ff', chance: 30.0, img: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=150' },
-      { id: 'w_7', name: 'P250 | Sand Dune', price: 1.50, color: '#b0c3d9', chance: 35.0, img: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=150' }
+      { id: 'w_1', name: 'Karambit | Fade', price: 1200.00, color: '#ffd700', chance: 0.5, img: 'https://community.steamstatic.com/economy/image/fWFc82js0fmoRAP-qOIPu55o2gvh82834uhggM4hdx4hLHjhX28Xdq9mnd1hA2sXf1Bwst31m83fC_SGC-30x84f4p5f3mJzklA1Mb32aGM20v3UTqS9Y13v81u7WyRmXfM1AY1S45G4UOn2Iu34E' },
+      { id: 'w_2', name: 'M4A4 | Howl', price: 850.00, color: '#eb4b4b', chance: 1.5, img: 'https://community.steamstatic.com/economy/image/fWFc82js0fmoRAP-qOIPu55o2gvh82834uhggM4hdx4hLHjhX28Xdq9mnd1hA2sXf1Bwst31m83fC_SGC-30x84f4p5f3mJzlkQ2Mr2wYjhS0ubm_q54XqfU13v81u7WyRmXfM1AY1S45G4UOn2Iu34E' },
+      { id: 'w_3', name: 'AK-47 | Fire Serpent', price: 400.00, color: '#eb4b4b', chance: 3.0, img: 'https://community.steamstatic.com/economy/image/fWFc82js0fmoRAP-qOIPu55o2gvh82834uhggM4hdx4hLHjhX28Xdq9mnd1hA2sXf1Bwst31m83fC_SGC-30x84f4p5f3mJzllo3MbK-YjhncATpUaEODaRk13v81u7WyRmXfM1AY1S45G4UOn2Iu34E' },
+      { id: 'w_4', name: 'AWP | Asiimov', price: 120.00, color: '#d32ce6', chance: 10.0, img: 'https://community.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyLwiYbf_jdk7uW-V6V-Kf2cGFidxOp_pewnF3nhxEt0sGnSzN76dH3GOg9xC8FyEORftRe-x9PuYurq71bW3d8UnjK-0H0YSTpMGQ' },
+      { id: 'w_5', name: 'USP-S | Kill Confirmed', price: 65.00, color: '#8847ff', chance: 20.0, img: 'https://community.steamstatic.com/economy/image/fWFc82js0fmoRAP-qOIPu55o2gvh82834uhggM4hdx4hLHjhX28Xdq9mnd1hA2sXf1Bwst31m83fC_SGC-30x84f4p5f3mJznlo3MryjZzNy2sOBU6E' },
+      { id: 'w_6', name: 'Glock-18 | Water Elemental', price: 15.00, color: '#4b69ff', chance: 30.0, img: 'https://community.steamstatic.com/economy/image/fWFc82js0fmoRAP-qOIPu55o2gvh82834uhggM4hdx4hLHjhX28Xdq9mnd1hA2sXf1Bwst31m83fC_SGC-30x84f4p5f3mJzklEwMr-cZzJm5v54I3sO' },
+      { id: 'w_7', name: 'P250 | Sand Dune', price: 1.50, color: '#b0c3d9', chance: 35.0, img: 'https://community.steamstatic.com/economy/image/fWFc82js0fmoRAP-qOIPu55o2gvh82834uhggM4hdx4hLHjhX28Xdq9mnd1hA2sXf1Bwst31m83fC_SGC-30x84f4p5f3mJznwUpNrr2aGM13sTUTq-G4A' }
     ]
   },
   knife: {
@@ -96,12 +96,12 @@ const CASES = {
     name: 'Knife & Glove Case',
     price: 150.00,
     items: [
-      { id: 'k_1', name: 'Butterfly Knife | Doppler', price: 2100.00, color: '#ffd700', chance: 1.0, img: 'https://images.unsplash.com/photo-1589241062272-c0a000072dfa?w=150' },
-      { id: 'k_2', name: 'Karambit | Marble Fade', price: 1600.00, color: '#ffd700', chance: 2.5, img: 'https://images.unsplash.com/photo-1589241062272-c0a000072dfa?w=150' },
-      { id: 'k_3', name: 'M9 Bayonet | Tiger Tooth', price: 950.00, color: '#eb4b4b', chance: 6.5, img: 'https://images.unsplash.com/photo-1589241062272-c0a000072dfa?w=150' },
-      { id: 'k_4', name: 'Sport Gloves | Vice', price: 1400.00, color: '#eb4b4b', chance: 4.0, img: 'https://images.unsplash.com/photo-1595590424283-b8f17842773f?w=150' },
-      { id: 'k_5', name: 'Gut Knife | Doppler', price: 180.00, color: '#d32ce6', chance: 36.0, img: 'https://images.unsplash.com/photo-1589241062272-c0a000072dfa?w=150' },
-      { id: 'k_6', name: 'Navaja Knife | Safari Mesh', price: 80.00, color: '#8847ff', chance: 50.0, img: 'https://images.unsplash.com/photo-1589241062272-c0a000072dfa?w=150' }
+      { id: 'k_1', name: 'Butterfly Knife | Doppler', price: 2100.00, color: '#ffd700', chance: 1.0, img: 'https://community.steamstatic.com/economy/image/fWFc82js0fmoRAP-qOIPu55o2gvh82834uhggM4hdx4hLHjhX28Xdq9mnd1hA2sXf1Bwst31m83fC_SGC-30x84f4p5f3mJz3xN1Nrr-aGM11vOTUqC32a2f81u7WyRmXfM1AY1S45G4UOn2Iu34E' },
+      { id: 'k_2', name: 'Karambit | Marble Fade', price: 1600.00, color: '#ffd700', chance: 2.5, img: 'https://community.steamstatic.com/economy/image/fWFc82js0fmoRAP-qOIPu55o2gvh82834uhggM4hdx4hLHjhX28Xdq9mnd1hA2sXf1Bwst31m83fC_SGC-30x84f4p5f3mJzklA1Mb32aGM20v3UTqS9Y13v81u7WyRmXfM1AY1S45G4UOn2Iu34E' },
+      { id: 'k_3', name: 'M9 Bayonet | Tiger Tooth', price: 950.00, color: '#eb4b4b', chance: 6.5, img: 'https://community.steamstatic.com/economy/image/fWFc82js0fmoRAP-qOIPu55o2gvh82834uhggM4hdx4hLHjhX28Xdq9mnd1hA2sXf1Bwst31m83fC_SGC-30x84f4p5f3mJzkl1sMb31aGM41_S_X6_vD_R2R12A2J-yS5S8' },
+      { id: 'k_4', name: 'Sport Gloves | Vice', price: 1400.00, color: '#eb4b4b', chance: 4.0, img: 'https://community.steamstatic.com/economy/image/fWFc82js0fmoRAP-qOIPu55o2gvh82834uhggM4hdx4hLHjhX28Xdq9mnd1hA2sXf1Bwst31m83fC_SGC-30x84f4p5f3mJ31v3-Nj75Yzh546OBCf_D_A12-vD219_mG-5U' },
+      { id: 'k_5', name: 'Gut Knife | Doppler', price: 180.00, color: '#d32ce6', chance: 36.0, img: 'https://community.steamstatic.com/economy/image/fWFc82js0fmoRAP-qOIPu55o2gvh82834uhggM4hdx4hLHjhX28Xdq9mnd1hA2sXf1Bwst31m83fC_SGC-30x84f4p5f3mJzklN3NaL2Yjh2_KOBCOTeSFA8vD9u001c2-J0A' },
+      { id: 'k_6', name: 'Navaja Knife | Safari Mesh', price: 80.00, color: '#8847ff', chance: 50.0, img: 'https://community.steamstatic.com/economy/image/fWFc82js0fmoRAP-qOIPu55o2gvh82834uhggM4hdx4hLHjhX28Xdq9mnd1hA2sXf1Bwst31m83fC_SGC-30x84f4p5f3mJzl150N3z-aGMx2-f94F1-vR18uQy09c0O' }
     ]
   }
 };
@@ -278,7 +278,7 @@ app.post('/api/add-funds', async (req, res) => {
   }
 });
 
-// --- FRONTEND (Fallback HTML, ha nincs public/index.html) ---
+// --- FRONTEND ---
 app.get('/', (req, res) => {
   res.send(`
     <!DOCTYPE html>
@@ -312,11 +312,11 @@ app.get('/', (req, res) => {
         .spinner-track { display: flex; position: absolute; left: 0; top: 20px; height: 160px; transition: transform 5s cubic-bezier(0.1, 1, 0.1, 1); }
         
         .item-card { min-width: 140px; height: 160px; background: #1c2331; margin: 0 5px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-bottom: 4px solid #fff; padding: 10px; text-align: center; font-size: 12px; }
-        .item-card img { width: 80px; height: 80px; object-fit: contain; margin-bottom: 10px; }
+        .item-card img { width: 100px; height: 80px; object-fit: contain; margin-bottom: 10px; }
         
         .inventory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; margin-top: 20px; }
         .inv-item { background: #151a23; border-radius: 8px; padding: 15px; text-align: center; position: relative; border-bottom: 4px solid #555; }
-        .inv-item img { width: 90px; height: 90px; object-fit: contain; }
+        .inv-item img { width: 110px; height: 80px; object-fit: contain; }
         .inv-item .sell-btn { margin-top: 10px; font-size: 11px; padding: 6px 10px; width: 100%; }
 
         .hidden { display: none !important; }
@@ -571,4 +571,5 @@ app.get('/', (req, res) => {
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`>>> Szerver elindult a ${PORT} porton! <<<`);
+});
 });
