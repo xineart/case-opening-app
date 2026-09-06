@@ -54,15 +54,25 @@
         <span class="steam-icon">🎮</span> <span id="txt-login-btn">BEJELENTKEZÉS</span>
       </button>
 
-      <!-- USER PROFILE (Bejelentkezés után) -->
-      <div class="user-profile-tag hidden" id="user-profile-box">
-        <span class="avatar">👤</span>
-        <span class="username" id="display-username">Player</span>
-      </div>
+     <!-- USER PROFILE & LENYÍLÓ LELTÁR FÜL -->
+      <div class="user-profile-tag hidden" id="user-profile-box" style="position: relative;">
+        <button class="btn btn-ghost" id="toggle-inventory-btn" style="display: flex; align-items: center; gap: 8px;">
+          <span class="avatar">👤</span>
+          <span class="username" id="display-username">Player</span>
+          <span>🎒 <small style="color: #ffd700;">(Leltár ▼)</small></span>
+        </button>
 
-      <button class="btn btn-ghost btn-icon" id="open-settings-btn" title="Beállítások">⚙️</button>
-    </div>
-  </header>
+        <!-- LENYÍLÓ LELTÁR PANEL -->
+        <div id="dropdown-inventory-panel" class="dropdown-inventory hidden">
+          <div class="dropdown-header">
+            <h4>SAJÁT LELTÁR</h4>
+            <span id="close-dropdown-inv" style="cursor: pointer;">&times;</span>
+          </div>
+          <div id="dropdown-inventory-grid" class="dropdown-items-list">
+            <p class="empty-inv-msg">Még nincs tárgyad.</p>
+          </div>
+        </div>
+      </div>
 
   <!-- FŐ TARTALOM -->
   <main class="app-container">
