@@ -524,3 +524,92 @@ body {
 .modal-divider { display: flex; align-items: center; text-align: center; margin: 1.2rem 0; color: #64748b; font-size: 0.8rem; }
 .modal-divider::before, .modal-divider::after { content: ''; flex: 1; border-bottom: 1px solid var(--border-color); }
 .modal-divider span { padding: 0 10px; }
+
+/* LENYÍLÓ LELTÁR PANEL STÍLUSA */
+.dropdown-inventory {
+  position: absolute;
+  top: 110%;
+  right: 0;
+  width: 320px;
+  max-height: 400px;
+  background: #151518;
+  border: 2px solid #333;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+  z-index: 1000;
+  padding: 12px;
+  overflow-y: auto;
+}
+
+.dropdown-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #333;
+  padding-bottom: 8px;
+  margin-bottom: 10px;
+}
+
+.dropdown-header h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #fff;
+}
+
+.dropdown-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dropdown-item-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #1c1c21;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border-left: 4px solid #4b69ff;
+}
+
+.dropdown-item-card img {
+  width: 35px;
+  height: 35px;
+  object-fit: contain;
+}
+
+.dropdown-item-info {
+  flex: 1;
+  margin-left: 10px;
+  text-align: left;
+}
+
+.dropdown-item-info .item-name {
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+
+.dropdown-item-info .item-price {
+  font-size: 0.75rem;
+  color: #ffd700;
+}
+
+.btn-sell-dropdown {
+  background: #eb4b4b;
+  color: #fff;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-sell-dropdown:hover {
+  background: #ff5e5e;
+}
