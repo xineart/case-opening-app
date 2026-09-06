@@ -11,9 +11,8 @@
   --neon-green-glow: rgba(0, 255, 136, 0.3);
   --cyan-accent: #00e5ff;
   --purple-accent: #8b5cf6;
-  --gold-accent: #f59e0b;
-  --text-main: #ffffff;
-  --text-muted: #64748b;
+  --steam-color: #171a21;
+  --steam-btn: #2a475e;
 
   --rarity-milspec: #4b69ff;
   --rarity-restricted: #8847ff;
@@ -26,16 +25,9 @@
 
 body {
   background-color: var(--bg-dark);
-  color: var(--text-main);
+  color: #ffffff;
   min-height: 100vh;
   overflow-x: hidden;
-}
-
-#effects-canvas {
-  position: fixed;
-  top: 0; left: 0; width: 100vw; height: 100vh;
-  pointer-events: none;
-  z-index: 999;
 }
 
 /* ÉLŐ DROP SÁV */
@@ -73,7 +65,7 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  min-width: 160px;
+  min-width: 170px;
 }
 
 .feed-item img { width: 38px; height: 30px; object-fit: contain; }
@@ -116,7 +108,7 @@ body {
 .nav-item {
   background: transparent;
   border: 1px solid transparent;
-  color: var(--text-muted);
+  color: #64748b;
   font-family: 'Chakra Petch', sans-serif;
   font-size: 0.95rem;
   font-weight: 700;
@@ -137,6 +129,31 @@ body {
 
 .header-right { display: flex; align-items: center; gap: 12px; }
 
+/* NYELVVÁLTÓ */
+.lang-selector {
+  display: flex;
+  background: #000;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 2px;
+}
+
+.lang-btn {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  padding: 4px 8px;
+  font-weight: 800;
+  font-size: 0.75rem;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.lang-btn.active {
+  background: var(--bg-card);
+  color: #fff;
+}
+
 .balance-display {
   background: #000;
   border: 1px solid var(--border-color);
@@ -146,8 +163,20 @@ body {
   flex-direction: column;
 }
 
-.balance-label { font-size: 0.65rem; color: var(--text-muted); font-weight: 700; }
+.balance-label { font-size: 0.65rem; color: #64748b; font-weight: 700; }
 .balance-value { color: var(--neon-green); font-family: 'Chakra Petch', sans-serif; font-size: 1.1rem; font-weight: 700; }
+
+.user-profile-tag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-card);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
 
 .btn {
   border: none;
@@ -162,6 +191,13 @@ body {
 
 .btn-primary { background: var(--neon-green); color: #000; }
 .btn-primary:hover { background: #00cc6a; box-shadow: 0 0 15px var(--neon-green-glow); }
+
+.btn-login { background: var(--purple-accent); color: #fff; }
+.btn-login:hover { background: #7c3aed; }
+
+.btn-steam { background: var(--steam-btn); color: #fff; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.btn-steam:hover { background: #66c0f4; color: #000; }
+
 .btn-ghost { background: transparent; border: 1px solid var(--border-color); color: #fff; }
 .btn-ghost:hover { background: var(--bg-card); }
 .btn-icon { padding: 0.6rem; font-size: 1.1rem; }
@@ -188,7 +224,7 @@ body {
 
 .page-title { margin-bottom: 2rem; }
 .page-title h1 { font-family: 'Chakra Petch', sans-serif; font-size: 2.2rem; }
-.page-title p { color: var(--text-muted); margin-top: 5px; }
+.page-title p { color: #64748b; margin-top: 5px; }
 .flex-title { display: flex; justify-content: space-between; align-items: center; }
 
 /* CASES GRID */
@@ -206,7 +242,6 @@ body {
   text-align: center;
   cursor: pointer;
   transition: all 0.25s;
-  position: relative;
 }
 
 .case-card:hover {
@@ -282,7 +317,7 @@ body {
 
 /* ITEMS GRID */
 .section-divider { margin: 2rem 0 1.2rem 0; }
-.section-divider h3 { font-family: 'Chakra Petch', sans-serif; color: var(--text-muted); font-size: 1.1rem; }
+.section-divider h3 { font-family: 'Chakra Petch', sans-serif; color: #64748b; font-size: 1.1rem; }
 
 .items-grid {
   display: grid;
@@ -314,18 +349,14 @@ body {
 .item-card.covert { border-bottom-color: var(--rarity-covert); }
 .item-card.gold { border-bottom-color: var(--rarity-gold); }
 
-/* LOOTBOX CASE BATTLES STYLES */
+/* BATTLES LAYOUT */
 .battles-main-layout {
   display: grid;
   grid-template-columns: 2.2fr 1fr;
   gap: 25px;
 }
 
-.battles-list-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
+.battles-list-grid { display: flex; flex-direction: column; gap: 14px; }
 
 .battle-card-item {
   background: var(--bg-panel);
@@ -335,54 +366,15 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  transition: all 0.2s;
 }
 
-.battle-card-item:hover {
-  border-color: var(--purple-accent);
-  background: var(--bg-card);
-}
-
-.battle-info-left {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-}
-
-.battle-case-preview {
-  display: flex;
-  align-items: center;
-  gap: -10px;
-}
-
-.battle-case-img {
-  width: 50px;
-  height: 45px;
-  object-fit: contain;
-}
-
-.battle-details h4 {
-  font-family: 'Chakra Petch', sans-serif;
-  font-size: 1.1rem;
-}
-
-.battle-details p {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-}
-
-.battle-actions-right {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.battle-cost-tag {
-  font-family: 'Chakra Petch', sans-serif;
-  font-size: 1.2rem;
-  font-weight: 800;
-  color: var(--neon-green);
-}
+.battle-info-left { display: flex; align-items: center; gap: 18px; }
+.battle-case-preview { display: flex; gap: 5px; }
+.battle-case-img { width: 50px; height: 45px; object-fit: contain; }
+.battle-details h4 { font-family: 'Chakra Petch', sans-serif; font-size: 1.1rem; }
+.battle-details p { font-size: 0.8rem; color: #64748b; }
+.battle-actions-right { display: flex; align-items: center; gap: 12px; }
+.battle-cost-tag { font-family: 'Chakra Petch', sans-serif; font-size: 1.2rem; font-weight: 800; color: var(--neon-green); }
 
 /* BORROW PANEL */
 .borrow-panel {
@@ -392,39 +384,11 @@ body {
   padding: 1.5rem;
 }
 
-.borrow-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.borrow-header h3 {
-  font-family: 'Chakra Petch', sans-serif;
-  font-size: 1.1rem;
-}
-
-.borrow-badge {
-  background: var(--purple-accent);
-  color: #fff;
-  font-size: 0.75rem;
-  font-weight: 800;
-  padding: 2px 8px;
-  border-radius: 6px;
-}
-
-.panel-desc {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  line-height: 1.4;
-  margin-bottom: 1.2rem;
-}
-
-.sponsor-feed {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
+.borrow-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.borrow-header h3 { font-family: 'Chakra Petch', sans-serif; font-size: 1.1rem; }
+.borrow-badge { background: var(--purple-accent); color: #fff; font-size: 0.75rem; font-weight: 800; padding: 2px 8px; border-radius: 6px; }
+.panel-desc { font-size: 0.8rem; color: #64748b; line-height: 1.4; margin-bottom: 1.2rem; }
+.sponsor-feed { display: flex; flex-direction: column; gap: 12px; }
 
 .sponsor-card {
   background: var(--bg-dark);
@@ -437,7 +401,7 @@ body {
 }
 
 .sponsor-card .p-name { font-weight: 700; font-size: 0.9rem; }
-.sponsor-card .p-need { font-size: 0.75rem; color: var(--text-muted); }
+.sponsor-card .p-need { font-size: 0.75rem; color: #64748b; }
 
 /* BATTLE ARENA */
 .battle-arena {
@@ -448,61 +412,18 @@ body {
   margin-bottom: 2.5rem;
 }
 
-.battle-arena-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-}
-
-.battle-mode-badge {
-  background: var(--purple-accent);
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 0.75rem;
-  font-weight: 800;
-}
-
-.arena-total-pot {
-  font-family: 'Chakra Petch', sans-serif;
-  font-size: 1.3rem;
-  font-weight: 800;
-}
-
+.battle-arena-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+.battle-mode-badge { background: var(--purple-accent); padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; }
+.arena-total-pot { font-family: 'Chakra Petch', sans-serif; font-size: 1.3rem; font-weight: 800; }
 .arena-total-pot span { color: var(--neon-green); }
 
-.battle-players-grid {
-  display: grid;
-  grid-template-columns: 1fr 60px 1fr;
-  gap: 20px;
-  align-items: center;
-}
-
-.battle-player-card {
-  background: var(--bg-dark);
-  border: 1px solid var(--border-color);
-  padding: 1.5rem;
-  border-radius: 14px;
-}
-
-.player-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 1rem;
-}
-
+.battle-players-grid { display: grid; grid-template-columns: 1fr 60px 1fr; gap: 20px; align-items: center; }
+.battle-player-card { background: var(--bg-dark); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: 14px; }
+.player-info { display: flex; align-items: center; gap: 12px; margin-bottom: 1rem; }
 .player-avatar { font-size: 1.8rem; }
 .player-name { font-weight: 700; font-size: 1rem; }
 .player-total { color: var(--neon-green); font-family: 'Chakra Petch', sans-serif; font-weight: 800; }
-
-.battle-vs-badge {
-  text-align: center;
-  font-family: 'Chakra Petch', sans-serif;
-  font-size: 1.8rem;
-  font-weight: 800;
-  color: var(--text-muted);
-}
+.battle-vs-badge { text-align: center; font-family: 'Chakra Petch', sans-serif; font-size: 1.8rem; font-weight: 800; color: #64748b; }
 
 .battle-drop-slot {
   height: 140px;
@@ -514,30 +435,12 @@ body {
   justify-content: center;
 }
 
-.slot-placeholder { color: var(--text-muted); font-size: 0.85rem; }
-
-.battle-controls {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin-top: 2rem;
-}
+.slot-placeholder { color: #64748b; font-size: 0.85rem; }
+.battle-controls { display: flex; justify-content: center; gap: 15px; margin-top: 2rem; }
 
 /* UPGRADER */
-.upgrader-container {
-  display: grid;
-  grid-template-columns: 1fr 320px 1fr;
-  gap: 25px;
-  align-items: start;
-}
-
-.upgrader-card {
-  background: var(--bg-panel);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  padding: 1.5rem;
-}
-
+.upgrader-container { display: grid; grid-template-columns: 1fr 320px 1fr; gap: 25px; align-items: start; }
+.upgrader-card { background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; }
 .upgrader-card h3 { font-family: 'Chakra Petch', sans-serif; margin-bottom: 1rem; font-size: 1.1rem; }
 
 .mini-inv-list, .mini-target-list {
@@ -562,25 +465,9 @@ body {
 .mini-item-card .name { font-size: 0.65rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .mini-item-card .price { font-size: 0.75rem; color: var(--neon-green); font-weight: 700; }
 
-.upgrader-center {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-}
-
-.upgrade-wheel-wrapper {
-  position: relative;
-  width: 240px;
-  height: 240px;
-}
-
-.upgrade-svg {
-  width: 100%;
-  height: 100%;
-  transform: rotate(-90deg);
-}
-
+.upgrader-center { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+.upgrade-wheel-wrapper { position: relative; width: 240px; height: 240px; }
+.upgrade-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
 .wheel-bg { fill: none; stroke: var(--bg-card); stroke-width: 20; }
 .wheel-chance {
   fill: none;
@@ -611,16 +498,9 @@ body {
 }
 
 .wheel-center-info span { display: block; font-size: 1.6rem; font-weight: 800; color: #fff; }
-.wheel-center-info small { color: var(--text-muted); font-weight: 700; }
+.wheel-center-info small { color: #64748b; font-weight: 700; }
 
-.target-display-box {
-  background: var(--bg-dark);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 1.5rem;
-  text-align: center;
-}
-
+.target-display-box { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; text-align: center; }
 .target-display-box img { width: 130px; height: 95px; object-fit: contain; margin-bottom: 10px; }
 .target-display-box h4 { font-family: 'Chakra Petch', sans-serif; font-size: 1.1rem; }
 .target-display-box .target-price { color: var(--neon-green); font-weight: 800; font-size: 1.2rem; display: block; margin-top: 5px; }
@@ -633,7 +513,14 @@ body {
 }
 
 .modal-box { background: var(--bg-panel); border: 1px solid var(--border-color); padding: 2.5rem; border-radius: 16px; width: 400px; position: relative; }
-.modal-close { position: absolute; top: 15px; right: 20px; font-size: 1.8rem; cursor: pointer; color: var(--text-muted); }
-.form-field { margin-bottom: 1.2rem; display: flex; justify-content: space-between; align-items: center; }
-.form-field label { font-size: 0.9rem; color: var(--text-muted); }
-.form-field input[type="number"] { width: 100%; background: #000; border: 1px solid var(--border-color); padding: 0.8rem; color: #fff; border-radius: 8px; }
+.modal-close { position: absolute; top: 15px; right: 20px; font-size: 1.8rem; cursor: pointer; color: #64748b; }
+.form-group { margin-bottom: 1rem; display: flex; flex-direction: column; gap: 6px; }
+.form-group label { font-size: 0.85rem; color: #64748b; }
+.form-group input { background: #000; border: 1px solid var(--border-color); padding: 0.8rem; color: #fff; border-radius: 8px; }
+
+.form-field { display: flex; justify-content: space-between; align-items: center; }
+.form-field.margin-v { margin: 1rem 0; }
+
+.modal-divider { display: flex; align-items: center; text-align: center; margin: 1.2rem 0; color: #64748b; font-size: 0.8rem; }
+.modal-divider::before, .modal-divider::after { content: ''; flex: 1; border-bottom: 1px solid var(--border-color); }
+.modal-divider span { padding: 0 10px; }
