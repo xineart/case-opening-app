@@ -1,24 +1,49 @@
-// --- VALÓDI STEAM / CS2 HD SKIN ÉS LÁDA KÉPHIVATKOZÁSOK ---
-const STEAM_CDN = "https://community.cloudflare.steamstatic.com/economy/image/";
-
+// --- VALÓDI, KÖZVETLENÜL BETÖLTŐ NYÍLT CS2 SKINEK ÉS LÁDÁK ---
 const SKIN_DATABASE = [
-  { id: 1, name: "P250 | Sand Dune", price: 0.50, color: "#4b69ff", img: STEAM_CDN + "-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLVy4OWMktptlhHz4885138pJld-41f282Q5542-D2B59d1A4dM13_e0mP/200fx180f" },
-  { id: 2, name: "Glock-18 | Water Elemental", price: 8.50, color: "#8847ff", img: STEAM_CDN + "-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLVy4OWMktptlhHz4885138pJld-41f282Q5542-D2B59d1A4dM13_e0mR/200fx180f" },
-  { id: 3, name: "AK-47 | Redline", price: 22.00, color: "#d32ce6", img: STEAM_CDN + "-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLVy4OWMktptlhHz4885138pJld-41f282Q5542-D2B59d1A4dM13_e0mT/200fx180f" },
-  { id: 4, name: "M4A4 | Neo-Noir", price: 35.00, color: "#eb4b4b", img: STEAM_CDN + "-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLVy4OWMktptlhHz4885138pJld-41f282Q5542-D2B59d1A4dM13_e0mV/200fx180f" },
-  { id: 5, name: "AWP | Asiimov", price: 110.00, color: "#eb4b4b", img: STEAM_CDN + "-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLVy4OWMktptlhHz4885138pJld-41f282Q5542-D2B59d1A4dM13_e0mX/200fx180f" },
-  { id: 6, name: "AK-47 | Vulcan", price: 280.00, color: "#eb4b4b", img: STEAM_CDN + "-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLVy4OWMktptlhHz4885138pJld-41f282Q5542-D2B59d1A4dM13_e0mZ/200fx180f" },
-  { id: 7, name: "★ Karambit | Fade", price: 2400.00, color: "#ffd700", img: STEAM_CDN + "-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLVy4OWMktptlhHz4885138pJld-41f282Q5542-D2B59d1A4dM13_e0mb/200fx180f" }
+  { id: 1, name: "P250 | Sand Dune", price: 0.50, color: "#4b69ff", img: "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/econ/default_generated/weapon_p250_cu_p250_sand_dune_light_png" },
+  { id: 2, name: "Glock-18 | Water Elemental", price: 8.50, color: "#8847ff", img: "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/econ/default_generated/weapon_glock_cu_glock_water_elemental_light_png" },
+  { id: 3, name: "AK-47 | Redline", price: 22.00, color: "#d32ce6", img: "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/econ/default_generated/weapon_ak47_cu_ak47_cobra_light_png" },
+  { id: 4, name: "M4A4 | Neo-Noir", price: 35.00, color: "#eb4b4b", img: "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/econ/default_generated/weapon_m4a1_cu_m4a4_neo_noir_light_png" },
+  { id: 5, name: "AWP | Asiimov", price: 110.00, color: "#eb4b4b", img: "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/econ/default_generated/weapon_awp_cu_awp_asimov_light_png" },
+  { id: 6, name: "AK-47 | Vulcan", price: 280.00, color: "#eb4b4b", img: "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/econ/default_generated/weapon_ak47_cu_ak47_vulcan_light_png" },
+  { id: 7, name: "★ Karambit | Fade", price: 2400.00, color: "#ffd700", img: "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/econ/default_generated/weapon_knife_karambit_an_fade_light_png" }
 ];
 
 const OFFICIAL_CASES = [
-  { id: 'terb-starter', name: 'Starter Case', price: 2.50, color: "#4b69ff", img: "https://e7.pngegg.com/pngimages/830/690/png-clipart-counter-strike-global-offensive-weapon-case-skin-weapon-case-loot-box.png" },
-  { id: 'terb-neon', name: 'Neon Collection', price: 12.00, color: "#8847ff", img: "https://e7.pngegg.com/pngimages/830/690/png-clipart-counter-strike-global-offensive-weapon-case-skin-weapon-case-loot-box.png" },
-  { id: 'terb-classified', name: 'Covert Case', price: 35.00, color: "#d32ce6", img: "https://e7.pngegg.com/pngimages/830/690/png-clipart-counter-strike-global-offensive-weapon-case-skin-weapon-case-loot-box.png" },
-  { id: 'terb-knife', name: 'Knife & Gold Box', price: 250.00, color: "#ffd700", img: "https://e7.pngegg.com/pngimages/830/690/png-clipart-counter-strike-global-offensive-weapon-case-skin-weapon-case-loot-box.png" }
+  { id: 'terb-starter', name: 'Starter Case', price: 2.50, color: "#4b69ff", img: "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/econ/weapon_cases/crate_community_1_png" },
+  { id: 'terb-neon', name: 'Neon Collection', price: 12.00, color: "#8847ff", img: "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/econ/weapon_cases/crate_community_2_png" },
+  { id: 'terb-classified', name: 'Covert Case', price: 35.00, color: "#d32ce6", img: "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/econ/weapon_cases/crate_community_3_png" },
+  { id: 'terb-knife', name: 'Knife & Gold Box', price: 250.00, color: "#ffd700", img: "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/econ/weapon_cases/crate_community_4_png" }
 ];
 
+// TRANSLATIONS
+const TRANSLATIONS = {
+  hu: {
+    liveDrops: "ÉLŐ DROPOK", navCases: "LÁDÁK", navBattles: "CASE BATTLES", navUpgrader: "UPGRADER",
+    balanceLabel: "EGYENLEG", loginBtn: "BEJELENTKEZÉS", casesTitle: "LOOTBOX STÍLUSÚ LÁDÁK",
+    casesSub: "Exkluzív skinek a legmagasabb nyerési esélyekkel", multiOpen: "Nyitási darabszám:",
+    caseContents: "LÁDA TARTALMA ÉS DROPRATE", inventoryTitle: "SAJÁT LELTÁR (INVENTORY)",
+    emptyInv: "Még nem nyertél tárgyat.", battlesSub: "Átlátható csaták, real-time multiplayer élmény és 80/20 Borrow szponzoráció.",
+    openBattles: "NYITOTT CSATÁK (LOBBY)", borrowDesc: "Finanszírozd más játékos belépőjének 80%-át! Cserébe a nyereményének 80%-a a tiéd lesz.",
+    upgraderSub: "Tedd kockára meglévő skinedet vagy egyenlegedet a magasabb értékű tárgyakért!",
+    yourStake: "1. SAJÁT TÉT", chanceLabel: "ESÉLY", targetSkin: "2. CÉLZOTT SKIN"
+  },
+  en: {
+    liveDrops: "LIVE DROPS", navCases: "CASES", navBattles: "CASE BATTLES", navUpgrader: "UPGRADER",
+    balanceLabel: "BALANCE", loginBtn: "LOGIN", casesTitle: "LOOTBOX STYLE CASES",
+    casesSub: "Exclusive skins with highest drop rates", multiOpen: "Open quantity:",
+    caseContents: "CASE CONTENTS & DROPRATES", inventoryTitle: "YOUR INVENTORY",
+    emptyInv: "No items in inventory yet.", battlesSub: "Transparent battles, real-time multiplayer experience and 80/20 Borrow feature.",
+    openBattles: "OPEN BATTLES (LOBBY)", borrowDesc: "Sponsor 80% of another player's entry fee! Get 80% of their winnings in return.",
+    upgraderSub: "Risk your existing skin or balance for higher value items!",
+    yourStake: "1. YOUR STAKE", chanceLabel: "CHANCE", targetSkin: "2. TARGET SKIN"
+  }
+};
+
 // STATE
+let currentLang = 'hu';
+let isLoggedIn = false;
+let currentUser = null;
 let userBalance = 100.00;
 let isSpinning = false;
 let activeCase = null;
@@ -26,25 +51,20 @@ let activeBattle = null;
 let userInventory = [];
 let multiOpenCount = 1;
 
-// AUDIO CONTEXT (WEB AUDIO API)
+// AUDIO
 let audioCtx = null;
-function initAudio() {
-  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-}
+function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
 
 function playClickSound() {
   if (!document.getElementById('sfx-toggle').checked) return;
   initAudio();
   const osc = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
-  osc.type = 'sine';
-  osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+  osc.type = 'sine'; osc.frequency.setValueAtTime(600, audioCtx.currentTime);
   gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
   gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
-  osc.connect(gain);
-  gain.connect(audioCtx.destination);
-  osc.start();
-  osc.stop(audioCtx.currentTime + 0.05);
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.start(); osc.stop(audioCtx.currentTime + 0.05);
 }
 
 function playWinSound() {
@@ -52,15 +72,12 @@ function playWinSound() {
   initAudio();
   const osc = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
-  osc.type = 'triangle';
-  osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+  osc.type = 'triangle'; osc.frequency.setValueAtTime(440, audioCtx.currentTime);
   osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.3);
   gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
   gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
-  osc.connect(gain);
-  gain.connect(audioCtx.destination);
-  osc.start();
-  osc.stop(audioCtx.currentTime + 0.4);
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.start(); osc.stop(audioCtx.currentTime + 0.4);
 }
 
 function getRarityClass(price) {
@@ -73,7 +90,7 @@ function getRarityClass(price) {
 
 document.addEventListener('DOMContentLoaded', () => {
   setupNavigation();
-  setupModalEvents();
+  setupAuthAndModals();
   renderCasesCatalog();
   renderBattlesLobby();
   renderSponsorFeed();
@@ -95,6 +112,69 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
+
+// AUTH & MODAL SYSTEM
+function setupAuthAndModals() {
+  const loginModal = document.getElementById('login-modal');
+  const settingsModal = document.getElementById('settings-modal');
+
+  document.getElementById('open-login-btn').onclick = () => loginModal.classList.remove('hidden');
+  document.getElementById('close-login-btn').onclick = () => loginModal.classList.add('hidden');
+  document.getElementById('confirm-login-btn').onclick = performLogin;
+  document.getElementById('steam-login-action').onclick = performLogin;
+
+  document.getElementById('open-settings-btn').onclick = () => settingsModal.classList.remove('hidden');
+  document.getElementById('close-settings-btn').onclick = () => settingsModal.classList.add('hidden');
+  document.getElementById('save-settings-btn').onclick = () => settingsModal.classList.add('hidden');
+
+  document.getElementById('open-deposit-btn').onclick = () => {
+    userBalance += 100;
+    updateBalanceUI();
+  };
+}
+
+function performLogin() {
+  const usernameInput = document.getElementById('login-username-input').value.trim();
+  currentUser = usernameInput.length > 0 ? usernameInput : "SteamUser_" + Math.floor(Math.random() * 8999 + 1000);
+  isLoggedIn = true;
+
+  document.getElementById('login-modal').classList.add('hidden');
+  document.getElementById('open-login-btn').classList.add('hidden');
+  document.getElementById('user-profile-box').classList.remove('hidden');
+  document.getElementById('user-balance-box').classList.remove('hidden');
+  document.getElementById('open-deposit-btn').classList.remove('hidden');
+
+  document.getElementById('display-username').innerText = currentUser;
+  document.getElementById('p1-display-name').innerText = currentUser;
+}
+
+// NYELVVÁLTÁS
+window.switchLanguage = function(lang) {
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`lang-${lang}`).classList.add('active');
+
+  const t = TRANSLATIONS[lang];
+  document.getElementById('txt-live-drops').innerText = t.liveDrops;
+  document.getElementById('txt-nav-cases').innerText = t.navCases;
+  document.getElementById('txt-nav-battles').innerText = t.navBattles;
+  document.getElementById('txt-nav-upgrader').innerText = t.navUpgrader;
+  document.getElementById('txt-balance-label').innerText = t.balanceLabel;
+  document.getElementById('txt-login-btn').innerText = t.loginBtn;
+  document.getElementById('txt-cases-title').innerText = t.casesTitle;
+  document.getElementById('txt-cases-sub').innerText = t.casesSub;
+  document.getElementById('txt-multi-open').innerText = t.multiOpen;
+  document.getElementById('txt-case-contents').innerText = t.caseContents;
+  document.getElementById('txt-inventory-title').innerText = t.inventoryTitle;
+  document.getElementById('txt-empty-inv').innerText = t.emptyInv;
+  document.getElementById('txt-battles-sub').innerText = t.battlesSub;
+  document.getElementById('txt-open-battles').innerText = t.openBattles;
+  document.getElementById('txt-borrow-desc').innerText = t.borrowDesc;
+  document.getElementById('txt-upgrader-sub').innerText = t.upgraderSub;
+  document.getElementById('txt-your-stake').innerText = t.yourStake;
+  document.getElementById('txt-chance-label').innerText = t.chanceLabel;
+  document.getElementById('txt-target-skin').innerText = t.targetSkin;
+};
 
 function setupNavigation() {
   document.querySelectorAll('.nav-item').forEach(btn => {
@@ -161,6 +241,7 @@ function closeCaseView() {
 }
 
 function handleOpenCase() {
+  if (!isLoggedIn) return document.getElementById('login-modal').classList.remove('hidden');
   if (isSpinning) return;
   const totalCost = activeCase.price * multiOpenCount;
   if (userBalance < totalCost) return alert("Nincs elég egyenleged!");
@@ -225,7 +306,7 @@ function renderInventory() {
   `).join('');
 }
 
-// BATTLES LOBBY (LOOTBOX STYLE)
+// BATTLES
 function renderBattlesLobby() {
   const list = document.getElementById('battles-list');
   list.innerHTML = `
@@ -280,6 +361,7 @@ function renderSponsorFeed() {
 function createNewBattle() { startBattleRoom(12.00); }
 
 function startBattleRoom(cost) {
+  if (!isLoggedIn) return document.getElementById('login-modal').classList.remove('hidden');
   if (userBalance < cost) return alert("Nincs elég egyenleged a belépőhöz!");
   userBalance -= cost;
   updateBalanceUI();
@@ -378,6 +460,7 @@ function updateUpgraderInventory() {
 }
 
 function runUpgrade() {
+  if (!isLoggedIn) return document.getElementById('login-modal').classList.remove('hidden');
   if (isSpinning) return;
   const inputVal = parseFloat(document.getElementById('upgrade-input-val').value) || 0;
   if (userBalance < inputVal) return alert("Nincs elég egyenleged a téthez!");
@@ -429,15 +512,4 @@ function initLiveFeed() {
     track.prepend(el);
     if (track.children.length > 7) track.removeChild(track.lastChild);
   }, 3500);
-}
-
-function setupModalEvents() {
-  const settingsModal = document.getElementById('settings-modal');
-  document.getElementById('open-settings-btn').onclick = () => settingsModal.classList.remove('hidden');
-  document.getElementById('close-settings-btn').onclick = () => settingsModal.classList.add('hidden');
-  document.getElementById('save-settings-btn').onclick = () => settingsModal.classList.add('hidden');
-  document.getElementById('open-deposit-btn').onclick = () => {
-    userBalance += 100;
-    updateBalanceUI();
-  };
 }
