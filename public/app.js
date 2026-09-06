@@ -40,23 +40,42 @@ const TRANSLATIONS = {
   }
 };
 
-// STATE
+// STATE & LOCAL STORAGE DATABASE
 let currentLang = 'hu';
-let isLoggedIn = false;
-let currentUser = null;
-let userBalance = 100.00;
+let currentUser = localStorage.getItem('cs2_active_user') || null;
+let isLoggedIn = !!currentUser;
+let usersDb = JSON.parse(localStorage.getItem('cs2_users_db')) || {};
+
+// Ha be van jelentkezve, töltsük be a mentett adatait, különben alapértelmezett
+let userBalance = isLoggedIn && usersDb[currentUser] ? usersDb[currentUser].balance : 100.00;
+let userInventory = isLoggedIn && usersDb[currentUser] ? usersDb[currentUser].inventory : [];
+
 let isSpinning = false;
 let activeCase = null;
 let activeBattle = null;
-let userInventory = [];
 let multiOpenCount = 1;
+
+// MENTÉS A LOCALSTORAGE-BA
+function saveUserData() {
+  if (!isLoggedIn || !currentUser) return;
+  
+  if (!usersDb[currentUser]) {
+    usersDb[currentUser] = { password: "", balance: 100.00, inventory: [] };
+  }
+  
+  usersDb[currentUser].balance = userBalance;
+  usersDb[currentUser].inventory = userInventory;
+
+  localStorage.setItem('cs2_users_db', JSON.stringify(usersDb));
+  localStorage.setItem('cs2_active_user', currentUser);
+}
 
 // AUDIO
 let audioCtx = null;
 function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
 
 function playClickSound() {
-  if (!document.getElementById('sfx-toggle').checked) return;
+  if (!document.getElementById('sfx-toggle')?.checked) return;
   initAudio();
   const osc = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
@@ -68,7 +87,7 @@ function playClickSound() {
 }
 
 function playWinSound() {
-  if (!document.getElementById('sfx-toggle').checked) return;
+  if (!document.getElementById('sfx-toggle')?.checked) return;
   initAudio();
   const osc = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
@@ -91,11 +110,19 @@ function getRarityClass(price) {
 document.addEventListener('DOMContentLoaded', () => {
   setupNavigation();
   setupAuthAndModals();
+  setupDropdownInventory();
   renderCasesCatalog();
   renderBattlesLobby();
   renderSponsorFeed();
   initLiveFeed();
   initUpgrader();
+
+  // Munkamenet ellenőrzése induláskor
+  if (isLoggedIn && currentUser) {
+    applyLoggedInState();
+  } else {
+    applyLoggedOutState();
+  }
 
   document.getElementById('open-case-btn').addEventListener('click', handleOpenCase);
   document.getElementById('back-to-catalog-btn').addEventListener('click', closeCaseView);
@@ -113,15 +140,17 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// AUTH & MODAL SYSTEM
+// AUTH & MODAL SYSTEM (MŰKÖDŐ REGISZTRÁCIÓ & BEJELENTKEZÉS)
 function setupAuthAndModals() {
   const loginModal = document.getElementById('login-modal');
   const settingsModal = document.getElementById('settings-modal');
 
   document.getElementById('open-login-btn').onclick = () => loginModal.classList.remove('hidden');
   document.getElementById('close-login-btn').onclick = () => loginModal.classList.add('hidden');
+  
   document.getElementById('confirm-login-btn').onclick = performLogin;
-  document.getElementById('steam-login-action').onclick = performLogin;
+  document.getElementById('confirm-register-btn').onclick = performRegister;
+  document.getElementById('logout-btn').onclick = performLogout;
 
   document.getElementById('open-settings-btn').onclick = () => settingsModal.classList.remove('hidden');
   document.getElementById('close-settings-btn').onclick = () => settingsModal.classList.add('hidden');
@@ -130,22 +159,145 @@ function setupAuthAndModals() {
   document.getElementById('open-deposit-btn').onclick = () => {
     userBalance += 100;
     updateBalanceUI();
+    saveUserData();
   };
 }
 
-function performLogin() {
-  const usernameInput = document.getElementById('login-username-input').value.trim();
-  currentUser = usernameInput.length > 0 ? usernameInput : "SteamUser_" + Math.floor(Math.random() * 8999 + 1000);
+function performRegister() {
+  const userIn = document.getElementById('login-username-input').value.trim();
+  const passIn = document.getElementById('login-password-input') ? document.getElementById('login-password-input').value.trim() : "1234";
+
+  if (!userIn) return alert("Kérlek adj meg egy felhasználónevet!");
+
+  if (usersDb[userIn]) {
+    return alert("Ez a felhasználónév már foglalt! Próbálj meg bejelentkezni.");
+  }
+
+  // Új fiók létrehozása
+  usersDb[userIn] = {
+    password: passIn,
+    balance: 100.00,
+    inventory: []
+  };
+
+  currentUser = userIn;
+  userBalance = 100.00;
+  userInventory = [];
   isLoggedIn = true;
 
+  saveUserData();
+  applyLoggedInState();
   document.getElementById('login-modal').classList.add('hidden');
+  alert("Sikeres regisztráció! Gratulálunk!");
+}
+
+function performLogin() {
+  const userIn = document.getElementById('login-username-input').value.trim();
+  const passIn = document.getElementById('login-password-input') ? document.getElementById('login-password-input').value.trim() : "1234";
+
+  if (!userIn) return alert("Kérlek adj meg egy felhasználónevet!");
+
+  if (!usersDb[userIn]) {
+    return alert("Nincs ilyen felhasználó! Kattints a REGISZTRÁCIÓ gombra a fiók létrehozásához.");
+  }
+
+  // Bejelentkezés ellenőrzés
+  currentUser = userIn;
+  userBalance = usersDb[userIn].balance;
+  userInventory = usersDb[userIn].inventory || [];
+  isLoggedIn = true;
+
+  saveUserData();
+  applyLoggedInState();
+  document.getElementById('login-modal').classList.add('hidden');
+}
+
+function performLogout() {
+  isLoggedIn = false;
+  currentUser = null;
+  localStorage.removeItem('cs2_active_user');
+  applyLoggedOutState();
+}
+
+function applyLoggedInState() {
   document.getElementById('open-login-btn').classList.add('hidden');
   document.getElementById('user-profile-box').classList.remove('hidden');
   document.getElementById('user-balance-box').classList.remove('hidden');
   document.getElementById('open-deposit-btn').classList.remove('hidden');
 
   document.getElementById('display-username').innerText = currentUser;
-  document.getElementById('p1-display-name').innerText = currentUser;
+  if (document.getElementById('p1-display-name')) {
+    document.getElementById('p1-display-name').innerText = currentUser;
+  }
+
+  updateBalanceUI();
+  renderInventory();
+}
+
+function applyLoggedOutState() {
+  document.getElementById('open-login-btn').classList.remove('hidden');
+  document.getElementById('user-profile-box').classList.add('hidden');
+  document.getElementById('user-balance-box').classList.add('hidden');
+  document.getElementById('open-deposit-btn').classList.add('hidden');
+  
+  userBalance = 0;
+  userInventory = [];
+  renderInventory();
+}
+
+// LENYÍLÓ INVENTORY FUNKCIÓ
+function setupDropdownInventory() {
+  const invToggleBtn = document.getElementById('toggle-inventory-btn') || document.getElementById('user-profile-box');
+  const dropdownPanel = document.getElementById('dropdown-inventory-panel');
+
+  if (invToggleBtn && dropdownPanel) {
+    invToggleBtn.addEventListener('click', (e) => {
+      // Megakadályozzuk, hogy a kijelentkezés gombra kattintva is lenyíljon
+      if (e.target.id === 'logout-btn') return;
+      dropdownPanel.classList.toggle('open');
+    });
+  }
+}
+
+// ITEM ELADÁSA (SELL SYSTEM)
+window.sellItem = function(index) {
+  if (index < 0 || index >= userInventory.length) return;
+
+  const itemToSell = userInventory[index];
+  userBalance += itemToSell.price;
+  
+  // Eltávolítjuk a tömbből
+  userInventory.splice(index, 1);
+
+  // Mentjük a változást és frissítjük a felületet
+  saveUserData();
+  updateBalanceUI();
+  renderInventory();
+  if (document.getElementById('tab-upgrader').classList.contains('active')) {
+    updateUpgraderInventory();
+  }
+};
+
+function renderInventory() {
+  const grid = document.getElementById('inventory-grid');
+  const countBadge = document.getElementById('inv-count-badge');
+  
+  if (countBadge) countBadge.innerText = userInventory.length;
+  if (!grid) return;
+
+  if (userInventory.length === 0) {
+    grid.innerHTML = `<div class="empty-inv-msg" id="txt-empty-inv">${TRANSLATIONS[currentLang].emptyInv}</div>`;
+    return;
+  }
+
+  grid.innerHTML = userInventory.map((item, index) => `
+    <div class="item-card ${getRarityClass(item.price)}">
+      <img src="${item.img}" alt="${item.name}">
+      <div class="name">${item.name}</div>
+      <div class="price">$${item.price.toFixed(2)}</div>
+      <button class="btn-sell-item" onclick="sellItem(${index})">ELADÁS ($${item.price.toFixed(2)})</button>
+    </div>
+  `).join('');
 }
 
 // NYELVVÁLTÁS
@@ -166,7 +318,6 @@ window.switchLanguage = function(lang) {
   document.getElementById('txt-multi-open').innerText = t.multiOpen;
   document.getElementById('txt-case-contents').innerText = t.caseContents;
   document.getElementById('txt-inventory-title').innerText = t.inventoryTitle;
-  document.getElementById('txt-empty-inv').innerText = t.emptyInv;
   document.getElementById('txt-battles-sub').innerText = t.battlesSub;
   document.getElementById('txt-open-battles').innerText = t.openBattles;
   document.getElementById('txt-borrow-desc').innerText = t.borrowDesc;
@@ -174,6 +325,8 @@ window.switchLanguage = function(lang) {
   document.getElementById('txt-your-stake').innerText = t.yourStake;
   document.getElementById('txt-chance-label').innerText = t.chanceLabel;
   document.getElementById('txt-target-skin').innerText = t.targetSkin;
+  
+  renderInventory();
 };
 
 function setupNavigation() {
@@ -240,7 +393,7 @@ function closeCaseView() {
   document.getElementById('case-catalog-view').classList.remove('hidden');
 }
 
-// JAVÍTOTT LÁDANYITÁS FÜGGVÉNY
+// PONTOS 80 KÁRTYÁS LÁDANYITÁS
 function handleOpenCase() {
   if (!isLoggedIn) return document.getElementById('login-modal').classList.remove('hidden');
   if (isSpinning) return;
@@ -251,22 +404,19 @@ function handleOpenCase() {
   updateBalanceUI();
   isSpinning = true;
 
-  const isFast = document.getElementById('fast-spin-toggle').checked;
+  const isFast = document.getElementById('fast-spin-toggle')?.checked;
   const spinTime = isFast ? 1.2 : 4.0;
 
   for (let s = 0; s < multiOpenCount; s++) {
     const wonItem = SKIN_DATABASE[Math.floor(Math.random() * SKIN_DATABASE.length)];
     const track = document.getElementById(`spinner-track-${s}`);
     
-    // Alaphelyzetbe állítás animáció nélkül
     track.style.transition = 'none';
     track.style.transform = 'translateX(0px)';
 
-    // Generálunk 80 kártyát, hogy bőven elég legyen a pörgetésre
     let spinnerList = [];
     for (let i = 0; i < 80; i++) {
       if (i === 65) {
-        // A 65. kártya a nyeremény
         spinnerList.push(wonItem);
       } else {
         spinnerList.push(SKIN_DATABASE[Math.floor(Math.random() * SKIN_DATABASE.length)]);
@@ -281,12 +431,10 @@ function handleOpenCase() {
       </div>
     `).join('');
 
-    // Eltolás kiszámítása a 65. kártya közepére
-    const cardWidth = 182; // 170px card width + 12px gap
+    const cardWidth = 182; 
     const containerWidth = track.parentElement.offsetWidth || 800;
     const targetX = -(65 * cardWidth) + (containerWidth / 2) - (cardWidth / 2);
 
-    // Animáció indítása 
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         track.style.transition = `transform ${spinTime}s cubic-bezier(0.1, 0.8, 0.1, 1)`;
@@ -302,25 +450,15 @@ function handleOpenCase() {
   setTimeout(() => {
     isSpinning = false;
     playWinSound();
+    saveUserData();
     renderInventory();
   }, spinTime * 1000 + 200);
-}
-
-function renderInventory() {
-  const grid = document.getElementById('inventory-grid');
-  if (userInventory.length === 0) return;
-  grid.innerHTML = userInventory.map(item => `
-    <div class="item-card ${getRarityClass(item.price)}">
-      <img src="${item.img}" alt="${item.name}">
-      <div class="name">${item.name}</div>
-      <div class="price">$${item.price.toFixed(2)}</div>
-    </div>
-  `).join('');
 }
 
 // BATTLES
 function renderBattlesLobby() {
   const list = document.getElementById('battles-list');
+  if (!list) return;
   list.innerHTML = `
     <div class="battle-card-item">
       <div class="battle-info-left">
@@ -337,28 +475,12 @@ function renderBattlesLobby() {
         <button class="btn btn-primary btn-sm" onclick="startBattleRoom(12.00)">CSATLAKOZÁS</button>
       </div>
     </div>
-
-    <div class="battle-card-item">
-      <div class="battle-info-left">
-        <div class="battle-case-preview">
-          <img src="${OFFICIAL_CASES[2].img}" class="battle-case-img">
-          <img src="${OFFICIAL_CASES[3].img}" class="battle-case-img">
-        </div>
-        <div class="battle-details">
-          <h4>High Roller Covert Battle</h4>
-          <p>2 Láda • Crazy Mód</p>
-        </div>
-      </div>
-      <div class="battle-actions-right">
-        <div class="battle-cost-tag">$285.00</div>
-        <button class="btn btn-primary btn-sm" onclick="startBattleRoom(285.00)">CSATLAKOZÁS</button>
-      </div>
-    </div>
   `;
 }
 
 function renderSponsorFeed() {
   const feed = document.getElementById('sponsor-feed-list');
+  if (!feed) return;
   feed.innerHTML = `
     <div class="sponsor-card">
       <div>
@@ -377,6 +499,7 @@ function startBattleRoom(cost) {
   if (userBalance < cost) return alert("Nincs elég egyenleged a belépőhöz!");
   userBalance -= cost;
   updateBalanceUI();
+  saveUserData();
 
   activeBattle = { cost };
   document.getElementById('arena-pot-val').innerText = `$${(cost * 2).toFixed(2)}`;
@@ -409,6 +532,7 @@ function runBattleSpin() {
       const winVal = p1Item.price + p2Item.price;
       userBalance += winVal;
       updateBalanceUI();
+      saveUserData();
       playWinSound();
       alert(`NYERTÉL! Összesen $${winVal.toFixed(2)} értékű dropot vittél el.`);
     } else {
@@ -423,45 +547,55 @@ function closeBattleArena() { document.getElementById('battle-arena').classList.
 let selectedTargetSkin = SKIN_DATABASE[2];
 
 function initUpgrader() {
-  document.getElementById('upgrade-input-val').addEventListener('input', updateUpgradeChance);
+  const inputEl = document.getElementById('upgrade-input-val');
+  if (inputEl) inputEl.addEventListener('input', updateUpgradeChance);
 
   const targetList = document.getElementById('upgrade-target-list');
-  targetList.innerHTML = SKIN_DATABASE.map(item => `
-    <div class="mini-item-card" onclick="selectUpgradeTarget(${item.id})">
-      <img src="${item.img}">
-      <div class="name">${item.name}</div>
-      <div class="price">$${item.price.toFixed(2)}</div>
-    </div>
-  `).join('');
+  if (targetList) {
+    targetList.innerHTML = SKIN_DATABASE.map(item => `
+      <div class="mini-item-card" onclick="selectUpgradeTarget(${item.id})">
+        <img src="${item.img}">
+        <div class="name">${item.name}</div>
+        <div class="price">$${item.price.toFixed(2)}</div>
+      </div>
+    `).join('');
+  }
 
-  document.getElementById('start-upgrade-btn').addEventListener('click', runUpgrade);
+  document.getElementById('start-upgrade-btn')?.addEventListener('click', runUpgrade);
   selectUpgradeTarget(selectedTargetSkin.id);
 }
 
 function selectUpgradeTarget(id) {
   selectedTargetSkin = SKIN_DATABASE.find(s => s.id === id);
-  document.getElementById('target-skin-img').src = selectedTargetSkin.img;
-  document.getElementById('target-skin-name').innerText = selectedTargetSkin.name;
-  document.getElementById('target-skin-price').innerText = `$${selectedTargetSkin.price.toFixed(2)}`;
+  if (document.getElementById('target-skin-img')) {
+    document.getElementById('target-skin-img').src = selectedTargetSkin.img;
+    document.getElementById('target-skin-name').innerText = selectedTargetSkin.name;
+    document.getElementById('target-skin-price').innerText = `$${selectedTargetSkin.price.toFixed(2)}`;
+  }
   updateUpgradeChance();
 }
 
 function updateUpgradeChance() {
-  const inputVal = parseFloat(document.getElementById('upgrade-input-val').value) || 1;
+  const inputVal = parseFloat(document.getElementById('upgrade-input-val')?.value) || 1;
   let chance = (inputVal / selectedTargetSkin.price) * 100;
   if (chance > 95) chance = 95;
   if (chance < 1) chance = 1;
 
-  document.getElementById('upgrade-chance-num').innerText = `${chance.toFixed(2)}%`;
+  if (document.getElementById('upgrade-chance-num')) {
+    document.getElementById('upgrade-chance-num').innerText = `${chance.toFixed(2)}%`;
+  }
 
   const slice = document.getElementById('upgrade-chance-slice');
-  const circumference = 502.4;
-  const offset = circumference - (circumference * (chance / 100));
-  slice.style.strokeDashoffset = offset;
+  if (slice) {
+    const circumference = 502.4;
+    const offset = circumference - (circumference * (chance / 100));
+    slice.style.strokeDashoffset = offset;
+  }
 }
 
 function updateUpgraderInventory() {
   const invList = document.getElementById('upgrade-inv-list');
+  if (!invList) return;
   invList.innerHTML = userInventory.map(item => `
     <div class="mini-item-card" onclick="document.getElementById('upgrade-input-val').value=${item.price}; updateUpgradeChance();">
       <img src="${item.img}">
@@ -479,6 +613,7 @@ function runUpgrade() {
 
   userBalance -= inputVal;
   updateBalanceUI();
+  saveUserData();
   isSpinning = true;
 
   let chance = (inputVal / selectedTargetSkin.price) * 100;
@@ -502,6 +637,7 @@ function runUpgrade() {
     if (win) {
       playWinSound();
       userInventory.push(selectedTargetSkin);
+      saveUserData();
       renderInventory();
       alert(`SIKERES UPGRADE! Nyertél egy ${selectedTargetSkin.name} skint!`);
     } else {
@@ -511,11 +647,13 @@ function runUpgrade() {
 }
 
 function updateBalanceUI() {
-  document.getElementById('user-balance').innerText = `$${userBalance.toFixed(2)}`;
+  const balEl = document.getElementById('user-balance');
+  if (balEl) balEl.innerText = `$${userBalance.toFixed(2)}`;
 }
 
 function initLiveFeed() {
   const track = document.getElementById('live-feed-track');
+  if (!track) return;
   setInterval(() => {
     const item = SKIN_DATABASE[Math.floor(Math.random() * SKIN_DATABASE.length)];
     const el = document.createElement('div');
