@@ -20,7 +20,7 @@
         <span id="user-balance">$0.00</span>
       </div>
       <button class="btn btn-success" onclick="openDepositModal()">+ Feltöltés</button>
-      <button class="btn" id="auth-btn" onclick="promptLogin()">Bejelentkezés</button>
+      <button class="btn" id="auth-btn" onclick="openAuthModal()">Bejelentkezés</button>
     </div>
   </header>
 
@@ -62,13 +62,45 @@
 
   </main>
 
+  <!-- AUTH MODAL (BEJELENTKEZÉS / REGISZTRÁCIÓ) -->
+  <div id="auth-modal" class="modal-overlay">
+    <div class="modal-content">
+      <span class="modal-close" onclick="closeAuthModal()">&times;</span>
+      <h3 id="auth-title">Bejelentkezés</h3>
+
+      <div class="form-group">
+        <label>Felhasználónév:</label>
+        <input type="text" id="auth-username" placeholder="Felhasználónév">
+      </div>
+
+      <div class="form-group" id="email-group" style="display: none;">
+        <label>E-mail cím:</label>
+        <input type="email" id="auth-email" placeholder="Email cím">
+      </div>
+
+      <div class="form-group">
+        <label>Jelszó:</label>
+        <input type="password" id="auth-password" placeholder="Jelszó">
+      </div>
+
+      <button class="btn btn-gold" id="auth-submit-btn" onclick="handleAuthSubmit()" style="width: 100%; margin-top: 1rem; padding: 0.8rem;">
+        BEJELENTKEZÉS
+      </button>
+
+      <p style="text-align: center; margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted);">
+        <span id="auth-toggle-text">Nincs még fiókod?</span> 
+        <a href="#" id="auth-toggle-btn" onclick="toggleAuthMode(event)" style="color: var(--accent-gold); text-decoration: none; font-weight: bold;">Regisztráció</a>
+      </p>
+    </div>
+  </div>
+
   <!-- DEPOSIT MODAL (BEFIZETÉSI ABLAK) -->
   <div id="deposit-modal" class="modal-overlay">
     <div class="modal-content">
       <span class="modal-close" onclick="closeDepositModal()">&times;</span>
       <h3>Egyenleg Feltöltése</h3>
       <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">
-        Válassz összeget és kriptovalutát a gyors és biztonságos befizetéshez.
+        Válassz összeget és kriptovalutát a feltöltéshez.
       </p>
 
       <div class="form-group">
@@ -87,7 +119,7 @@
       </div>
 
       <button class="btn btn-gold" onclick="processDeposit()" style="width: 100%; margin-top: 1rem; padding: 0.8rem;">
-        FIZETÉSI INDÍTÁSA
+        FIZETÉS INDÍTÁSA
       </button>
     </div>
   </div>
