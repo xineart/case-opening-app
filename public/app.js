@@ -86,9 +86,20 @@ class SoundEngine {
 const Audio = new SoundEngine();
 
 // --------------------------------------------------------------------------
-// 3. MASTER ITEM DATABASE (Teljes CS2 Tárhely)
 // --------------------------------------------------------------------------
-// --- HELYI images/ MAPPÁBÓL BETÖLTŐ NYÍLT CS2 SKINEK ÉS LÁDÁK ---
+// 3. MASTER ITEM DATABASE (Helyi images/ mappás verzió)
+// --------------------------------------------------------------------------
+
+// Színkódok szerinti ritkaság leképezése (A te color kódjaid alapján)
+const COLOR_TO_RARITY = {
+    "#4b69ff": "milspec",     // Kék
+    "#8847ff": "restricted",  // Lila
+    "#d32ce6": "classified",  // Rózsaszín
+    "#eb4b4b": "covert",      // Piros
+    "#ffd700": "special"      // Arany / Kés
+};
+
+// 1. A te helyi képes SKIN_DATABASE tömböd
 const SKIN_DATABASE = [
   { id: 1, name: "P250 | Sand Dune", price: 0.50, color: "#4b69ff", img: "images/p250_sanddune.png" },
   { id: 2, name: "Glock-18 | Water Elemental", price: 8.50, color: "#8847ff", img: "images/glock_waterelemental.png" },
@@ -99,20 +110,33 @@ const SKIN_DATABASE = [
   { id: 7, name: "★ Karambit | Fade", price: 2400.00, color: "#ffd700", img: "images/karambit_fade.png" }
 ];
 
+// 2. Az app komponenseivel való kompatibilitás miatti konvertálás (MASTER_ITEMS)
+const MASTER_ITEMS = SKIN_DATABASE.map(item => ({
+    id: `item_${item.id}`,
+    name: item.name,
+    price: item.price,
+    color: item.color,
+    rarity: COLOR_TO_RARITY[item.color] || "milspec",
+    img: item.img
+}));
+
+// 3. A te helyi képes LÁDA adatbázisod (OFFICIAL_CASES & CASE_COLLECTION)
 const OFFICIAL_CASES = [
   { id: 'terb-starter', name: 'Starter Case', price: 2.50, color: "#4b69ff", img: "images/case_starter.png" },
   { id: 'terb-neon', name: 'Neon Collection', price: 12.00, color: "#8847ff", img: "images/case_neon.png" },
   { id: 'terb-classified', name: 'Covert Case', price: 35.00, color: "#d32ce6", img: "images/case_covert.png" },
   { id: 'terb-knife', name: 'Knife & Gold Box', price: 250.00, color: "#ffd700", img: "images/case_knife.png" }
 ];
-// LÁDA TÍPUSOK ADATBÁZISA
-const CASE_COLLECTION = [
-    { id: "kilowatt", name: "Kilowatt Case", price: 2.50, category: "Official", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f" },
-    { id: "recoil", name: "Recoil Case", price: 1.80, category: "Official", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f" },
-    { id: "revolution", name: "Revolution Case", price: 1.20, category: "Official", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f" },
-    { id: "knife_god", name: "Knife Only Case", price: 150.00, category: "Custom", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f" },
-    { id: "budget_beast", name: "50 Cent Budget", price: 0.50, category: "Budget", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f" }
-];
+
+// Átmásoljuk a ládákat a rendszer által használt CASE_COLLECTION változóba
+const CASE_COLLECTION = OFFICIAL_CASES.map(c => ({
+    id: c.id,
+    name: c.name,
+    price: c.price,
+    color: c.color,
+    category: "Official",
+    img: c.img
+}));
 
 // --------------------------------------------------------------------------
 // 4. PROVABLY FAIR (CRYPTOGRAPHIC SEED GENERATOR)
