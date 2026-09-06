@@ -1,19 +1,19 @@
-// --- VALÓDI, KÖZVETLENÜL BETÖLTŐ NYÍLT CS2 SKINEK ÉS LÁDÁK ---
+// --- HELYI `images/` MAPPÁBÓL BETÖLTŐ NYÍLT CS2 SKINEK ÉS LÁDÁK ---
 const SKIN_DATABASE = [
-  { id: 1, name: "P250 | Sand Dune", price: 0.50, color: "#4b69ff", img: "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/econ/default_generated/weapon_p250_cu_p250_sand_dune_light_png" },
-  { id: 2, name: "Glock-18 | Water Elemental", price: 8.50, color: "#8847ff", img: "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/econ/default_generated/weapon_glock_cu_glock_water_elemental_light_png" },
-  { id: 3, name: "AK-47 | Redline", price: 22.00, color: "#d32ce6", img: "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/econ/default_generated/weapon_ak47_cu_ak47_cobra_light_png" },
-  { id: 4, name: "M4A4 | Neo-Noir", price: 35.00, color: "#eb4b4b", img: "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/econ/default_generated/weapon_m4a1_cu_m4a4_neo_noir_light_png" },
-  { id: 5, name: "AWP | Asiimov", price: 110.00, color: "#eb4b4b", img: "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/econ/default_generated/weapon_awp_cu_awp_asimov_light_png" },
-  { id: 6, name: "AK-47 | Vulcan", price: 280.00, color: "#eb4b4b", img: "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/econ/default_generated/weapon_ak47_cu_ak47_vulcan_light_png" },
-  { id: 7, name: "★ Karambit | Fade", price: 2400.00, color: "#ffd700", img: "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/econ/default_generated/weapon_knife_karambit_an_fade_light_png" }
+  { id: 1, name: "P250 | Sand Dune", price: 0.50, color: "#4b69ff", img: "images/p250_sanddune.png" },
+  { id: 2, name: "Glock-18 | Water Elemental", price: 8.50, color: "#8847ff", img: "images/glock_waterelemental.png" },
+  { id: 3, name: "AK-47 | Redline", price: 22.00, color: "#d32ce6", img: "images/ak47_redline.png" },
+  { id: 4, name: "M4A4 | Neo-Noir", price: 35.00, color: "#eb4b4b", img: "images/m4a4_neonoir.png" },
+  { id: 5, name: "AWP | Asiimov", price: 110.00, color: "#eb4b4b", img: "images/awp_asiimov.png" },
+  { id: 6, name: "AK-47 | Vulcan", price: 280.00, color: "#eb4b4b", img: "images/ak47_vulcan.png" },
+  { id: 7, name: "★ Karambit | Fade", price: 2400.00, color: "#ffd700", img: "images/karambit_fade.png" }
 ];
 
 const OFFICIAL_CASES = [
-  { id: 'terb-starter', name: 'Starter Case', price: 2.50, color: "#4b69ff", img: "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/econ/weapon_cases/crate_community_1_png" },
-  { id: 'terb-neon', name: 'Neon Collection', price: 12.00, color: "#8847ff", img: "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/econ/weapon_cases/crate_community_2_png" },
-  { id: 'terb-classified', name: 'Covert Case', price: 35.00, color: "#d32ce6", img: "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/econ/weapon_cases/crate_community_3_png" },
-  { id: 'terb-knife', name: 'Knife & Gold Box', price: 250.00, color: "#ffd700", img: "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/econ/weapon_cases/crate_community_4_png" }
+  { id: 'terb-starter', name: 'Starter Case', price: 2.50, color: "#4b69ff", img: "images/case_starter.png" },
+  { id: 'terb-neon', name: 'Neon Collection', price: 12.00, color: "#8847ff", img: "images/case_neon.png" },
+  { id: 'terb-classified', name: 'Covert Case', price: 35.00, color: "#d32ce6", img: "images/case_covert.png" },
+  { id: 'terb-knife', name: 'Knife & Gold Box', price: 250.00, color: "#ffd700", img: "images/case_knife.png" }
 ];
 
 // TRANSLATIONS
