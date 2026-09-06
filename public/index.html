@@ -3,22 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CS2 Case Simulator</title>
-  <link href="https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <title>LUXDROP - CS2 Case Opening & Gambling</title>
+  <link href="https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     /* ==========================================
-       1. ALAP STÍLUSOK & CS2 TÉMA
+       1. LUXDROP STÍLUS & DESIGN SYSTEM
        ========================================== */
     :root {
-      --bg-dark: #0d0f12;
-      --bg-card: #15181e;
-      --bg-panel: #1b1e26;
-      --accent-yellow: #e5a93b;
-      --accent-blue: #3b82f6;
-      --text-main: #f1f5f9;
-      --text-muted: #94a3b8;
-      
-      /* CS2 Ritkasági színek */
+      --bg-dark: #08090c;
+      --bg-card: #12151c;
+      --bg-panel: #181c26;
+      --bg-panel-light: #212634;
+      --accent-green: #22c55e;
+      --accent-green-glow: rgba(34, 197, 94, 0.4);
+      --accent-gold: #eab308;
+      --accent-cyan: #06b6d4;
+      --text-main: #f8fafc;
+      --text-muted: #64748b;
+      --border-color: #2a3142;
+
+      /* CS2 Ritkasági Színek */
       --rarity-milspec: #4b69ff;
       --rarity-restricted: #8847ff;
       --rarity-classified: #d32ce6;
@@ -48,147 +52,253 @@
        ========================================== */
     header {
       background: var(--bg-panel);
-      height: 70px;
+      height: 75px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 30px;
-      border-bottom: 2px solid #232733;
+      padding: 0 40px;
+      border-bottom: 1px solid var(--border-color);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+      position: relative;
+      z-index: 100;
     }
 
-    .logo {
-      font-family: 'Teko', sans-serif;
-      font-size: 2rem;
-      letter-spacing: 2px;
-      font-weight: 700;
-    }
-    .logo span { color: var(--accent-yellow); }
-
-    .nav-tabs {
+    .brand-logo {
       display: flex;
-      gap: 15px;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
     }
 
-    .tab-btn {
+    .brand-logo .logo-text {
+      font-family: 'Teko', sans-serif;
+      font-size: 2.8rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      line-height: 1;
+      background: linear-gradient(135deg, #fff 0%, var(--accent-green) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-transform: uppercase;
+    }
+
+    .nav-menu {
+      display: flex;
+      gap: 8px;
+      background: rgba(0,0,0,0.3);
+      padding: 5px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+    }
+
+    .nav-btn {
       background: transparent;
       border: none;
       color: var(--text-muted);
-      font-size: 0.95rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      padding: 10px 20px;
-      cursor: pointer;
-      border-radius: 6px;
-      transition: all 0.2s ease;
-    }
-
-    .tab-btn:hover, .tab-btn.active {
-      color: #fff;
-      background: #232733;
-    }
-
-    .user-profile {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-
-    .balance-box {
-      background: #111317;
-      padding: 8px 16px;
-      border-radius: 6px;
-      border: 1px solid #232733;
-      font-weight: 700;
-      color: var(--accent-yellow);
-    }
-
-    .btn-action {
-      background: var(--accent-yellow);
-      color: #000;
-      border: none;
-      padding: 10px 20px;
+      font-size: 0.85rem;
       font-weight: 800;
       text-transform: uppercase;
-      border-radius: 6px;
+      padding: 10px 22px;
       cursor: pointer;
-      transition: transform 0.1s ease;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      letter-spacing: 0.5px;
     }
-    .btn-action:hover { transform: translateY(-2px); }
 
-    /* ==========================================
-       3. LIVE DROP FEED
-       ========================================== */
-    .live-feed {
-      background: #101216;
-      height: 65px;
+    .nav-btn:hover, .nav-btn.active {
+      color: #fff;
+      background: var(--bg-panel-light);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+
+    .nav-btn.active {
+      border-bottom: 2px solid var(--accent-green);
+    }
+
+    .user-actions {
       display: flex;
       align-items: center;
-      overflow: hidden;
-      border-bottom: 1px solid #232733;
-      padding: 0 10px;
+      gap: 15px;
     }
 
-    .feed-track {
+    .balance-badge {
+      background: #0b0d12;
+      border: 1px solid var(--border-color);
+      padding: 8px 18px;
+      border-radius: 8px;
       display: flex;
+      align-items: center;
       gap: 8px;
     }
 
-    .feed-item {
-      background: var(--bg-card);
-      width: 110px;
-      height: 50px;
-      border-radius: 4px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      border-bottom: 3px solid var(--rarity-milspec);
-      flex-shrink: 0;
+    .balance-badge .label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 700;
+      text-transform: uppercase;
     }
 
-    .feed-item img { height: 30px; object-fit: contain; }
-    .feed-item span { font-size: 0.65rem; color: var(--text-muted); text-overflow: ellipsis; white-space: nowrap; overflow: hidden; max-width: 90px; }
+    .balance-badge .val {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--accent-green);
+    }
+
+    .btn-deposit {
+      background: var(--accent-green);
+      color: #000;
+      border: none;
+      padding: 10px 22px;
+      font-weight: 800;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 0 15px var(--accent-green-glow);
+      transition: all 0.2s ease;
+    }
+
+    .btn-deposit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 25px var(--accent-green-glow);
+    }
 
     /* ==========================================
-       4. RULETT / PÖRGETŐ ARÉNA
+       3. LIVE DROPS FEED
        ========================================== */
-    .main-container {
-      max-width: 1200px;
+    .live-feed-container {
+      background: #0a0c10;
+      height: 70px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .live-feed-tag {
+      background: var(--bg-panel);
+      padding: 0 20px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Teko', sans-serif;
+      font-size: 1.3rem;
+      letter-spacing: 1px;
+      color: var(--accent-green);
+      border-right: 1px solid var(--border-color);
+      z-index: 10;
+      box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+    }
+
+    .feed-scroll-track {
+      display: flex;
+      gap: 10px;
+      padding-left: 15px;
+      align-items: center;
+    }
+
+    .feed-card {
+      width: 120px;
+      height: 54px;
+      background: var(--bg-card);
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      border-bottom: 3px solid var(--rarity-milspec);
+      display: flex;
+      align-items: center;
+      padding: 5px 8px;
+      gap: 8px;
+      flex-shrink: 0;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .feed-card img {
+      width: 45px;
+      height: 35px;
+      object-fit: contain;
+    }
+
+    .feed-card .info {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .feed-card .info .name {
+      font-size: 0.65rem;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 55px;
+    }
+
+    .feed-card .info .price {
+      font-size: 0.6rem;
+      color: var(--accent-green);
+      font-weight: 800;
+    }
+
+    /* ==========================================
+       4. MAIN CONTAINER & ROULETTE STAGE
+       ========================================== */
+    main {
+      max-width: 1280px;
       margin: 30px auto;
       padding: 0 20px;
       width: 100%;
+      flex-grow: 1;
     }
 
-    .roulette-arena {
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .roulette-stage {
       background: var(--bg-panel);
-      border-radius: 12px;
-      padding: 30px;
-      border: 1px solid #232733;
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+      padding: 35px;
       text-align: center;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      position: relative;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+      background: radial-gradient(circle at top, rgba(34, 197, 94, 0.05) 0%, var(--bg-panel) 70%);
     }
 
     .case-title {
       font-family: 'Teko', sans-serif;
-      font-size: 2.5rem;
-      letter-spacing: 1px;
-      margin-bottom: 20px;
+      font-size: 3rem;
+      letter-spacing: 2px;
       text-transform: uppercase;
+      margin-bottom: 20px;
+      text-shadow: 0 0 20px rgba(255,255,255,0.1);
+    }
+
+    /* Multi Track Containers */
+    .tracks-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 30px;
     }
 
     .roulette-viewport {
       position: relative;
       width: 100%;
-      height: 160px;
-      background: #0b0c0e;
-      border-radius: 8px;
+      height: 150px;
+      background: #090b0e;
+      border-radius: 12px;
       overflow: hidden;
-      border: 2px solid #232733;
-      margin-bottom: 25px;
+      border: 2px solid var(--border-color);
+      box-shadow: inset 0 0 30px rgba(0,0,0,0.9);
     }
 
-    /* A Mutató Nyíl középen */
     .roulette-pointer {
       position: absolute;
       top: 0;
@@ -196,9 +306,30 @@
       transform: translateX(-50%);
       width: 4px;
       height: 100%;
-      background: var(--accent-yellow);
-      z-index: 10;
-      box-shadow: 0 0 10px var(--accent-yellow);
+      background: var(--accent-green);
+      z-index: 20;
+      box-shadow: 0 0 15px var(--accent-green);
+    }
+
+    .roulette-pointer::before, .roulette-pointer::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+    }
+
+    .roulette-pointer::before {
+      top: 0;
+      border-top: 12px solid var(--accent-green);
+    }
+
+    .roulette-pointer::after {
+      bottom: 0;
+      border-bottom: 12px solid var(--accent-green);
     }
 
     .roulette-track {
@@ -206,35 +337,37 @@
       gap: 10px;
       position: absolute;
       left: 0;
-      top: 15px;
+      top: 10px;
       will-change: transform;
     }
 
-    /* KÁRTYA STÍLUSOK (Pontos méretek a JS-hez!) */
+    /* CARD DESIGN */
     .item-card {
       width: 182px;
-      height: 130px;
+      height: 126px;
       background: var(--bg-card);
-      border-radius: 6px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      border-bottom: 4px solid var(--rarity-milspec);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
       padding: 10px;
       flex-shrink: 0;
-      border-bottom: 4px solid var(--rarity-milspec);
       position: relative;
+      transition: transform 0.2s ease;
     }
 
     .item-card img {
-      max-height: 65px;
+      max-height: 60px;
       object-fit: contain;
+      filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
     }
 
     .item-card .item-name {
       font-size: 0.75rem;
       font-weight: 700;
-      text-align: center;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -243,160 +376,318 @@
 
     .item-card .item-price {
       font-size: 0.7rem;
-      color: var(--text-muted);
+      color: var(--accent-green);
+      font-weight: 800;
     }
 
-    /* Ritkaság szegélyek */
     .item-card.milspec { border-bottom-color: var(--rarity-milspec); }
     .item-card.restricted { border-bottom-color: var(--rarity-restricted); }
     .item-card.classified { border-bottom-color: var(--rarity-classified); }
     .item-card.covert { border-bottom-color: var(--rarity-covert); }
     .item-card.gold { border-bottom-color: var(--rarity-gold); }
 
-    /* Vezérlő gombok */
-    .controls {
+    /* CONTROLS BAR */
+    .controls-bar {
       display: flex;
-      justify-content: center;
       align-items: center;
-      gap: 20px;
+      justify-content: center;
+      gap: 25px;
+      background: var(--bg-card);
+      padding: 15px 30px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      max-width: 800px;
+      margin: 0 auto;
     }
 
-    .btn-open {
-      background: #22c55e;
-      color: #fff;
-      font-size: 1.2rem;
-      padding: 14px 40px;
+    .multi-btn-group {
+      display: flex;
+      gap: 5px;
+      background: rgba(0,0,0,0.4);
+      padding: 4px;
+      border-radius: 8px;
     }
-    .btn-open:hover { background: #16a34a; }
+
+    .btn-multi {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-weight: 800;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-multi:hover, .btn-multi.active {
+      background: var(--bg-panel-light);
+      color: #fff;
+    }
 
     .fast-toggle {
       display: flex;
       align-items: center;
       gap: 8px;
       font-size: 0.85rem;
+      font-weight: 700;
       color: var(--text-muted);
       cursor: pointer;
     }
 
-    /* ==========================================
-       5. LÁDÁK ÉS KÍNÁLAT GRID
-       ========================================== */
-    .section-header {
-      font-family: 'Teko', sans-serif;
-      font-size: 1.8rem;
-      margin: 40px 0 15px 0;
+    .btn-open-case {
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+      color: #000;
+      border: none;
+      padding: 14px 45px;
+      font-weight: 900;
+      font-size: 1.1rem;
       text-transform: uppercase;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 0 20px var(--accent-green-glow);
+      transition: all 0.2s ease;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-open-case:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 30px var(--accent-green-glow);
+    }
+
+    /* ==========================================
+       5. GRID SECTIONS (CASES & PREVIEW)
+       ========================================== */
+    .section-title {
+      font-family: 'Teko', sans-serif;
+      font-size: 2rem;
       letter-spacing: 1px;
+      margin: 40px 0 20px 0;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title::after {
+      content: '';
+      flex-grow: 1;
+      height: 1px;
+      background: var(--border-color);
     }
 
     .grid-container {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 15px;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
     }
 
-    .case-select-card {
+    .case-card {
       background: var(--bg-panel);
-      border-radius: 8px;
-      padding: 15px;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
       text-align: center;
-      border: 1px solid #232733;
       cursor: pointer;
       transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
     }
 
-    .case-select-card:hover {
-      border-color: var(--accent-yellow);
-      transform: translateY(-3px);
+    .case-card:hover {
+      border-color: var(--accent-green);
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
     }
 
-    .case-select-card img {
-      width: 100px;
-      height: 80px;
+    .case-card img {
+      width: 130px;
+      height: 100px;
       object-fit: contain;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
+      filter: drop-shadow(0 10px 15px rgba(0,0,0,0.6));
     }
 
-    .case-select-card h4 { font-size: 0.9rem; margin-bottom: 5px; }
-    .case-select-card p { font-size: 0.8rem; color: var(--accent-yellow); font-weight: 700; }
+    .case-card h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
 
-    /* FÜLEK ELREJTÉSE / MEGJELENÍTÉSE */
-    .tab-page { display: none; }
-    .tab-page.active { display: block; }
+    .case-card .price {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: var(--accent-green);
+    }
+
+    /* INVENTORY DROPDOWN / PANEL */
+    .inventory-panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+
+    .inventory-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
+      max-height: 300px;
+      overflow-y: auto;
+      padding-right: 5px;
+    }
+
+    .inventory-card {
+      background: var(--bg-card);
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      padding: 10px;
+      text-align: center;
+      position: relative;
+    }
+
+    .inventory-card img {
+      width: 60px;
+      height: 45px;
+      object-fit: contain;
+    }
+
+    .inventory-card .name {
+      font-size: 0.7rem;
+      font-weight: 700;
+      margin: 5px 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .inventory-card .price {
+      font-size: 0.65rem;
+      color: var(--accent-green);
+      font-weight: 800;
+    }
+
+    .btn-sell {
+      background: #ef4444;
+      color: #fff;
+      border: none;
+      padding: 4px 8px;
+      font-size: 0.65rem;
+      font-weight: 800;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 5px;
+    }
   </style>
 </head>
 <body>
 
-  <!-- 1. FEJLÉC -->
+  <!-- 1. FEJLÉC / NAV -->
   <header>
-    <div class="logo"><span>CS2</span>DROP</div>
-    <nav class="nav-tabs">
-      <button class="tab-btn active" onclick="switchTab('cases')">Ládák</button>
-      <button class="tab-btn" onclick="switchTab('upgrader')">Fejlesztő</button>
+    <div class="brand-logo" onclick="switchTab('cases')">
+      <div class="logo-text">LUXDROP</div>
+    </div>
+
+    <nav class="nav-menu">
+      <button class="nav-btn active" onclick="switchTab('cases')">Ládák</button>
+      <button class="nav-btn" onclick="switchTab('battles')">Battles</button>
+      <button class="nav-btn" onclick="switchTab('upgrader')">Upgrader</button>
+      <button class="nav-btn" onclick="switchTab('inventory')">Leltár</button>
     </nav>
-    <div class="user-profile">
-      <div class="balance-box" id="user-balance">$250.00</div>
-      <button class="btn-action" onclick="addFunds()">Befizetés</button>
+
+    <div class="user-actions">
+      <div class="balance-badge">
+        <span class="label">Egyenleg:</span>
+        <span class="val" id="user-balance">$250.00</span>
+      </div>
+      <button class="btn-deposit" onclick="addFunds()">Befizetés</button>
     </div>
   </header>
 
-  <!-- 2. LIVE DROPS -->
-  <div class="live-feed">
-    <div class="feed-track" id="live-feed-track"></div>
+  <!-- 2. LIVE DROP FEED -->
+  <div class="live-feed-container">
+    <div class="live-feed-tag">LIVE DROPS</div>
+    <div class="feed-scroll-track" id="live-feed-track">
+      <!-- JavaScript ide szúrja be a nyitásokat -->
+    </div>
   </div>
 
-  <div class="main-container">
-    
+  <main>
     <!-- ==========================================
          TAB 1: LÁDANYITÁS
          ========================================== -->
-    <div id="tab-cases" class="tab-page active">
-      <div class="roulette-arena">
-        <h2 class="case-title" id="active-case-name">Kilowatt Case</h2>
-        
-        <!-- Pörgető ablak -->
-        <div class="roulette-viewport">
-          <div class="roulette-pointer"></div>
-          <div class="roulette-track" id="roulette-track"></div>
+    <div id="tab-cases" class="tab-content active">
+      <div class="roulette-stage">
+        <h1 class="case-title" id="active-case-title">Kilowatt Case</h1>
+
+        <div class="tracks-wrapper" id="tracks-wrapper">
+          <!-- JS ide rendereli a pörgető sávokat (1x, 2x, 3x stb.) -->
         </div>
 
-        <!-- Vezérlők -->
-        <div class="controls">
+        <div class="controls-bar">
+          <div class="multi-btn-group">
+            <button class="btn-multi active" onclick="setMultiOpen(1, this)">1x</button>
+            <button class="btn-multi" onclick="setMultiOpen(2, this)">2x</button>
+            <button class="btn-multi" onclick="setMultiOpen(3, this)">3x</button>
+            <button class="btn-multi" onclick="setMultiOpen(4, this)">4x</button>
+            <button class="btn-multi" onclick="setMultiOpen(5, this)">5x</button>
+          </div>
+
           <label class="fast-toggle">
-            <input type="checkbox" id="fast-spin-toggle"> Gyors nyitás
+            <input type="checkbox" id="fast-spin-toggle"> Gyors Nyitás
           </label>
-          <button class="btn-action btn-open" id="open-btn" onclick="handleOpenCase()">
+
+          <button class="btn-open-case" id="btn-open-main" onclick="handleOpenCase()">
             Nyitás ($2.50)
           </button>
         </div>
       </div>
 
-      <!-- Láda kiválasztó -->
-      <div class="section-header">Ládák Választéka</div>
+      <div class="section-title">Válassz Ládát</div>
       <div class="grid-container" id="cases-grid"></div>
 
-      <!-- Láda tartalom preview -->
-      <div class="section-header">Láda Tartalma</div>
+      <div class="section-title">Láda Tartalma</div>
       <div class="grid-container" id="case-preview-grid"></div>
     </div>
 
     <!-- ==========================================
-         TAB 2: UPGRADGER
+         TAB 2: CASE BATTLES
          ========================================== -->
-    <div id="tab-upgrader" class="tab-page">
-      <div class="roulette-arena">
-        <h2 class="case-title">Skin Fejlesztő (Upgrader)</h2>
-        <p style="color: var(--text-muted);">Fejleszd a gyengébb skineidet drágább tárgyakra!</p>
+    <div id="tab-battles" class="tab-content">
+      <div class="roulette-stage">
+        <h1 class="case-title">Case Battles</h1>
+        <p style="color: var(--text-muted);">Hamarosan... Hozz létre csatát és nyerd el az ellenfeled skinjeit!</p>
       </div>
     </div>
 
-  </div>
+    <!-- ==========================================
+         TAB 3: UPGRADGER
+         ========================================== -->
+    <div id="tab-upgrader" class="tab-content">
+      <div class="roulette-stage">
+        <h1 class="case-title">Skin Upgrader</h1>
+        <p style="color: var(--text-muted);">Hamarosan... Fejleszd a kis értéku skinjeidet késre vagy kesztyure!</p>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         TAB 4: LELTÁR (INVENTORY)
+         ========================================== -->
+    <div id="tab-inventory" class="tab-content">
+      <div class="section-title">A Te Leltárad</div>
+      <div class="inventory-panel">
+        <div class="inventory-grid" id="inventory-grid">
+          <!-- JS ide rendezi a megszerzett skineket -->
+        </div>
+      </div>
+    </div>
+  </main>
 
   <!-- ==========================================
-       JAVASCRIPT MOTOR (ESÉLYEK + ROULETTE)
+       6. JAVASCRIPT ENGINE (LOGIKA & ESÉLYEK)
        ========================================== -->
   <script>
-    // 1. ESÉLY BEÁLLÍTÁSOK (CS:GO Gyári esélyek %)
+    // CS:GO Gyári esélyek (%)
     const RARITY_CHANCES = {
       milspec: 79.92,     // Kék (~80%)
       restricted: 15.98,  // Lila (~16%)
@@ -405,7 +696,6 @@
       gold: 0.26          // Kés / Kesztyű (~0.26%)
     };
 
-    // 2. SKINEK ADATBÁZISA
     const SKIN_DATABASE = [
       { id: 1, name: "P250 | Sand Dune", price: 0.15, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f", rarity: "milspec" },
       { id: 2, name: "AK-47 | Safari Mesh", price: 0.50, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f", rarity: "milspec" },
@@ -420,23 +710,23 @@
 
     const CASE_DATABASE = [
       { id: "kilowatt", name: "Kilowatt Case", price: 2.50, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f" },
-      { id: "revolution", name: "Revolution Case", price: 1.50, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f" }
+      { id: "dreams", name: "Dreams & Nightmares", price: 1.80, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f" },
+      { id: "revolution", name: "Revolution Case", price: 1.20, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f" }
     ];
 
-    // Állapotok
     let userBalance = 250.00;
+    let userInventory = [];
     let isSpinning = false;
+    let multiOpenCount = 1;
     let activeCase = CASE_DATABASE[0];
 
-    // INICIALIZÁLÁS
     document.addEventListener('DOMContentLoaded', () => {
       renderCasesGrid();
       renderCasePreview();
-      initRouletteTrack();
+      renderTracks();
       initLiveFeed();
     });
 
-    // SÚLYOZOTT SORSOLÁS (Ez adja az esélyeket)
     function getRandomSkinByRarity() {
       const rand = Math.random() * 100;
       let cumulative = 0;
@@ -456,89 +746,119 @@
         : SKIN_DATABASE[0];
     }
 
-    // PÖRGETÉS LOGIKA PONTOS MATEMATIKÁVAL
+    function renderTracks() {
+      const wrapper = document.getElementById('tracks-wrapper');
+      let html = '';
+      for (let i = 0; i < multiOpenCount; i++) {
+        html += `
+          <div class="roulette-viewport">
+            <div class="roulette-pointer"></div>
+            <div class="roulette-track" id="spinner-track-${i}"></div>
+          </div>
+        `;
+      }
+      wrapper.innerHTML = html;
+
+      for (let i = 0; i < multiOpenCount; i++) {
+        const track = document.getElementById(`spinner-track-${i}`);
+        if (track) {
+          track.innerHTML = SKIN_DATABASE.slice(0, 10).map(item => `
+            <div class="item-card ${item.rarity}">
+              <img src="${item.img}">
+              <div class="item-name">${item.name}</div>
+              <div class="item-price">$${item.price.toFixed(2)}</div>
+            </div>
+          `).join('');
+        }
+      }
+    }
+
+    function setMultiOpen(count, btn) {
+      if (isSpinning) return;
+      document.querySelectorAll('.btn-multi').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      multiOpenCount = count;
+      renderTracks();
+      updateOpenBtnText();
+    }
+
+    function updateOpenBtnText() {
+      const total = (activeCase.price * multiOpenCount).toFixed(2);
+      document.getElementById('btn-open-main').innerText = `Nyitás ($${total})`;
+    }
+
     function handleOpenCase() {
       if (isSpinning) return;
-      if (userBalance < activeCase.price) {
+      const totalCost = activeCase.price * multiOpenCount;
+      if (userBalance < totalCost) {
         alert("Nincs elég egyenleged!");
         return;
       }
 
-      userBalance -= activeCase.price;
+      userBalance -= totalCost;
       updateBalanceUI();
       isSpinning = true;
 
       const isFast = document.getElementById('fast-spin-toggle').checked;
       const spinTime = isFast ? 1.2 : 4.0;
 
-      const track = document.getElementById('roulette-track');
       const CARD_WIDTH = 182;
       const CARD_GAP = 10;
-      const TOTAL_STEP = CARD_WIDTH + CARD_GAP; // 192px
-      const WINNING_INDEX = 65; // A 65. kártyán áll meg
+      const TOTAL_STEP = CARD_WIDTH + CARD_GAP;
+      const WINNING_INDEX = 65;
 
-      // Nyertes kisorsolása az esélyek alapján
-      const wonItem = getRandomSkinByRarity();
+      for (let s = 0; s < multiOpenCount; s++) {
+        const wonItem = getRandomSkinByRarity();
+        const track = document.getElementById(`spinner-track-${s}`);
+        if (!track) continue;
 
-      // Rulett pálya előkészítése
-      track.style.transition = 'none';
-      track.style.transform = 'translateX(0px)';
+        track.style.transition = 'none';
+        track.style.transform = 'translateX(0px)';
 
-      let trackItems = [];
-      for (let i = 0; i < 80; i++) {
-        if (i === WINNING_INDEX) {
-          trackItems.push(wonItem);
-        } else {
-          trackItems.push(getRandomSkinByRarity());
+        let trackItems = [];
+        for (let i = 0; i < 80; i++) {
+          if (i === WINNING_INDEX) {
+            trackItems.push(wonItem);
+          } else {
+            trackItems.push(getRandomSkinByRarity());
+          }
         }
+
+        track.innerHTML = trackItems.map(item => `
+          <div class="item-card ${item.rarity}">
+            <img src="${item.img}">
+            <div class="item-name">${item.name}</div>
+            <div class="item-price">$${item.price.toFixed(2)}</div>
+          </div>
+        `).join('');
+
+        const containerWidth = track.parentElement.clientWidth;
+        const targetX = -(WINNING_INDEX * TOTAL_STEP) + (containerWidth / 2) - (CARD_WIDTH / 2);
+
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            track.style.transition = `transform ${spinTime}s cubic-bezier(0.1, 0.8, 0.1, 1)`;
+            track.style.transform = `translateX(${targetX}px)`;
+          });
+        });
+
+        userInventory.push(wonItem);
+        addLiveFeedItem(wonItem);
       }
 
-      track.innerHTML = trackItems.map(item => `
-        <div class="item-card ${item.rarity}">
-          <img src="${item.img}">
-          <div class="item-name">${item.name}</div>
-          <div class="item-price">$${item.price.toFixed(2)}</div>
-        </div>
-      `).join('');
-
-      // Pontos középre igazítás kiszámítása
-      const containerWidth = track.parentElement.clientWidth;
-      const targetX = -(WINNING_INDEX * TOTAL_STEP) + (containerWidth / 2) - (CARD_WIDTH / 2);
-
-      // Animáció indítása
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          track.style.transition = `transform ${spinTime}s cubic-bezier(0.1, 0.8, 0.1, 1)`;
-          track.style.transform = `translateX(${targetX}px)`;
-        });
-      });
-
-      // Befejezés
       setTimeout(() => {
         isSpinning = false;
-        addLiveFeedItem(wonItem);
-      }, spinTime * 1000 + 100);
-    }
-
-    // RENDERELŐK ÉS SEGEDFÜGGVÉNYEK
-    function initRouletteTrack() {
-      const track = document.getElementById('roulette-track');
-      track.innerHTML = SKIN_DATABASE.slice(0, 10).map(item => `
-        <div class="item-card ${item.rarity}">
-          <img src="${item.img}">
-          <div class="item-name">${item.name}</div>
-          <div class="item-price">$${item.price.toFixed(2)}</div>
-        </div>
-      `).join('');
+        renderInventory();
+      }, spinTime * 1000 + 200);
     }
 
     function renderCasesGrid() {
       const grid = document.getElementById('cases-grid');
       grid.innerHTML = CASE_DATABASE.map(c => `
-        <div class="case-select-card" onclick="selectCase('${c.id}')">
+        <div class="case-card" onclick="selectCase('${c.id}')">
           <img src="${c.img}">
-          <h4>${c.name}</h4>
-          <p>$${c.price.toFixed(2)}</p>
+          <h3>${c.name}</h3>
+          <div class="price">$${c.price.toFixed(2)}</div>
         </div>
       `).join('');
     }
@@ -558,8 +878,8 @@
       const c = CASE_DATABASE.find(x => x.id === id);
       if (!c) return;
       activeCase = c;
-      document.getElementById('active-case-name').innerText = c.name;
-      document.getElementById('open-btn').innerText = `Nyitás ($${c.price.toFixed(2)})`;
+      document.getElementById('active-case-title').innerText = c.name;
+      updateOpenBtnText();
     }
 
     function updateBalanceUI() {
@@ -572,16 +892,15 @@
     }
 
     function switchTab(tabId) {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
-      
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(p => p.classList.remove('active'));
+
       event.target.classList.add('active');
       document.getElementById(`tab-${tabId}`).classList.add('active');
     }
 
     function initLiveFeed() {
-      const track = document.getElementById('live-feed-track');
-      for (let i = 0; i < 12; i++) {
+      for (let i = 0; i < 10; i++) {
         addLiveFeedItem(SKIN_DATABASE[Math.floor(Math.random() * SKIN_DATABASE.length)]);
       }
     }
@@ -589,11 +908,41 @@
     function addLiveFeedItem(item) {
       const track = document.getElementById('live-feed-track');
       const div = document.createElement('div');
-      div.className = 'feed-item';
+      div.className = 'feed-card';
       div.style.borderBottomColor = `var(--rarity-${item.rarity})`;
-      div.innerHTML = `<img src="${item.img}"><span>${item.name}</span>`;
+      div.innerHTML = `
+        <img src="${item.img}">
+        <div class="info">
+          <span class="name">${item.name}</span>
+          <span class="price">$${item.price.toFixed(2)}</span>
+        </div>
+      `;
       track.insertBefore(div, track.firstChild);
       if (track.children.length > 15) track.removeChild(track.lastChild);
+    }
+
+    function renderInventory() {
+      const grid = document.getElementById('inventory-grid');
+      if (!grid) return;
+      if (userInventory.length === 0) {
+        grid.innerHTML = `<p style="color:var(--text-muted); grid-column:span 4;">A leltárad üres.</p>`;
+        return;
+      }
+      grid.innerHTML = userInventory.map((item, idx) => `
+        <div class="inventory-card">
+          <img src="${item.img}">
+          <div class="name">${item.name}</div>
+          <div class="price">$${item.price.toFixed(2)}</div>
+          <button class="btn-sell" onclick="sellItem(${idx})">Eladás</button>
+        </div>
+      `).join('');
+    }
+
+    function sellItem(idx) {
+      userBalance += userInventory[idx].price;
+      userInventory.splice(idx, 1);
+      updateBalanceUI();
+      renderInventory();
     }
   </script>
 </body>
