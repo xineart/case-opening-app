@@ -68,6 +68,8 @@ body {
   padding-left: 10px;
   overflow-x: auto;
   scrollbar-width: none;
+  width: 100%;
+  align-items: center;
 }
 .drop-track::-webkit-scrollbar { display: none; }
 
@@ -84,8 +86,18 @@ body {
   flex-shrink: 0;
 }
 
-.feed-item img { width: 38px; height: 30px; object-fit: contain; }
-.feed-item span { font-size: 0.75rem; font-weight: 700; white-space: nowrap; }
+.feed-item img { 
+  width: 38px; 
+  height: 30px; 
+  object-fit: contain; 
+  display: block;
+}
+
+.feed-item span { 
+  font-size: 0.75rem; 
+  font-weight: 700; 
+  white-space: nowrap; 
+}
 
 /* NAVBAR */
 .navbar {
@@ -268,6 +280,9 @@ body {
   text-align: center;
   cursor: pointer;
   transition: all 0.25s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .case-card:hover {
@@ -276,7 +291,14 @@ body {
   background: var(--bg-card-hover);
 }
 
-.case-card img { width: 160px; height: 130px; object-fit: contain; margin-bottom: 1rem; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.6)); }
+.case-card img { 
+  width: 160px; 
+  height: 130px; 
+  object-fit: contain; 
+  margin-bottom: 1rem; 
+  filter: drop-shadow(0 10px 15px rgba(0,0,0,0.6)); 
+  display: block;
+}
 .case-card h3 { font-family: 'Chakra Petch', sans-serif; font-size: 1.2rem; }
 .case-card .price { color: var(--neon-green); font-family: 'Chakra Petch', sans-serif; font-size: 1.2rem; font-weight: 800; margin-top: 6px; }
 
@@ -314,7 +336,7 @@ body {
   background: rgba(0, 255, 136, 0.1);
 }
 
-/* ROULETTE CONTAINER (PIXELPONTOSÍTVA) */
+/* ROULETTE CONTAINER & TRACK */
 .roulette-container {
   position: relative;
   width: 100%;
@@ -340,10 +362,9 @@ body {
   pointer-events: none;
 }
 
-/* ROULETTE TRACK (JAVÍTVA: ABSOLUTE SIKERESEN ELTÁVOLÍTVA) */
 .roulette-track {
   display: flex !important;
-  gap: 10px !important; /* SZIGORÚAN MEGEGYEZIK A JS CARD_GAP ÉRTÉKÉVEL */
+  gap: 10px !important;
   align-items: center;
   height: 100%;
   padding: 0 !important;
@@ -351,8 +372,8 @@ body {
   will-change: transform;
 }
 
-/* ITEMS GRID ÉS ROULETTE KÁRTYÁK MÉRÉTEZÉSE */
-.section-divider { margin: 2rem 0 1.2rem 0; }
+/* ITEMS GRID ÉS ROULETTE KÁRTYÁK */
+.section-divider { margin: 2rem 0 1.2rem 0; text-align: left; }
 .section-divider h3 { font-family: 'Chakra Petch', sans-serif; color: #64748b; font-size: 1.1rem; }
 
 .items-grid {
@@ -378,14 +399,20 @@ body {
   margin: 0 !important;
 }
 
-/* A pörgetőn belüli kártyák méretének kőkemény rögzítése */
 .roulette-track .item-card {
   width: 182px !important;
   min-width: 182px !important;
   max-width: 182px !important;
 }
 
-.item-card img { width: 120px; height: 80px; object-fit: contain; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5)); }
+.item-card img { 
+  width: 120px; 
+  height: 80px; 
+  object-fit: contain; 
+  filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5)); 
+  display: block;
+}
+
 .item-card .name { font-size: 0.75rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
 .item-card .price { color: var(--neon-green); font-size: 0.85rem; font-weight: 800; }
 
@@ -420,7 +447,7 @@ body {
 
 .battle-info-left { display: flex; align-items: center; gap: 18px; }
 .battle-case-preview { display: flex; gap: 5px; }
-.battle-case-img { width: 50px; height: 45px; object-fit: contain; }
+.battle-case-img { width: 50px; height: 45px; object-fit: contain; display: block; }
 .battle-details h4 { font-family: 'Chakra Petch', sans-serif; font-size: 1.1rem; }
 .battle-details p { font-size: 0.8rem; color: #64748b; }
 .battle-actions-right { display: flex; align-items: center; gap: 12px; }
@@ -519,10 +546,13 @@ body {
   border-radius: 8px;
   text-align: center;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.mini-item-card img { width: 60px; height: 45px; object-fit: contain; }
-.mini-item-card .name { font-size: 0.65rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mini-item-card img { width: 60px; height: 45px; object-fit: contain; display: block; }
+.mini-item-card .name { font-size: 0.65rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
 .mini-item-card .price { font-size: 0.75rem; color: var(--neon-green); font-weight: 700; }
 
 .upgrader-center { display: flex; flex-direction: column; align-items: center; gap: 20px; }
@@ -562,7 +592,7 @@ body {
 .wheel-center-info small { color: #64748b; font-weight: 700; }
 
 .target-display-box { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; text-align: center; width: 100%; }
-.target-display-box img { width: 130px; height: 95px; object-fit: contain; margin-bottom: 10px; }
+.target-display-box img { width: 130px; height: 95px; object-fit: contain; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto; }
 .target-display-box h4 { font-family: 'Chakra Petch', sans-serif; font-size: 1.1rem; }
 .target-display-box .target-price { color: var(--neon-green); font-weight: 800; font-size: 1.2rem; display: block; margin-top: 5px; }
 
@@ -637,6 +667,7 @@ body {
   width: 35px;
   height: 35px;
   object-fit: contain;
+  display: block;
 }
 
 .dropdown-item-info {
