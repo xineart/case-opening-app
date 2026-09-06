@@ -80,22 +80,58 @@ function triggerConfetti() {
 }
 
 // ADATBÁZIS
+// MŰKÖDŐ, VALÓDI CS2 SKINEK ÉS LÁDÁK KÉP-URL ADATBÁZISA
 const SKIN_DATABASE = [
-  { id: 1, name: "P250 | Sand Dune", price: 0.50, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d1844vf45gA484_45Q1feDjVsJP1bJ413qA" },
-  { id: 2, name: "Glock-18 | Water Elemental", price: 8.50, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d1844vf45gA484_45Q1feDjVsJP1bJ413qA" },
-  { id: 3, name: "AK-47 | Redline", price: 22.00, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d1844vf45gA484_45Q1feDjVsJP1bJ413qA" },
-  { id: 4, name: "M4A4 | Neo-Noir", price: 35.00, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d1844vf45gA484_45Q1feDjVsJP1bJ413qA" },
-  { id: 5, name: "AWP | Asiimov", price: 110.00, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d1844vf45gA484_45Q1feDjVsJP1bJ413qA" },
-  { id: 6, name: "AK-47 | Vulcan", price: 280.00, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d1844vf45gA484_45Q1feDjVsJP1bJ413qA" },
-  { id: 7, name: "★ Butterfly Knife | Fade", price: 2400.00, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d1844vf45gA484_45Q1feDjVsJP1bJ413qA" }
+  { 
+    id: 1, 
+    name: "P250 | Sand Dune", 
+    price: 0.50, 
+    img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d1844vf45gA484_45Q1feDjVsJP1bJ413qA036UrDUR30v3E340x8aa8657B_E2t2_0i_x2N39G36_0_19g8i8X160XfM0fS0l4aI" 
+  },
+  { 
+    id: 2, 
+    name: "Glock-18 | Water Elemental", 
+    price: 8.50, 
+    img: "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/econ/default_generated/weapon_glock_cu_glock_water_elemental_light.png" 
+  },
+  { 
+    id: 3, 
+    name: "AK-47 | Redline", 
+    price: 22.00, 
+    img: "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/econ/default_generated/weapon_ak47_cu_ak47_cobra_light.png" 
+  },
+  { 
+    id: 4, 
+    name: "M4A4 | Neo-Noir", 
+    price: 35.00, 
+    img: "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/econ/default_generated/weapon_m4a1_cu_m4a4_neo_noir_light.png" 
+  },
+  { 
+    id: 5, 
+    name: "AWP | Asiimov", 
+    price: 110.00, 
+    img: "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/econ/default_generated/weapon_awp_cu_awp_asimov_light.png" 
+  },
+  { 
+    id: 6, 
+    name: "AK-47 | Vulcan", 
+    price: 280.00, 
+    img: "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/econ/default_generated/weapon_ak47_cu_ak47_vulcan_light.png" 
+  },
+  { 
+    id: 7, 
+    name: "★ Karambit | Fade", 
+    price: 2400.00, 
+    img: "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/econ/default_generated/weapon_knife_karambit_an_progression_light.png" 
+  }
 ];
 
 const OFFICIAL_CASES = [
-  { id: 'starter', name: 'Starter Case', price: 2.50, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d1844vf45gA484_45Q1feDjVsJP1bJ413qA' },
-  { id: 'neon', name: 'Neon Lights Case', price: 12.00, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d1844vf45gA484_45Q1feDjVsJP1bJ413qA' },
-  { id: 'classified', name: 'Classified Collection', price: 35.00, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d1844vf45gA484_45Q1feDjVsJP1bJ413qA' },
-  { id: 'covert', name: 'Covert Operations', price: 75.00, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d1844vf45gA484_45Q1feDjVsJP1bJ413qA' },
-  { id: 'knife', name: 'Exotic Knife Box', price: 250.00, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d1844vf45gA484_45Q1feDjVsJP1bJ413qA' }
+  { id: 'starter', name: 'Kilowatt Case', price: 2.50, img: 'https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/econ/weapon_cases/crate_community_33.png' },
+  { id: 'neon', name: 'Revolution Case', price: 12.00, img: 'https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/econ/weapon_cases/crate_community_32.png' },
+  { id: 'classified', name: 'Recoil Case', price: 35.00, img: 'https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/econ/weapon_cases/crate_community_30.png' },
+  { id: 'covert', name: 'Dreams & Nightmares', price: 75.00, img: 'https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/econ/weapon_cases/crate_community_29.png' },
+  { id: 'knife', name: 'Operation Riptide Case', price: 250.00, img: 'https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/images/econ/weapon_cases/crate_community_28.png' }
 ];
 
 function getRarityClass(price) {
