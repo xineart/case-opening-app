@@ -9,7 +9,7 @@
 </head>
 <body>
 
-  <!-- HEADER / ENGINES -->
+  <!-- HEADER / NAVBAR -->
   <header>
     <div class="logo">
       <span>📦</span> LOOTDROP.GG
@@ -17,17 +17,17 @@
     <div class="user-stats">
       <div class="balance-box">
         <span>Egyenleg:</span>
-        <span id="user-balance">$100.00</span>
+        <span id="user-balance">$0.00</span>
       </div>
       <button class="btn btn-success" onclick="openDepositModal()">+ Feltöltés</button>
-      <button class="btn" id="auth-btn">Bejelentkezés</button>
+      <button class="btn" id="auth-btn" onclick="promptLogin()">Bejelentkezés</button>
     </div>
   </header>
 
   <!-- MAIN CONTAINER -->
   <main class="main-container">
 
-    <!-- PÖRGETŐ SECTOIN -->
+    <!-- PÖRGETŐ SECTION -->
     <section class="case-display-area">
       <h2>Hyper Beast Edition Case</h2>
       <p style="color: var(--text-muted); margin-top: 5px;">Nyisd ki a ládát $25.00 áron</p>
@@ -35,7 +35,7 @@
       <!-- ROULETTE SPINNER -->
       <div class="spinner-wrapper">
         <div class="spinner-track" id="spinner-track">
-          <!-- A JS ide generálja majd a pörgető kártyákat -->
+          <!-- A JS ide generálja a pörgető kártyákat -->
         </div>
       </div>
 
@@ -44,46 +44,53 @@
       </button>
     </section>
 
+    <!-- SAJÁT LELTÁR (INVENTORY) SECTION -->
+    <section style="margin-bottom: 3rem;">
+      <div class="section-title">Saját Leltár (Inventory)</div>
+      <div class="items-grid" id="inventory-grid">
+        <!-- A JS ide tölti be a játékos meglévő tárgyait -->
+      </div>
+    </section>
+
     <!-- LÁDA TARTALMA (LOOT TABLE) -->
     <section>
       <div class="section-title">Láda Tartalma</div>
       <div class="items-grid" id="case-items-grid">
-        
-        <!-- PÉLDA TÁRGY KÁRTYÁK -->
-        <div class="item-card milspec">
-          <img src="https://via.placeholder.com/150/4b69ff?text=P250" alt="Item">
-          <div class="item-name">P250 | Ripple</div>
-          <div class="item-price">$1.20</div>
-        </div>
-
-        <div class="item-card restricted">
-          <img src="https://via.placeholder.com/150/8847ff?text=AK-47" alt="Item">
-          <div class="item-name">AK-47 | Point Disarray</div>
-          <div class="item-price">$18.50</div>
-        </div>
-
-        <div class="item-card classified">
-          <img src="https://via.placeholder.com/150/d32ce6?text=M4A4" alt="Item">
-          <div class="item-name">M4A4 | Desolate Space</div>
-          <div class="item-price">$45.00</div>
-        </div>
-
-        <div class="item-card covert">
-          <img src="https://via.placeholder.com/150/eb4b4b?text=AWP+Hyper" alt="Item">
-          <div class="item-name">AWP | Hyper Beast</div>
-          <div class="item-price">$120.00</div>
-        </div>
-
-        <div class="item-card gold">
-          <img src="https://via.placeholder.com/150/caab05?text=Karambit" alt="Item">
-          <div class="item-name">★ Karambit | Gamma Doppler</div>
-          <div class="item-price">$1,450.00</div>
-        </div>
-
+        <!-- A JS ide tölti be a láda tartalmát -->
       </div>
     </section>
 
   </main>
+
+  <!-- DEPOSIT MODAL (BEFIZETÉSI ABLAK) -->
+  <div id="deposit-modal" class="modal-overlay">
+    <div class="modal-content">
+      <span class="modal-close" onclick="closeDepositModal()">&times;</span>
+      <h3>Egyenleg Feltöltése</h3>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">
+        Válassz összeget és kriptovalutát a gyors és biztonságos befizetéshez.
+      </p>
+
+      <div class="form-group">
+        <label>Összeg ($ USD):</label>
+        <input type="number" id="deposit-amount" min="5" value="25" step="5">
+      </div>
+
+      <div class="form-group">
+        <label>Fizetési Mód:</label>
+        <select id="deposit-currency">
+          <option value="USDT">Tether (USDT - TRC20)</option>
+          <option value="BTC">Bitcoin (BTC)</option>
+          <option value="ETH">Ethereum (ETH)</option>
+          <option value="LTC">Litecoin (LTC)</option>
+        </select>
+      </div>
+
+      <button class="btn btn-gold" onclick="processDeposit()" style="width: 100%; margin-top: 1rem; padding: 0.8rem;">
+        FIZETÉSI INDÍTÁSA
+      </button>
+    </div>
+  </div>
 
   <script src="app.js"></script>
 </body>
