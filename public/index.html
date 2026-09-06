@@ -3,273 +3,111 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lootbox.com - Enterprise Case Opening Platform</title>
-  <style>
-    /* --- SYSTEM RESET & VARIABLES --- */
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; user-select: none; }
-    :root {
-      --bg-dark: #0b0c10;
-      --card-bg: #13151c;
-      --accent-orange: #f5a623;
-      --accent-green: #2ce68a;
-      --accent-red: #e53935;
-      --text-main: #f0f2f5;
-      --text-muted: #6c7284;
-      --border-color: #1e222d;
-    }
-
-    body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
-
-    /* --- HEADER & NAVIGATION --- */
-    header {
-      width: 100%;
-      height: 70px;
-      background: #0f1015;
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0 40px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-    .logo { font-size: 22px; font-weight: 900; color: var(--accent-orange); letter-spacing: 2px; text-transform: uppercase; cursor: pointer; }
-    .user-profile { display: flex; align-items: center; gap: 20px; }
-    .balance-badge { background: #181a24; border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 15px; }
-    .balance-badge span { color: var(--accent-green); }
-    .btn-steam { background: #171a21; border: 1px solid #2a475e; color: #b8b6b4; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; text-decoration: none; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
-    .btn-steam:hover { background: #2a475e; color: #fff; }
-
-    /* --- MAIN CONTAINER --- */
-    main { width: 100%; max-width: 1200px; margin: 0 auto; padding: 40px 20px; flex-grow: 1; }
-
-    /* --- SPINNER ARENA --- */
-    .arena-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 30px; text-align: center; margin-bottom: 40px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-    .case-title { font-size: 28px; font-weight: 800; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
-
-    .spinner-viewport {
-      position: relative;
-      width: 100%;
-      height: 200px;
-      background: #08090c;
-      border-radius: 10px;
-      border: 2px solid var(--border-color);
-      overflow: hidden;
-      margin-bottom: 25px;
-    }
-    .pointer {
-      position: absolute;
-      top: 0; left: 50%;
-      transform: translateX(-50%);
-      width: 4px; height: 100%;
-      background: var(--accent-orange);
-      z-index: 10;
-      box-shadow: 0 0 15px var(--accent-orange);
-    }
-    .spinner-track {
-      display: flex;
-      position: absolute;
-      left: 0; top: 20px;
-      will-change: transform;
-    }
-
-    /* ITEM CARDS */
-    .item-card {
-      width: 140px;
-      height: 160px;
-      margin: 0 6px;
-      background: #181a24;
-      border-radius: 8px;
-      border-bottom: 4px solid var(--text-muted);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px;
-      flex-shrink: 0;
-      transition: transform 0.2s;
-    }
-    .item-card img { width: 85px; height: 85px; object-fit: contain; }
-    .item-card .name { font-size: 11px; font-weight: 700; color: #fff; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .item-card .price { font-size: 12px; color: var(--accent-green); font-weight: 600; }
-
-    /* CONTROLS */
-    .controls { display: flex; justify-content: center; align-items: center; gap: 15px; }
-    .btn-action {
-      padding: 16px 60px;
-      font-size: 18px;
-      font-weight: 900;
-      text-transform: uppercase;
-      background: linear-gradient(135deg, #f5a623 0%, #d48207 100%);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 0 5px 20px rgba(245, 166, 35, 0.3);
-      transition: all 0.2s;
-    }
-    .btn-action:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(245, 166, 35, 0.5); }
-    .btn-action:disabled { background: #2c303e; color: #555; cursor: not-allowed; box-shadow: none; transform: none; }
-
-    /* --- INVENTORY GRID --- */
-    .section-title { font-size: 20px; font-weight: 800; margin-bottom: 20px; text-transform: uppercase; color: var(--text-muted); text-align: left; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
-    .inventory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
-    .inv-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; align-items: center; text-align: center; }
-    .inv-card img { width: 90px; height: 90px; object-fit: contain; margin-bottom: 10px; }
-    .inv-card .sell-btn { width: 100%; margin-top: 10px; padding: 8px; background: rgba(229, 57, 53, 0.15); border: 1px solid var(--accent-red); color: var(--accent-red); font-weight: 700; border-radius: 6px; cursor: pointer; transition: 0.2s; }
-    .inv-card .sell-btn:hover { background: var(--accent-red); color: #fff; }
-
-    /* --- WIN MODAL --- */
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 1000; }
-    .modal-card { background: var(--card-bg); border: 1px solid var(--border-color); padding: 40px; border-radius: 12px; text-align: center; max-width: 400px; width: 90%; }
-    .modal-card img { width: 150px; height: 150px; object-fit: contain; margin: 20px 0; }
-    .provably-fair-info { font-size: 10px; color: var(--text-muted); font-family: monospace; word-break: break-all; margin-top: 15px; background: #08090c; padding: 8px; border-radius: 4px; }
-  </style>
+  <title>Enterprise Lootbox Platform</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+  <!-- HEADER -->
   <header>
-    <div class="logo">Lootbox</div>
-    <div class="user-profile">
-      <div class="balance-badge">Egyenleg: $<span id="balance">0.00</span></div>
-      <a href="/auth/steam" class="btn-steam">Steam Bejelentkezés</a>
+    <div class="logo">ENTERPRISE CASINO</div>
+    <div class="user-control">
+      <div id="authContainer">
+        <button class="btn btn-secondary" onclick="openAuthModal('login')">Bejelentkezés</button>
+        <button class="btn btn-primary" onclick="openAuthModal('register')">Regisztráció</button>
+      </div>
+      <div id="userProfile" class="user-profile hidden">
+        <div class="balance-card">
+          <span>Egyenleg:</span>
+          <strong id="userBalance">$0.00</strong>
+        </div>
+        <div class="username-tag" id="userNameTag">User</div>
+        <button class="btn btn-secondary btn-sm" onclick="logout()">Kijelentkezés</button>
+      </div>
     </div>
   </header>
 
+  <!-- FŐ TARTALOM -->
   <main>
-    <div class="arena-card">
-      <div class="case-title">Cobblestone Souvenir Case</div>
+    <!-- PÖRGETŐ ARÉNA -->
+    <section class="arena-card">
+      <div class="case-header">
+        <h1 class="case-title">Hyper Beast Edition Case</h1>
+        <div class="case-price">Ár: $25.00</div>
+      </div>
+
+      <!-- ANIMÁCIÓS SZALAG -->
       <div class="spinner-viewport">
         <div class="pointer"></div>
-        <div class="spinner-track" id="track"></div>
+        <div class="spinner-track" id="spinnerTrack"></div>
       </div>
-      <div class="controls">
-        <button class="btn-action" id="openBtn" onclick="openCase()">Láda Nyitása ($10.00)</button>
-      </div>
-    </div>
 
-    <div class="section-title">Raktárad (Inventory)</div>
-    <div class="inventory-grid" id="inventory"></div>
+      <div class="controls">
+        <button class="btn btn-action" id="spinBtn" onclick="spinCase()">LÁDA NYITÁSA ($25.00)</button>
+      </div>
+    </section>
+
+    <!-- PROVABLY FAIR INFORMÁCIÓK -->
+    <section class="pf-card hidden" id="pfCard">
+      <h3>Provably Fair Védelem (SHA-256)</h3>
+      <div class="pf-grid">
+        <div><span>Server Seed Hash:</span> <code id="pfServerHash">-</code></div>
+        <div><span>Client Seed:</span> <code id="pfClientSeed">-</code></div>
+        <div><span>Nonce:</span> <code id="pfNonce">-</code></div>
+      </div>
+    </section>
+
+    <!-- RAKTÁR / INVENTORY -->
+    <section class="inventory-section">
+      <h2>Saját Raktár (Inventory)</h2>
+      <div class="inventory-grid" id="inventoryGrid">
+        <div class="empty-msg">Jelentkezz be a raktárad megtekintéséhez!</div>
+      </div>
+    </section>
   </main>
 
-  <!-- NYEREMÉNY MODAL -->
-  <div class="modal-overlay" id="winModal">
+  <!-- AUTH MODAL (Regisztráció / Bejelentkezés) -->
+  <div class="modal-overlay hidden" id="authModal">
     <div class="modal-card">
-      <h2>Gratulálunk!</h2>
-      <img id="modalImg" src="">
-      <h3 id="modalName">Item Name</h3>
-      <p style="color: var(--accent-green); font-weight: bold; margin-top: 5px;" id="modalPrice">$0.00</p>
-      <div class="provably-fair-info" id="pfInfo">Hash: -</div>
-      <button class="btn-action" style="margin-top: 20px; width: 100%;" onclick="closeModal()">Rendben</button>
+      <button class="modal-close" onclick="closeAuthModal()">&times;</button>
+      <h2 id="modalTitle">Bejelentkezés</h2>
+      
+      <form id="authForm" onsubmit="handleAuthSubmit(event)">
+        <div class="form-group">
+          <label>Felhasználónév</label>
+          <input type="text" id="authUsername" required placeholder="Felhasználónév">
+        </div>
+
+        <div class="form-group hidden" id="emailGroup">
+          <label>E-mail cím</label>
+          <input type="email" id="authEmail" placeholder="email@domain.hu">
+        </div>
+
+        <div class="form-group">
+          <label>Jelszó</label>
+          <input type="password" id="authPassword" required placeholder="••••••••">
+        </div>
+
+        <div class="error-msg hidden" id="authError"></div>
+
+        <button type="submit" class="btn btn-primary btn-full" id="authSubmitBtn">Bejelentkezés</button>
+      </form>
     </div>
   </div>
 
-  <script>
-    const CARD_WIDTH = 152; // 140px width + 12px margin
-    const WINNER_INDEX = 65; // A nyertes elem pozíciója a szalagon
+  <!-- NYEREMÉNY MODAL -->
+  <div class="modal-overlay hidden" id="winModal">
+    <div class="modal-card win-card">
+      <h2>GRATULÁLUNK!</h2>
+      <div class="win-image-wrap">
+        <img id="winImg" src="" alt="Nyeremény">
+      </div>
+      <h3 id="winName">Item Name</h3>
+      <div class="win-price" id="winPrice">$0.00</div>
+      <button class="btn btn-action btn-full" onclick="closeWinModal()">Rendben</button>
+    </div>
+  </div>
 
-    // User adatok frissítése
-    async function refreshUser() {
-      const res = await fetch('/api/user');
-      const data = await res.json();
-      document.getElementById('balance').innerText = data.balance.toFixed(2);
-      loadInventory();
-    }
-
-    // Inventory frissítése
-    async function loadInventory() {
-      const res = await fetch('/api/inventory');
-      const items = await res.json();
-      const container = document.getElementById('inventory');
-      container.innerHTML = '';
-
-      items.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'inv-card';
-        card.style.borderBottom = `3px solid ${item.item_color}`;
-        card.innerHTML = `
-          <img src="${item.item_image}">
-          <div style="font-size:12px; font-weight:bold;">${item.item_name}</div>
-          <div style="color:var(--accent-green); font-size:12px; margin-top:4px;">$${item.item_price.toFixed(2)}</div>
-          <button class="sell-btn" onclick="sellItem(${item.id})">Eladás</button>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    // Ládanyitási animáció és kérés
-    async function openCase() {
-      const btn = document.getElementById('openBtn');
-      btn.disabled = true;
-
-      const res = await fetch('/api/open-case', { method: 'POST' });
-      const data = await res.json();
-
-      if (data.error) {
-        alert(data.error);
-        btn.disabled = false;
-        return;
-      }
-
-      const track = document.getElementById('track');
-      track.style.transition = 'none';
-      track.style.transform = 'translateX(0px)';
-      track.innerHTML = '';
-
-      // Szalag feltöltése szimulált elemekkel
-      for (let i = 0; i < 80; i++) {
-        const item = (i === WINNER_INDEX) ? data.wonItem : data.allItems[Math.floor(Math.random() * data.allItems.length)];
-        const card = document.createElement('div');
-        card.className = 'item-card';
-        card.style.borderBottomColor = item.color;
-        card.innerHTML = `
-          <img src="${item.img}">
-          <div class="name">${item.name}</div>
-          <div class="price">$${item.price.toFixed(2)}</div>
-        `;
-        track.appendChild(card);
-      }
-
-      // Animáció indítása (Cubic-Bezier fizikai lassulás)
-      setTimeout(() => {
-        const viewportWidth = track.parentElement.clientWidth;
-        const targetOffset = (WINNER_INDEX * CARD_WIDTH) - (viewportWidth / 2) + (CARD_WIDTH / 2);
-        
-        track.style.transition = 'transform 6s cubic-bezier(0.05, 0.9, 0.1, 1)';
-        track.style.transform = `translateX(-${targetOffset}px)`;
-      }, 50);
-
-      // Leállás utáni eredmény kijelzés
-      setTimeout(() => {
-        document.getElementById('modalImg').src = data.wonItem.img;
-        document.getElementById('modalName').innerText = data.wonItem.name;
-        document.getElementById('modalPrice').innerText = `$${data.wonItem.price.toFixed(2)}`;
-        document.getElementById('pfInfo').innerText = `Provably Fair SHA256: ${data.provablyFair.serverSeedHash}`;
-        document.getElementById('winModal').style.display = 'flex';
-        
-        refreshUser();
-        btn.disabled = false;
-      }, 6200);
-    }
-
-    // Tárgy eladása
-    async function sellItem(id) {
-      const res = await fetch('/api/sell-item', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id })
-      });
-      const data = await res.json();
-      if (data.success) refreshUser();
-    }
-
-    function closeModal() {
-      document.getElementById('winModal').style.display = 'none';
-    }
-
-    // Inicializálás
-    refreshUser();
-  </script>
+  <script src="app.js"></script>
 </body>
 </html>
