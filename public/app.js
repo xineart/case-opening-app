@@ -88,39 +88,23 @@ const Audio = new SoundEngine();
 // --------------------------------------------------------------------------
 // 3. MASTER ITEM DATABASE (Teljes CS2 Tárhely)
 // --------------------------------------------------------------------------
-const MASTER_ITEMS = [
-    // --- MILSPEC (KÉK) ---
-    { id: "m1", name: "P250 | Sand Dune", type: "Pistol", price: 0.08, rarity: "milspec", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f" },
-    { id: "m2", name: "AK-47 | Safari Mesh", type: "Rifle", price: 0.35, rarity: "milspec", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f" },
-    { id: "m3", name: "M4A4 | Magnesium", type: "Rifle", price: 0.80, rarity: "milspec", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f" },
-    { id: "m4", name: "USP-S | Flashback", type: "Pistol", price: 1.10, rarity: "milspec", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f" },
-    { id: "m5", name: "Glock-18 | High Beam", type: "Pistol", price: 0.45, rarity: "milspec", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f" },
-
-    // --- RESTRICTED (LILA) ---
-    { id: "r1", name: "Desert Eagle | Light Rail", type: "Pistol", price: 2.80, rarity: "restricted", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f" },
-    { id: "r2", name: "AWP | Acheron", type: "Sniper", price: 3.50, rarity: "restricted", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f" },
-    { id: "r3", name: "M4A1-S | Night Terror", type: "Rifle", price: 4.20, rarity: "restricted", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f" },
-    { id: "r4", name: "AK-47 | Uncharted", type: "Rifle", price: 5.10, rarity: "restricted", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f" },
-
-    // --- CLASSIFIED (RÓZSASZÍN) ---
-    { id: "c1", name: "AK-47 | Redline", type: "Rifle", price: 22.00, rarity: "classified", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f" },
-    { id: "c2", name: "AWP | Neo-Noir", type: "Sniper", price: 38.50, rarity: "classified", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f" },
-    { id: "c3", name: "M4A4 | The Emperor", type: "Rifle", price: 45.00, rarity: "classified", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f" },
-    { id: "c4", name: "USP-S | Kill Confirmed", type: "Pistol", price: 85.00, rarity: "classified", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f" },
-
-    // --- COVERT (PIROS) ---
-    { id: "co1", name: "AK-47 | Vulcan", type: "Rifle", price: 280.00, rarity: "covert", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f" },
-    { id: "co2", name: "M4A1-S | Printstream", type: "Rifle", price: 340.00, rarity: "covert", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f" },
-    { id: "co3", name: "AWP | Desert Hydra", type: "Sniper", price: 1850.00, rarity: "covert", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f" },
-    { id: "co4", name: "AK-47 | Fire Serpent", type: "Rifle", price: 1100.00, rarity: "covert", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f" },
-
-    // --- SPECIAL (SÁRGA / KÉS & KESZTYŰ) ---
-    { id: "sp1", name: "Karambit | Fade", type: "Knife", price: 2400.00, rarity: "special", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f" },
-    { id: "sp2", name: "Butterfly Knife | Doppler", type: "Knife", price: 3100.00, rarity: "special", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f" },
-    { id: "sp3", name: "Sport Gloves | Pandora's Box", type: "Gloves", price: 4500.00, rarity: "special", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f" },
-    { id: "sp4", name: "M9 Bayonet | Lore", type: "Knife", price: 1650.00, rarity: "special", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f" }
+// --- HELYI images/ MAPPÁBÓL BETÖLTŐ NYÍLT CS2 SKINEK ÉS LÁDÁK ---
+const SKIN_DATABASE = [
+  { id: 1, name: "P250 | Sand Dune", price: 0.50, color: "#4b69ff", img: "images/p250_sanddune.png" },
+  { id: 2, name: "Glock-18 | Water Elemental", price: 8.50, color: "#8847ff", img: "images/glock_waterelemental.png" },
+  { id: 3, name: "AK-47 | Redline", price: 22.00, color: "#d32ce6", img: "images/ak47_redline.png" },
+  { id: 4, name: "M4A4 | Neo-Noir", price: 35.00, color: "#eb4b4b", img: "images/m4a4_neonoir.png" },
+  { id: 5, name: "AWP | Asiimov", price: 110.00, color: "#eb4b4b", img: "images/awp_asiimov.png" },
+  { id: 6, name: "AK-47 | Vulcan", price: 280.00, color: "#eb4b4b", img: "images/ak47_vulcan.png" },
+  { id: 7, name: "★ Karambit | Fade", price: 2400.00, color: "#ffd700", img: "images/karambit_fade.png" }
 ];
 
+const OFFICIAL_CASES = [
+  { id: 'terb-starter', name: 'Starter Case', price: 2.50, color: "#4b69ff", img: "images/case_starter.png" },
+  { id: 'terb-neon', name: 'Neon Collection', price: 12.00, color: "#8847ff", img: "images/case_neon.png" },
+  { id: 'terb-classified', name: 'Covert Case', price: 35.00, color: "#d32ce6", img: "images/case_covert.png" },
+  { id: 'terb-knife', name: 'Knife & Gold Box', price: 250.00, color: "#ffd700", img: "images/case_knife.png" }
+];
 // LÁDA TÍPUSOK ADATBÁZISA
 const CASE_COLLECTION = [
     { id: "kilowatt", name: "Kilowatt Case", price: 2.50, category: "Official", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f" },
