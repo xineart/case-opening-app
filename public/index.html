@@ -3,212 +3,598 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CS2 Case Opening & Gambling Simulator</title>
-  <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <title>CS2 Case Simulator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ==========================================
+       1. ALAP STÍLUSOK & CS2 TÉMA
+       ========================================== */
+    :root {
+      --bg-dark: #0d0f12;
+      --bg-card: #15181e;
+      --bg-panel: #1b1e26;
+      --accent-yellow: #e5a93b;
+      --accent-blue: #3b82f6;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      
+      /* CS2 Ritkasági színek */
+      --rarity-milspec: #4b69ff;
+      --rarity-restricted: #8847ff;
+      --rarity-classified: #d32ce6;
+      --rarity-covert: #eb4b4b;
+      --rarity-gold: #ffd700;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* ==========================================
+       2. FEJLÉC (NAVBAR)
+       ========================================== */
+    header {
+      background: var(--bg-panel);
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 30px;
+      border-bottom: 2px solid #232733;
+    }
+
+    .logo {
+      font-family: 'Teko', sans-serif;
+      font-size: 2rem;
+      letter-spacing: 2px;
+      font-weight: 700;
+    }
+    .logo span { color: var(--accent-yellow); }
+
+    .nav-tabs {
+      display: flex;
+      gap: 15px;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn:hover, .tab-btn.active {
+      color: #fff;
+      background: #232733;
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .balance-box {
+      background: #111317;
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: 1px solid #232733;
+      font-weight: 700;
+      color: var(--accent-yellow);
+    }
+
+    .btn-action {
+      background: var(--accent-yellow);
+      color: #000;
+      border: none;
+      padding: 10px 20px;
+      font-weight: 800;
+      text-transform: uppercase;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: transform 0.1s ease;
+    }
+    .btn-action:hover { transform: translateY(-2px); }
+
+    /* ==========================================
+       3. LIVE DROP FEED
+       ========================================== */
+    .live-feed {
+      background: #101216;
+      height: 65px;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      border-bottom: 1px solid #232733;
+      padding: 0 10px;
+    }
+
+    .feed-track {
+      display: flex;
+      gap: 8px;
+    }
+
+    .feed-item {
+      background: var(--bg-card);
+      width: 110px;
+      height: 50px;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      border-bottom: 3px solid var(--rarity-milspec);
+      flex-shrink: 0;
+    }
+
+    .feed-item img { height: 30px; object-fit: contain; }
+    .feed-item span { font-size: 0.65rem; color: var(--text-muted); text-overflow: ellipsis; white-space: nowrap; overflow: hidden; max-width: 90px; }
+
+    /* ==========================================
+       4. RULETT / PÖRGETŐ ARÉNA
+       ========================================== */
+    .main-container {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 0 20px;
+      width: 100%;
+    }
+
+    .roulette-arena {
+      background: var(--bg-panel);
+      border-radius: 12px;
+      padding: 30px;
+      border: 1px solid #232733;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .case-title {
+      font-family: 'Teko', sans-serif;
+      font-size: 2.5rem;
+      letter-spacing: 1px;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+    }
+
+    .roulette-viewport {
+      position: relative;
+      width: 100%;
+      height: 160px;
+      background: #0b0c0e;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 2px solid #232733;
+      margin-bottom: 25px;
+    }
+
+    /* A Mutató Nyíl középen */
+    .roulette-pointer {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4px;
+      height: 100%;
+      background: var(--accent-yellow);
+      z-index: 10;
+      box-shadow: 0 0 10px var(--accent-yellow);
+    }
+
+    .roulette-track {
+      display: flex;
+      gap: 10px;
+      position: absolute;
+      left: 0;
+      top: 15px;
+      will-change: transform;
+    }
+
+    /* KÁRTYA STÍLUSOK (Pontos méretek a JS-hez!) */
+    .item-card {
+      width: 182px;
+      height: 130px;
+      background: var(--bg-card);
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      flex-shrink: 0;
+      border-bottom: 4px solid var(--rarity-milspec);
+      position: relative;
+    }
+
+    .item-card img {
+      max-height: 65px;
+      object-fit: contain;
+    }
+
+    .item-card .item-name {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100%;
+    }
+
+    .item-card .item-price {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    /* Ritkaság szegélyek */
+    .item-card.milspec { border-bottom-color: var(--rarity-milspec); }
+    .item-card.restricted { border-bottom-color: var(--rarity-restricted); }
+    .item-card.classified { border-bottom-color: var(--rarity-classified); }
+    .item-card.covert { border-bottom-color: var(--rarity-covert); }
+    .item-card.gold { border-bottom-color: var(--rarity-gold); }
+
+    /* Vezérlő gombok */
+    .controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .btn-open {
+      background: #22c55e;
+      color: #fff;
+      font-size: 1.2rem;
+      padding: 14px 40px;
+    }
+    .btn-open:hover { background: #16a34a; }
+
+    .fast-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    /* ==========================================
+       5. LÁDÁK ÉS KÍNÁLAT GRID
+       ========================================== */
+    .section-header {
+      font-family: 'Teko', sans-serif;
+      font-size: 1.8rem;
+      margin: 40px 0 15px 0;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 15px;
+    }
+
+    .case-select-card {
+      background: var(--bg-panel);
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      border: 1px solid #232733;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .case-select-card:hover {
+      border-color: var(--accent-yellow);
+      transform: translateY(-3px);
+    }
+
+    .case-select-card img {
+      width: 100px;
+      height: 80px;
+      object-fit: contain;
+      margin-bottom: 10px;
+    }
+
+    .case-select-card h4 { font-size: 0.9rem; margin-bottom: 5px; }
+    .case-select-card p { font-size: 0.8rem; color: var(--accent-yellow); font-weight: 700; }
+
+    /* FÜLEK ELREJTÉSE / MEGJELENÍTÉSE */
+    .tab-page { display: none; }
+    .tab-page.active { display: block; }
+  </style>
 </head>
 <body>
 
-  <!-- ==========================================
-       1. FEJLÉC (NAVBAR)
-       ========================================== -->
-  <header class="navbar">
-    <div class="logo">
-      <span class="logo-bold">CS2</span>DROP
-    </div>
-
-    <nav class="nav-links">
-      <button class="nav-item active" data-tab="cases" data-i18n="cases">Ládák</button>
-      <button class="nav-item" data-tab="battles" data-i18n="battles">Csaták</button>
-      <button class="nav-item" data-tab="upgrader" data-i18n="upgrader">Fejlesztő</button>
-      <button class="nav-item" data-tab="borrow" data-i18n="borrowTitle">Kölcsönzés</button>
+  <!-- 1. FEJLÉC -->
+  <header>
+    <div class="logo"><span>CS2</span>DROP</div>
+    <nav class="nav-tabs">
+      <button class="tab-btn active" onclick="switchTab('cases')">Ládák</button>
+      <button class="tab-btn" onclick="switchTab('upgrader')">Fejlesztő</button>
     </nav>
-
-    <div class="user-area">
-      <!-- Egyenleg kijelző -->
-      <div class="balance-container">
-        <span class="balance-label">Egyenleg:</span>
-        <span id="user-balance" class="balance-value">$250.00</span>
-      </div>
-
-      <!-- Nyelvváltó gombok -->
-      <div class="lang-selector">
-        <button class="lang-btn active" data-lang="hu">HU</button>
-        <button class="lang-btn" data-lang="en">EN</button>
-      </div>
-
-      <!-- Bejelentkezés / Profil gomb -->
-      <button id="btn-login-nav" class="btn btn-login" data-i18n="login">Bejelentkezés</button>
+    <div class="user-profile">
+      <div class="balance-box" id="user-balance">$250.00</div>
+      <button class="btn-action" onclick="addFunds()">Befizetés</button>
     </div>
   </header>
 
-  <!-- LELTÁR DROPDOWN (PROFILRA KATTINTVA) -->
-  <div id="dropdown-inventory" class="dropdown-inventory hidden">
-    <div class="dropdown-header">
-      <h3 data-i18n="inventory">Leltárad</h3>
-      <button class="modal-close" onclick="toggleInventoryDropdown()">×</button>
-    </div>
-    <div id="dropdown-inventory-list" class="dropdown-inventory-list">
-      <!-- JavaScript ide rendereli a saját skineket -->
-    </div>
+  <!-- 2. LIVE DROPS -->
+  <div class="live-feed">
+    <div class="feed-track" id="live-feed-track"></div>
   </div>
 
-  <!-- LIVE DROP FEED (Legutóbb nyitott skinek) -->
-  <div class="live-feed-bar">
-    <div class="live-feed-title">LIVE DROPS</div>
-    <div class="drop-track-wrapper">
-      <div id="drop-track" class="drop-track">
-        <!-- JS generálja a folyamatos nyitásokat -->
-      </div>
-    </div>
-  </div>
-
-  <main class="main-content">
-
+  <div class="main-container">
+    
     <!-- ==========================================
-         2. TAB 1: LÁDANYITÁS (CASES)
+         TAB 1: LÁDANYITÁS
          ========================================== -->
-    <section id="tab-cases" class="tab-page active">
-      <div class="case-opening-stage">
-        <h1 id="active-case-title">Kilowatt Case</h1>
-
-        <!-- PÖRGETŐ SÁVOK (Többszörös nyitáshoz is) -->
-        <div id="roulette-tracks-wrapper" class="roulette-tracks-wrapper">
-          <!-- JS ide rendereli a 1x, 2x, 3x, 4x, 5x sávokat -->
+    <div id="tab-cases" class="tab-page active">
+      <div class="roulette-arena">
+        <h2 class="case-title" id="active-case-name">Kilowatt Case</h2>
+        
+        <!-- Pörgető ablak -->
+        <div class="roulette-viewport">
+          <div class="roulette-pointer"></div>
+          <div class="roulette-track" id="roulette-track"></div>
         </div>
 
-        <!-- VEZÉRLŐPULT (Multi-open & Gyors pörgetés) -->
-        <div class="controls-panel">
-          <div class="multi-open-group">
-            <button class="btn-multi active" data-count="1">1x</button>
-            <button class="btn-multi" data-count="2">2x</button>
-            <button class="btn-multi" data-count="3">3x</button>
-            <button class="btn-multi" data-count="4">4x</button>
-            <button class="btn-multi" data-count="5">5x</button>
-          </div>
-
-          <label class="fast-spin-toggle">
-            <input type="checkbox" id="fast-spin-toggle">
-            <span data-i18n="quickOpen">Gyors Nyitás</span>
+        <!-- Vezérlők -->
+        <div class="controls">
+          <label class="fast-toggle">
+            <input type="checkbox" id="fast-spin-toggle"> Gyors nyitás
           </label>
-
-          <button id="btn-open-case" class="btn btn-open" onclick="handleOpenCase()" data-i18n="openCase">
-            Láda Nyitása ($2.50)
+          <button class="btn-action btn-open" id="open-btn" onclick="handleOpenCase()">
+            Nyitás ($2.50)
           </button>
         </div>
       </div>
 
-      <!-- LÁDA VÁLASZTÓ GRID -->
-      <div class="section-title">Válassz Ládát</div>
-      <div id="cases-grid" class="cases-grid">
-        <!-- JS tölti fel a ládákkal -->
-      </div>
+      <!-- Láda kiválasztó -->
+      <div class="section-header">Ládák Választéka</div>
+      <div class="grid-container" id="cases-grid"></div>
 
-      <!-- ELŐNÉZET: A LÁDÁBAN LÉVŐ SKINEK -->
-      <div class="section-title">Láda Tartalma</div>
-      <div id="case-items-preview" class="case-items-preview">
-        <!-- JS tölti fel a skinekkel -->
-      </div>
-    </section>
-
-    <!-- ==========================================
-         3. TAB 2: CASE BATTLES (CSATÁK)
-         ========================================== -->
-    <section id="tab-battles" class="tab-page">
-      <div class="battles-header">
-        <h2 data-i18n="battleTitle">Case Battles (Láda Csaták)</h2>
-        <button id="btn-create-battle" class="btn btn-primary" data-i18n="createBattle">Csata Létrehozása</button>
-      </div>
-      <div class="battles-list">
-        <div class="battle-card">
-          <div class="battle-info">
-            <span class="battle-case-name">3x Kilowatt Case</span>
-            <span class="battle-price">$7.50</span>
-          </div>
-          <div class="battle-players">
-            <div class="player-slot filled">👤 Player1</div>
-            <div class="player-slot empty">Várakozás...</div>
-          </div>
-          <button class="btn btn-success" data-i18n="joinBattle">Csatlakozás</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- ==========================================
-         4. TAB 3: UPGRADGER (FEJLESZTŐ)
-         ========================================== -->
-    <section id="tab-upgrader" class="tab-page">
-      <div class="upgrader-container">
-        <!-- Bal oldal: Saját kiválasztott skin -->
-        <div class="upgrader-box">
-          <h3>Saját Tárgyad</h3>
-          <div id="upgrade-my-item-display" class="selected-item-box">
-            <span id="upgrade-my-item-name">Válassz a leltáradból!</span>
-            <span id="upgrade-my-item-price" class="price">$0.00</span>
-          </div>
-          <div id="upgrader-inventory-list" class="mini-inventory-grid">
-            <!-- JS tölti fel a saját leltárad tárgyaival -->
-          </div>
-        </div>
-
-        <!-- Közép: Százalékos Kerék & Indítás -->
-        <div class="upgrader-center">
-          <div class="circle-wrapper">
-            <svg class="circle-svg" viewBox="0 0 180 180">
-              <circle class="circle-bg" cx="90" cy="90" r="80"></circle>
-              <circle id="upgrade-svg-circle" class="circle-progress" cx="90" cy="90" r="80"></circle>
-            </svg>
-            <div id="upgrade-wheel-pointer" class="wheel-pointer"></div>
-            <div id="upgrade-chance-text" class="chance-text">0.00%</div>
-          </div>
-          <button id="btn-start-upgrade" class="btn btn-upgrade" data-i18n="upgradeBtn">Fejlesztés Indítása</button>
-        </div>
-
-        <!-- Jobb oldal: Cél skin -->
-        <div class="upgrader-box">
-          <h3>Cél Tárgy</h3>
-          <div id="upgrade-target-display" class="selected-item-box">
-            <img id="upgrade-target-img" src="" style="max-height: 50px; display:none;">
-            <span id="upgrade-target-name">Válassz a listából!</span>
-            <span id="upgrade-target-price" class="price">$0.00</span>
-          </div>
-          <div id="upgrader-target-list" class="mini-inventory-grid">
-            <!-- JS tölti fel a megszerezhető skinekkel -->
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ==========================================
-         5. TAB 4: BORROW (SZPONZORÁCIÓ)
-         ========================================== -->
-    <section id="tab-borrow" class="tab-page">
-      <div class="borrow-container">
-        <h2 data-i18n="borrowTitle">Tőke Kölcsönzés / Szponzoráció</h2>
-        <p data-i18n="borrowDesc">Nincs elég pénzed? Kérj szponzorációt más játékosoktól!</p>
-        <div class="borrow-form">
-          <input type="number" id="borrow-amount" placeholder="Igényelt összegh ($)" min="1" max="100">
-          <button id="btn-request-borrow" class="btn btn-primary">Kérelem Beküldése</button>
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- ==========================================
-       6. MODAL: BEJELENTKEZÉS
-       ========================================== -->
-  <div id="login-modal" class="modal-backdrop hidden">
-    <div class="modal-card">
-      <button class="modal-close">×</button>
-      <h2 data-i18n="login">Bejelentkezés</h2>
-      <p>A pörgetéshez és mentéshez adj meg egy nevet!</p>
-      <input type="text" id="login-username-input" placeholder="Felhasználónév...">
-      <button id="btn-submit-login" class="btn btn-primary" style="width: 100%; margin-top: 15px;">Belépés</button>
+      <!-- Láda tartalom preview -->
+      <div class="section-header">Láda Tartalma</div>
+      <div class="grid-container" id="case-preview-grid"></div>
     </div>
+
+    <!-- ==========================================
+         TAB 2: UPGRADGER
+         ========================================== -->
+    <div id="tab-upgrader" class="tab-page">
+      <div class="roulette-arena">
+        <h2 class="case-title">Skin Fejlesztő (Upgrader)</h2>
+        <p style="color: var(--text-muted);">Fejleszd a gyengébb skineidet drágább tárgyakra!</p>
+      </div>
+    </div>
+
   </div>
 
-  <!-- JS MOTOR BEKÖTÉSE -->
-  <script src="app.js"></script>
+  <!-- ==========================================
+       JAVASCRIPT MOTOR (ESÉLYEK + ROULETTE)
+       ========================================== -->
+  <script>
+    // 1. ESÉLY BEÁLLÍTÁSOK (CS:GO Gyári esélyek %)
+    const RARITY_CHANCES = {
+      milspec: 79.92,     // Kék (~80%)
+      restricted: 15.98,  // Lila (~16%)
+      classified: 3.20,   // Rózsaszín (~3.2%)
+      covert: 0.64,       // Piros (~0.64%)
+      gold: 0.26          // Kés / Kesztyű (~0.26%)
+    };
+
+    // 2. SKINEK ADATBÁZISA
+    const SKIN_DATABASE = [
+      { id: 1, name: "P250 | Sand Dune", price: 0.15, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f", rarity: "milspec" },
+      { id: 2, name: "AK-47 | Safari Mesh", price: 0.50, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f", rarity: "milspec" },
+      { id: 3, name: "M4A4 | Evil Daimyo", price: 3.50, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f", rarity: "restricted" },
+      { id: 4, name: "AWP | Atheris", price: 12.00, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f", rarity: "restricted" },
+      { id: 5, name: "AK-47 | Redline", price: 25.00, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f", rarity: "classified" },
+      { id: 6, name: "M4A1-S | Player Two", price: 65.00, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f", rarity: "classified" },
+      { id: 7, name: "AK-47 | Fire Serpent", price: 750.00, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f", rarity: "covert" },
+      { id: 8, name: "AWP | Dragon Lore", price: 3500.00, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f", rarity: "covert" },
+      { id: 9, name: "Karambit | Doppler", price: 1200.00, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f", rarity: "gold" }
+    ];
+
+    const CASE_DATABASE = [
+      { id: "kilowatt", name: "Kilowatt Case", price: 2.50, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f" },
+      { id: "revolution", name: "Revolution Case", price: 1.50, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f" }
+    ];
+
+    // Állapotok
+    let userBalance = 250.00;
+    let isSpinning = false;
+    let activeCase = CASE_DATABASE[0];
+
+    // INICIALIZÁLÁS
+    document.addEventListener('DOMContentLoaded', () => {
+      renderCasesGrid();
+      renderCasePreview();
+      initRouletteTrack();
+      initLiveFeed();
+    });
+
+    // SÚLYOZOTT SORSOLÁS (Ez adja az esélyeket)
+    function getRandomSkinByRarity() {
+      const rand = Math.random() * 100;
+      let cumulative = 0;
+      let selectedRarity = 'milspec';
+
+      for (const [rarity, chance] of Object.entries(RARITY_CHANCES)) {
+        cumulative += chance;
+        if (rand <= cumulative) {
+          selectedRarity = rarity;
+          break;
+        }
+      }
+
+      const availableSkins = SKIN_DATABASE.filter(skin => skin.rarity === selectedRarity);
+      return availableSkins.length > 0 
+        ? availableSkins[Math.floor(Math.random() * availableSkins.length)]
+        : SKIN_DATABASE[0];
+    }
+
+    // PÖRGETÉS LOGIKA PONTOS MATEMATIKÁVAL
+    function handleOpenCase() {
+      if (isSpinning) return;
+      if (userBalance < activeCase.price) {
+        alert("Nincs elég egyenleged!");
+        return;
+      }
+
+      userBalance -= activeCase.price;
+      updateBalanceUI();
+      isSpinning = true;
+
+      const isFast = document.getElementById('fast-spin-toggle').checked;
+      const spinTime = isFast ? 1.2 : 4.0;
+
+      const track = document.getElementById('roulette-track');
+      const CARD_WIDTH = 182;
+      const CARD_GAP = 10;
+      const TOTAL_STEP = CARD_WIDTH + CARD_GAP; // 192px
+      const WINNING_INDEX = 65; // A 65. kártyán áll meg
+
+      // Nyertes kisorsolása az esélyek alapján
+      const wonItem = getRandomSkinByRarity();
+
+      // Rulett pálya előkészítése
+      track.style.transition = 'none';
+      track.style.transform = 'translateX(0px)';
+
+      let trackItems = [];
+      for (let i = 0; i < 80; i++) {
+        if (i === WINNING_INDEX) {
+          trackItems.push(wonItem);
+        } else {
+          trackItems.push(getRandomSkinByRarity());
+        }
+      }
+
+      track.innerHTML = trackItems.map(item => `
+        <div class="item-card ${item.rarity}">
+          <img src="${item.img}">
+          <div class="item-name">${item.name}</div>
+          <div class="item-price">$${item.price.toFixed(2)}</div>
+        </div>
+      `).join('');
+
+      // Pontos középre igazítás kiszámítása
+      const containerWidth = track.parentElement.clientWidth;
+      const targetX = -(WINNING_INDEX * TOTAL_STEP) + (containerWidth / 2) - (CARD_WIDTH / 2);
+
+      // Animáció indítása
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          track.style.transition = `transform ${spinTime}s cubic-bezier(0.1, 0.8, 0.1, 1)`;
+          track.style.transform = `translateX(${targetX}px)`;
+        });
+      });
+
+      // Befejezés
+      setTimeout(() => {
+        isSpinning = false;
+        addLiveFeedItem(wonItem);
+      }, spinTime * 1000 + 100);
+    }
+
+    // RENDERELŐK ÉS SEGEDFÜGGVÉNYEK
+    function initRouletteTrack() {
+      const track = document.getElementById('roulette-track');
+      track.innerHTML = SKIN_DATABASE.slice(0, 10).map(item => `
+        <div class="item-card ${item.rarity}">
+          <img src="${item.img}">
+          <div class="item-name">${item.name}</div>
+          <div class="item-price">$${item.price.toFixed(2)}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderCasesGrid() {
+      const grid = document.getElementById('cases-grid');
+      grid.innerHTML = CASE_DATABASE.map(c => `
+        <div class="case-select-card" onclick="selectCase('${c.id}')">
+          <img src="${c.img}">
+          <h4>${c.name}</h4>
+          <p>$${c.price.toFixed(2)}</p>
+        </div>
+      `).join('');
+    }
+
+    function renderCasePreview() {
+      const grid = document.getElementById('case-preview-grid');
+      grid.innerHTML = SKIN_DATABASE.map(item => `
+        <div class="item-card ${item.rarity}">
+          <img src="${item.img}">
+          <div class="item-name">${item.name}</div>
+          <div class="item-price">$${item.price.toFixed(2)}</div>
+        </div>
+      `).join('');
+    }
+
+    function selectCase(id) {
+      const c = CASE_DATABASE.find(x => x.id === id);
+      if (!c) return;
+      activeCase = c;
+      document.getElementById('active-case-name').innerText = c.name;
+      document.getElementById('open-btn').innerText = `Nyitás ($${c.price.toFixed(2)})`;
+    }
+
+    function updateBalanceUI() {
+      document.getElementById('user-balance').innerText = `$${userBalance.toFixed(2)}`;
+    }
+
+    function addFunds() {
+      userBalance += 100;
+      updateBalanceUI();
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
+      
+      event.target.classList.add('active');
+      document.getElementById(`tab-${tabId}`).classList.add('active');
+    }
+
+    function initLiveFeed() {
+      const track = document.getElementById('live-feed-track');
+      for (let i = 0; i < 12; i++) {
+        addLiveFeedItem(SKIN_DATABASE[Math.floor(Math.random() * SKIN_DATABASE.length)]);
+      }
+    }
+
+    function addLiveFeedItem(item) {
+      const track = document.getElementById('live-feed-track');
+      const div = document.createElement('div');
+      div.className = 'feed-item';
+      div.style.borderBottomColor = `var(--rarity-${item.rarity})`;
+      div.innerHTML = `<img src="${item.img}"><span>${item.name}</span>`;
+      track.insertBefore(div, track.firstChild);
+      if (track.children.length > 15) track.removeChild(track.lastChild);
+    }
+  </script>
 </body>
 </html>
