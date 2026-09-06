@@ -238,22 +238,62 @@
 
   </main>
 
-  <!-- BEJELENTKEZÉS MODAL -->
+  <!-- BEJELENTKEZÉS ÉS REGISZTRÁCIÓ MODAL -->
   <div id="login-modal" class="modal-backdrop hidden">
     <div class="modal-box">
       <span class="modal-close" id="close-login-btn">&times;</span>
-      <h2 style="margin-bottom: 1.5rem; text-align: center;">BEJELENTKEZÉS</h2>
 
-      <div class="form-group">
-        <label>Felhasználónév</label>
-        <input type="text" id="login-username-input" placeholder="Pl. CsGoPro99">
+      <!-- TAB VÁLASZTÓ (Bejelentkezés vs Regisztráció) -->
+      <div class="auth-tabs" style="display: flex; gap: 10px; margin-bottom: 1.5rem; border-bottom: 2px solid #222; padding-bottom: 10px;">
+        <button class="btn btn-ghost active-auth-tab" id="tab-btn-login" style="flex: 1; font-weight: bold;">BEJELENTKEZÉS</button>
+        <button class="btn btn-ghost" id="tab-btn-register" style="flex: 1; font-weight: bold;">REGISZTRÁCIÓ</button>
       </div>
 
-      <button class="btn btn-primary width-100" id="confirm-login-btn" style="margin-top: 1rem;">BEJELENTKEZÉS</button>
+      <!-- BEJELENTKEZÉS FORM -->
+      <div id="auth-form-login">
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label style="display: block; margin-bottom: 5px; font-size: 0.9rem; color: #888;">Felhasználónév vagy E-mail</label>
+          <input type="text" id="login-username-input" placeholder="Pl. CsGoPro99" style="width: 100%; padding: 10px; background: #151518; border: 1px solid #333; color: #fff; border-radius: 6px;">
+        </div>
 
-      <div class="modal-divider"><span>VAGY</span></div>
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label style="display: block; margin-bottom: 5px; font-size: 0.9rem; color: #888;">Jelszó</label>
+          <input type="password" id="login-password-input" placeholder="••••••••" style="width: 100%; padding: 10px; background: #151518; border: 1px solid #333; color: #fff; border-radius: 6px;">
+        </div>
 
-      <button class="btn btn-steam width-100" id="steam-login-action">
+        <button class="btn btn-primary width-100" id="confirm-login-btn" style="margin-top: 0.5rem; width: 100%;">BEJELENTKEZÉS</button>
+      </div>
+
+      <!-- REGISZTRÁCIÓ FORM -->
+      <div id="auth-form-register" class="hidden">
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label style="display: block; margin-bottom: 5px; font-size: 0.9rem; color: #888;">Felhasználónév</label>
+          <input type="text" id="reg-username-input" placeholder="Pl. CsGoPro99" style="width: 100%; padding: 10px; background: #151518; border: 1px solid #333; color: #fff; border-radius: 6px;">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label style="display: block; margin-bottom: 5px; font-size: 0.9rem; color: #888;">E-mail cím</label>
+          <input type="email" id="reg-email-input" placeholder="pelda@email.hu" style="width: 100%; padding: 10px; background: #151518; border: 1px solid #333; color: #fff; border-radius: 6px;">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label style="display: block; margin-bottom: 5px; font-size: 0.9rem; color: #888;">Jelszó</label>
+          <input type="password" id="reg-password-input" placeholder="••••••••" style="width: 100%; padding: 10px; background: #151518; border: 1px solid #333; color: #fff; border-radius: 6px;">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label style="display: block; margin-bottom: 5px; font-size: 0.9rem; color: #888;">Jelszó megerősítése</label>
+          <input type="password" id="reg-password-confirm-input" placeholder="••••••••" style="width: 100%; padding: 10px; background: #151518; border: 1px solid #333; color: #fff; border-radius: 6px;">
+        </div>
+
+        <button class="btn btn-primary width-100" id="confirm-register-btn" style="margin-top: 0.5rem; width: 100%;">REGISZTRÁCIÓ LEGYEN</button>
+      </div>
+
+      <div class="modal-divider" style="margin: 1.5rem 0; text-align: center; position: relative;">
+        <span style="background: #111; padding: 0 10px; color: #666; font-size: 0.8rem;">VAGY</span>
+      </div>
+
+      <button class="btn btn-steam width-100" id="steam-login-action" style="width: 100%;">
         🎮 Bejelentkezés Steam Fiókkal
       </button>
     </div>
