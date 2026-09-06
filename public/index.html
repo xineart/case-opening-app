@@ -3,152 +3,221 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LOOTBOX.GG - Case Battles & Borrow System</title>
+  <title>LOOTBOX.GG - Next-Gen Case Battles & Borrow</title>
   <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Teko:wght@600;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700;800&family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
 
-  <!-- ÉLŐ NYEREMÉNYFOLYAM (LIVE DROPS) -->
-  <div class="live-feed-container">
-    <div class="live-feed-track" id="live-feed-track"></div>
+  <!-- ÉLŐ NYEREMÉNY SÁV -->
+  <div class="drop-bar">
+    <div class="drop-bar-label">ÉLŐ NYEREMÉNYEK</div>
+    <div class="drop-track" id="live-feed-track"></div>
   </div>
 
-  <!-- HEADER -->
-  <header>
+  <!-- NAVIGATION HEADER -->
+  <header class="navbar">
     <div class="logo">
-      <span>📦</span> LOOTBOX<span class="logo-accent">.GG</span>
+      <div class="logo-icon">📦</div>
+      <span>LOOT<span class="highlight">BOX</span></span>
     </div>
 
-    <nav class="main-nav">
-      <button class="nav-btn active" data-tab="cases">📦 LÁDÁK</button>
-      <button class="nav-btn" data-tab="battles">⚔️ CASE BATTLES</button>
-      <button class="nav-btn highlight" data-tab="borrow">🤝 BORROW MÓD (80/20)</button>
+    <nav class="nav-links">
+      <button class="nav-item active" data-tab="cases">
+        <span class="nav-icon">🎁</span> LÁDÁK
+      </button>
+      <button class="nav-item" data-tab="battles">
+        <span class="nav-icon">⚔️</span> CASE BATTLES
+      </button>
+      <button class="nav-item borrow-badge" data-tab="borrow">
+        <span class="nav-icon">⚡</span> BORROW MÓD (80/20)
+      </button>
     </nav>
 
-    <div class="user-stats">
-      <div class="balance-box">
-        <span class="label">EGYENLEG</span>
-        <span class="val" id="user-balance">$100.00</span>
+    <div class="header-user">
+      <div class="balance-display">
+        <span class="balance-label">EGYENLEG</span>
+        <span class="balance-value" id="user-balance">$100.00</span>
       </div>
-      <button class="btn btn-gold" id="open-deposit-btn">+ FELTÖLTÉS</button>
-      <button class="btn btn-outline" id="open-auth-btn">BEJELENTKEZÉS</button>
+      <button class="btn btn-primary" id="open-deposit-btn">+ FELTÖLTÉS</button>
+      <button class="btn btn-ghost" id="open-auth-btn">FIÓK</button>
     </div>
   </header>
 
-  <!-- MAIN CONTENT -->
-  <main class="main-container">
+  <!-- MAIN CONTAINER -->
+  <main class="app-container">
 
-    <!-- ==================== 1. MODUL: LÁDA KATALÓGUS ÉS PÖRGETŐ ==================== -->
-    <div id="tab-cases" class="tab-content active">
+    <!-- ==================== 1. MODUL: LÁDAKATALÓGUS ÉS PÖRGETŐ ==================== -->
+    <div id="tab-cases" class="tab-page active">
       
       <!-- KATALÓGUS -->
       <div id="case-catalog-view">
-        <div class="section-header">
-          <h2>HIVATALOS LÁDÁK</h2>
-          <span class="subtitle">Válassz ládát a pörgetéshez</span>
+        <div class="page-title">
+          <h1>HIVATALOS LÁDÁK</h1>
+          <p>Nyiss exkluzív CS2 skineket a legmagasabb nyerési eséllyel</p>
         </div>
         <div class="cases-grid" id="cases-grid"></div>
       </div>
 
-      <!-- SPINNER NÉZET -->
+      <!-- PÖRGETŐ FELÜLET -->
       <div id="case-opener-view" class="hidden">
-        <button class="btn btn-secondary" id="back-to-catalog-btn">← VISSZA A LÁDÁKHOZ</button>
+        <button class="btn btn-ghost back-btn" id="back-to-catalog-btn">← VISSZA A LÁDÁKHOZ</button>
         
-        <div class="case-display-area">
-          <h2 class="case-title" id="active-case-name">Láda Neve</h2>
-          <p class="case-price-tag" id="active-case-price-text">$0.00</p>
-
-          <!-- SPINNER ROULETTE -->
-          <div class="spinner-wrapper">
-            <div class="spinner-track" id="spinner-track"></div>
+        <div class="unboxing-stage">
+          <div class="case-header-info">
+            <h2 id="active-case-name">Case Name</h2>
+            <div class="case-price-tag" id="active-case-price-text">$0.00</div>
           </div>
 
-          <button class="btn btn-gold btn-xl" id="open-case-btn">LÁDA NYITÁSA</button>
+          <!-- ROULETTE SPINNER -->
+          <div class="roulette-container">
+            <div class="roulette-pointer"></div>
+            <div class="roulette-track" id="spinner-track"></div>
+          </div>
+
+          <button class="btn btn-launch" id="open-case-btn">LÁDA NYITÁSA</button>
         </div>
 
-        <div class="section-header" style="margin-top: 3rem;">
-          <h3>LÁDA TARTALMA ÉS ESÉLYEK</h3>
+        <div class="section-divider">
+          <h3>LÁDA TARTALMA ÉS DROPRATE</h3>
         </div>
         <div class="items-grid" id="case-items-grid"></div>
       </div>
 
       <!-- INVENTORY -->
       <div class="inventory-section">
-        <div class="section-header">
-          <h2>SAJÁT LELTÁR (INVENTORY)</h2>
+        <div class="section-divider">
+          <h3>SAJÁT LELTÁR (INVENTORY)</h3>
         </div>
         <div class="items-grid" id="inventory-grid">
-          <p class="empty-text">Még nincs nyert tárgyad.</p>
+          <p class="empty-inv-msg">Még nem nyertél tárgyat. Nyiss egy ládát vagy indíts csatát!</p>
         </div>
       </div>
     </div>
 
     <!-- ==================== 2. MODUL: CASE BATTLES ==================== -->
-    <div id="tab-battles" class="tab-content">
-      <div class="section-header flex-between">
+    <div id="tab-battles" class="tab-page">
+      <div class="page-title flex-title">
         <div>
-          <h2>ÉLŐ CASE BATTLES</h2>
-          <span class="subtitle">Nyiss ládákat mások ellen – A győztes viszi a teljes nyereményt!</span>
+          <h1>CASE BATTLES</h1>
+          <p>Nyiss ládákat játékosok vagy BOT-ok ellen. A legnagyobb értéket nyitó játékos mindent visz!</p>
         </div>
-        <button class="btn btn-gold" id="create-battle-btn">+ CSATA LÉTREHOZÁSA</button>
+        <button class="btn btn-primary btn-lg" id="create-battle-modal-btn">+ CSATA LÉTREHOZÁSA</button>
       </div>
 
-      <div class="battles-grid" id="battles-list"></div>
+      <!-- CSATA ARÉNA (HA ÉPPEN MEGY EGY CSATA) -->
+      <div id="battle-arena" class="battle-arena hidden">
+        <div class="battle-arena-header">
+          <h2>⚔️ CSATA FOLYAMATBAN</h2>
+          <span class="battle-status-badge">LIVE</span>
+        </div>
+
+        <div class="battle-players-grid">
+          <!-- PLAYER 1 (TE) -->
+          <div class="battle-player-card">
+            <div class="player-info">
+              <span class="player-name">TE (Játékos)</span>
+              <span class="player-total" id="p1-total">$0.00</span>
+            </div>
+            <div class="battle-drop-slot" id="p1-drop-slot">
+              <span class="slot-placeholder">Pörgetésre vár...</span>
+            </div>
+          </div>
+
+          <div class="battle-vs">VS</div>
+
+          <!-- PLAYER 2 (BOT) -->
+          <div class="battle-player-card">
+            <div class="player-info">
+              <span class="player-name">BOT Alpha</span>
+              <span class="player-total" id="p2-total">$0.00</span>
+            </div>
+            <div class="battle-drop-slot" id="p2-drop-slot">
+              <span class="slot-placeholder">Pörgetésre vár...</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="battle-controls">
+          <button class="btn btn-launch" id="start-battle-spin-btn">CSATA PÖRGETÉSE</button>
+          <button class="btn btn-ghost" id="close-battle-arena-btn">KILÉPÉS</button>
+        </div>
+      </div>
+
+      <!-- BATTLES LOBBY LISTA -->
+      <div class="battles-lobby" id="battles-list"></div>
     </div>
 
-    <!-- ==================== 3. MODUL: VALÓDI LOOTBOX BORROW MÓD ==================== -->
-    <div id="tab-borrow" class="tab-content">
-      <div class="borrow-hero">
-        <h1>LOOTBOX BORROW & STAKING</h1>
-        <p>Játssz 80%-os szponzorációval! A finanszírozó állja a költséged 80%-át, a nyeremény pedig 80/20 arányban oszlik meg.</p>
+    <!-- ==================== 3. MODUL: LOOTBOX BORROW MÓD ==================== -->
+    <div id="tab-borrow" class="tab-page">
+      <div class="borrow-banner">
+        <div class="borrow-hero-content">
+          <h1>LOOTBOX BORROW & STAKING</h1>
+          <p>Nincs elég egyenleged egy nagy csatára? Kérj 80%-os szponzorációt! A hitelező állja a tét 80%-át, és a nyereményből is 80/20 arányban részesültök.</p>
+        </div>
       </div>
 
-      <div class="borrow-grid">
-        <!-- BORROW KÉRELEM BEÁLLÍTÓ -->
+      <div class="borrow-layout">
+        <!-- BORROW KÉRELEM PANEL -->
         <div class="borrow-card">
-          <h3>🤝 Kérj szponzorációt Csatára / Nyitásra</h3>
+          <h3>⚡ Ugrás a Csatába 80% Szponzorációval</h3>
           
-          <div class="form-group">
-            <label>Játékmód / Ládák értéke ($):</label>
+          <div class="form-field">
+            <label>Játék/Csata Értéke ($)</label>
             <input type="number" id="borrow-total-amount" value="100" min="10" step="10">
           </div>
 
-          <div class="borrow-slider-box">
-            <label>Finanszírozási Arány (Borrow Share): <strong id="borrow-percent-label">80%</strong></label>
-            <input type="range" id="borrow-slider" min="50" max="90" value="80" step="5">
+          <div class="borrow-slider-container">
+            <div class="slider-header">
+              <span>Hitelezői Részesedés (Borrow Share)</span>
+              <strong id="borrow-percent-label">80%</strong>
+            </div>
+            <input type="range" id="borrow-slider" min="50" max="90" value="80" step="5" class="custom-slider">
           </div>
 
-          <div class="borrow-breakdown">
-            <div class="row">
+          <div class="borrow-summary">
+            <div class="summary-row">
               <span>Saját Befizetésed (20%):</span>
-              <strong id="borrow-user-pays" class="text-green">$20.00</strong>
+              <strong class="text-neon" id="borrow-user-pays">$20.00 USD</strong>
             </div>
-            <div class="row">
-              <span>Finanszírozó állja (80%):</span>
-              <strong id="borrow-backer-pays" class="text-gold">$80.00</strong>
+            <div class="summary-row">
+              <span>Hitelező Állja (80%):</span>
+              <strong class="text-cyan" id="borrow-backer-pays">$80.00 USD</strong>
             </div>
-            <div class="row">
-              <span>Nyeremény Részesedésed:</span>
-              <strong id="borrow-user-cut">20%</strong>
+            <div class="summary-row">
+              <span>Részesedésed a Nyereményből:</span>
+              <strong class="text-neon" id="borrow-user-cut">20%</strong>
             </div>
           </div>
 
-          <button class="btn btn-gold width-100" id="submit-borrow-req">BORROW KÉRELEM INDÍTÁSA</button>
+          <button class="btn btn-launch width-100" id="submit-borrow-req">SZPONZORÁLT CSATA INDÍTÁSA</button>
         </div>
 
-        <!-- AKTÍV SZPONZORÁLT SZOBÁK LISTÁJA -->
+        <!-- FINANSZÍROZÓI BOARD -->
         <div class="borrow-card">
-          <h3>📊 Aktív Finanszírozott Szobák</h3>
-          <div class="sponsored-list" id="sponsored-list">
-            <div class="sponsored-item">
-              <div>
-                <strong>Player_Pro #8812</strong>
-                <span class="badge">80% Borrowed</span>
+          <h3>📊 Aktív Finanszírozható Játékosok</h3>
+          <p class="card-subtext">Fektess be más játékosok csatáiba, és vidd el a nyereményük 80%-át!</p>
+
+          <div class="sponsor-feed" id="sponsor-feed-list">
+            <div class="sponsor-item">
+              <div class="sponsor-user">
+                <strong>CyberSniper_99</strong>
+                <span class="badge-borrow">80% BORROW</span>
               </div>
-              <div>
-                <span>Tőke: <strong>$50.00</strong></span>
-                <button class="btn btn-sm btn-gold" onclick="alert('Finanszíroztad a játékost!')">FINANSZÍROZÁS</button>
+              <div class="sponsor-action">
+                <span>Csata: <strong>$100.00</strong></span>
+                <button class="btn btn-sm btn-primary" onclick="alert('Sikeresen finanszíroztad a csatát! A nyeremény 80%-a a tiéd.')">FINANSZÍROZÁS ($80)</button>
+              </div>
+            </div>
+
+            <div class="sponsor-item">
+              <div class="sponsor-user">
+                <strong>GamerGirl_CS2</strong>
+                <span class="badge-borrow">75% BORROW</span>
+              </div>
+              <div class="sponsor-action">
+                <span>Csata: <strong>$200.00</strong></span>
+                <button class="btn btn-sm btn-primary" onclick="alert('Sikeresen finanszíroztad a csatát! A nyeremény 75%-a a tiéd.')">FINANSZÍROZÁS ($150)</button>
               </div>
             </div>
           </div>
@@ -159,24 +228,29 @@
   </main>
 
   <!-- AUTH MODAL -->
-  <div id="auth-modal" class="modal-overlay hidden">
-    <div class="modal-content">
+  <div id="auth-modal" class="modal-backdrop hidden">
+    <div class="modal-box">
       <span class="modal-close" id="close-auth-btn">&times;</span>
-      <h2 id="auth-title">BEJELENTKEZÉS</h2>
-      <div class="form-group">
+      <h2 id="auth-title">LOOTBOX FIÓK</h2>
+      
+      <div class="form-field">
         <label>Felhasználónév</label>
-        <input type="text" id="auth-username" placeholder="Felhasználónév">
+        <input type="text" id="auth-username" placeholder="pl. ProGamer">
       </div>
-      <div class="form-group hidden" id="email-group">
+      
+      <div class="form-field hidden" id="email-group">
         <label>E-mail cím</label>
-        <input type="email" id="auth-email" placeholder="E-mail">
+        <input type="email" id="auth-email" placeholder="email@domain.com">
       </div>
-      <div class="form-group">
+
+      <div class="form-field">
         <label>Jelszó</label>
-        <input type="password" id="auth-password" placeholder="Jelszó">
+        <input type="password" id="auth-password" placeholder="••••••••">
       </div>
-      <button class="btn btn-gold width-100" id="auth-submit-btn">BEJELENTKEZÉS</button>
-      <p class="auth-toggle-note">
+
+      <button class="btn btn-launch width-100" id="auth-submit-btn">BEJELENTKEZÉS</button>
+
+      <p class="auth-toggle">
         <span id="auth-toggle-text">Nincs még fiókod?</span> 
         <a href="#" id="auth-toggle-link">Regisztráció</a>
       </p>
