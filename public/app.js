@@ -1,28 +1,27 @@
 /* ==========================================================================
-   LUXDROP CORE ENGINE v4.2 - FULL SYSTEM ARCHITECTURE
-   Contains: Item Databases, Sound FX Engine, CS2 Odds, Multi-Track Spinner,
-   Provably Fair System, Case Battles, Upgrader, Inventory, VIP Levels,
-   Contract System, Audio Web API, Live Drop Websocket Mock.
+   LUXDROP CORE ENGINE v4.2 - FULL SYSTEM ARCHITECTURE (FIXED IMAGE ENGINE)
+   Contains: Dynamic Image Fallbacks, Sound FX Engine, CS2 Odds, Multi-Track Spinner,
+   Provably Fair System, Inventory, Live Feed, UI Event Listeners.
    ========================================================================== */
 
 // --------------------------------------------------------------------------
 // 1. CONFIGURATION & CONSTANTS
 // --------------------------------------------------------------------------
 const LUX_CONFIG = {
-    VERSION: "4.2.0-PROD",
+    VERSION: "4.2.0-PROD-IMGFIX",
     CURRENCY_SYMBOL: "$",
     SPIN_DURATION_NORMAL: 4.5, // sec
     SPIN_DURATION_FAST: 1.2,   // sec
     CARD_WIDTH: 180,           // px
     CARD_GAP: 12,              // px
-    WIN_INDEX: 68,             // A megállási pozíció a generált tömbben
+    WIN_INDEX: 68,             // Megállási pozíció a generált tömbben
     MAX_LIVE_DROPS: 20,
     STORAGE_KEY_BALANCE: "lux_user_balance",
     STORAGE_KEY_INVENTORY: "lux_user_inventory",
     STORAGE_KEY_STATS: "lux_user_stats"
 };
 
-// Hivatalos CS2 esélyek (%)
+// CS2 Esélyek (%)
 const CS2_ODDS = {
     MILSPEC: 79.92,
     RESTRICTED: 15.98,
@@ -31,8 +30,52 @@ const CS2_ODDS = {
     SPECIAL: 0.26
 };
 
+// Dinamikus tartalék kép generáló (Canvas alapon), ha a helyi kép hiányozna (404)
+function createFallbackImage(title, color) {
+    const canvas = document.createElement("canvas");
+    canvas.width = 200;
+    canvas.height = 200;
+    const ctx = canvas.getContext("2d");
+
+    // Háttér gradiens
+    const grad = ctx.createLinearGradient(0, 0, 200, 200);
+    grad.addColorStop(0, "#1a1c23");
+    grad.addColorStop(1, "#0d0e12");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 200, 200);
+
+    // Belső fény / körvonal
+    ctx.strokeStyle = color || "#4b69ff";
+    ctx.lineWidth = 6;
+    ctx.strokeRect(10, 10, 180, 180);
+
+    // Szöveg kirajzolás
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 14px sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    
+    // Szöveg tördelése
+    const parts = title.split(" | ");
+    if (parts.length > 1) {
+        ctx.fillText(parts[0], 100, 85);
+        ctx.fillStyle = color || "#4b69ff";
+        ctx.fillText(parts[1], 100, 115);
+    } else {
+        ctx.fillText(title, 100, 100);
+    }
+
+    return canvas.toDataURL("image/png");
+}
+
+// Global Image Error Handler (HTML onerror-ből hívható)
+window.handleImgError = function(imgElement, title, color) {
+    imgElement.onerror = null; // Végtelen ciklus megakadályozása
+    imgElement.src = createFallbackImage(title, color);
+};
+
 // --------------------------------------------------------------------------
-// 2. AUDIO ENGINE (Web Audio API - Nincs külső fájlfüggőség)
+// 2. AUDIO ENGINE (Web Audio API)
 // --------------------------------------------------------------------------
 class SoundEngine {
     constructor() {
@@ -86,31 +129,26 @@ class SoundEngine {
 const Audio = new SoundEngine();
 
 // --------------------------------------------------------------------------
+// 3. MASTER ITEM DATABASE
 // --------------------------------------------------------------------------
-// 3. MASTER ITEM DATABASE (Helyi images/ mappás verzió)
-// --------------------------------------------------------------------------
-
-// Színkódok szerinti ritkaság leképezése (A te color kódjaid alapján)
 const COLOR_TO_RARITY = {
-    "#4b69ff": "milspec",     // Kék
-    "#8847ff": "restricted",  // Lila
-    "#d32ce6": "classified",  // Rózsaszín
-    "#eb4b4b": "covert",      // Piros
-    "#ffd700": "special"      // Arany / Kés
+    "#4b69ff": "milspec",
+    "#8847ff": "restricted",
+    "#d32ce6": "classified",
+    "#eb4b4b": "covert",
+    "#ffd700": "special"
 };
 
-// 1. A te helyi képes SKIN_DATABASE tömböd
 const SKIN_DATABASE = [
-  { id: 1, name: "P250 | Sand Dune", price: 0.50, color: "#4b69ff", img: "images/p250_sanddune.png" },
-  { id: 2, name: "Glock-18 | Water Elemental", price: 8.50, color: "#8847ff", img: "images/glock_waterelemental.png" },
-  { id: 3, name: "AK-47 | Redline", price: 22.00, color: "#d32ce6", img: "images/ak47_redline.png" },
-  { id: 4, name: "M4A4 | Neo-Noir", price: 35.00, color: "#eb4b4b", img: "images/m4a4_neonoir.png" },
-  { id: 5, name: "AWP | Asiimov", price: 110.00, color: "#eb4b4b", img: "images/awp_asiimov.png" },
-  { id: 6, name: "AK-47 | Vulcan", price: 280.00, color: "#eb4b4b", img: "images/ak47_vulcan.png" },
-  { id: 7, name: "★ Karambit | Fade", price: 2400.00, color: "#ffd700", img: "images/karambit_fade.png" }
+  { id: 1, name: "P250 | Sand Dune", price: 0.50, color: "#4b69ff", img: "./images/p250_sanddune.png" },
+  { id: 2, name: "Glock-18 | Water Elemental", price: 8.50, color: "#8847ff", img: "./images/glock_waterelemental.png" },
+  { id: 3, name: "AK-47 | Redline", price: 22.00, color: "#d32ce6", img: "./images/ak47_redline.png" },
+  { id: 4, name: "M4A4 | Neo-Noir", price: 35.00, color: "#eb4b4b", img: "./images/m4a4_neonoir.png" },
+  { id: 5, name: "AWP | Asiimov", price: 110.00, color: "#eb4b4b", img: "./images/awp_asiimov.png" },
+  { id: 6, name: "AK-47 | Vulcan", price: 280.00, color: "#eb4b4b", img: "./images/ak47_vulcan.png" },
+  { id: 7, name: "★ Karambit | Fade", price: 2400.00, color: "#ffd700", img: "./images/karambit_fade.png" }
 ];
 
-// 2. Az app komponenseivel való kompatibilitás miatti konvertálás (MASTER_ITEMS)
 const MASTER_ITEMS = SKIN_DATABASE.map(item => ({
     id: `item_${item.id}`,
     name: item.name,
@@ -120,15 +158,13 @@ const MASTER_ITEMS = SKIN_DATABASE.map(item => ({
     img: item.img
 }));
 
-// 3. A te helyi képes LÁDA adatbázisod (OFFICIAL_CASES & CASE_COLLECTION)
 const OFFICIAL_CASES = [
-  { id: 'terb-starter', name: 'Starter Case', price: 2.50, color: "#4b69ff", img: "images/case_starter.png" },
-  { id: 'terb-neon', name: 'Neon Collection', price: 12.00, color: "#8847ff", img: "images/case_neon.png" },
-  { id: 'terb-classified', name: 'Covert Case', price: 35.00, color: "#d32ce6", img: "images/case_covert.png" },
-  { id: 'terb-knife', name: 'Knife & Gold Box', price: 250.00, color: "#ffd700", img: "images/case_knife.png" }
+  { id: 'terb-starter', name: 'Starter Case', price: 2.50, color: "#4b69ff", img: "./images/case_starter.png" },
+  { id: 'terb-neon', name: 'Neon Collection', price: 12.00, color: "#8847ff", img: "./images/case_neon.png" },
+  { id: 'terb-classified', name: 'Covert Case', price: 35.00, color: "#d32ce6", img: "./images/case_covert.png" },
+  { id: 'terb-knife', name: 'Knife & Gold Box', price: 250.00, color: "#ffd700", img: "./images/case_knife.png" }
 ];
 
-// Átmásoljuk a ládákat a rendszer által használt CASE_COLLECTION változóba
 const CASE_COLLECTION = OFFICIAL_CASES.map(c => ({
     id: c.id,
     name: c.name,
@@ -139,7 +175,7 @@ const CASE_COLLECTION = OFFICIAL_CASES.map(c => ({
 }));
 
 // --------------------------------------------------------------------------
-// 4. PROVABLY FAIR (CRYPTOGRAPHIC SEED GENERATOR)
+// 4. PROVABLY FAIR
 // --------------------------------------------------------------------------
 class ProvablyFair {
     constructor() {
@@ -157,7 +193,6 @@ class ProvablyFair {
         return result;
     }
 
-    // Algoritmus ami a megadott seed-ekből visszaad egy 0-100 közötti float-ot
     getRoll() {
         this.nonce++;
         const combined = `${this.serverSeed}-${this.clientSeed}-${this.nonce}`;
@@ -167,14 +202,14 @@ class ProvablyFair {
             hash |= 0;
         }
         const absHash = Math.abs(hash);
-        return (absHash % 1000000) / 10000; // 0.0000 - 99.9999
+        return (absHash % 1000000) / 10000;
     }
 }
 
 const PF = new ProvablyFair();
 
 // --------------------------------------------------------------------------
-// 5. STATE MANAGEMENT (GLOBAL)
+// 5. STATE MANAGEMENT
 // --------------------------------------------------------------------------
 class AppState {
     constructor() {
@@ -264,7 +299,6 @@ class SpinEngine {
         }
         this.tracksContainer.innerHTML = html;
 
-        // Első feltöltés dummy adatokkal
         for (let i = 0; i < State.multiCount; i++) {
             const track = document.getElementById(`track-${i}`);
             if (track) {
@@ -282,7 +316,6 @@ class SpinEngine {
     }
 
     rollSkinByOdds() {
-        // Ha speciális láda (pl Knife Only)
         if (State.activeCase.id === "knife_god") {
             const knives = MASTER_ITEMS.filter(x => x.rarity === "special");
             return knives[Math.floor(Math.random() * knives.length)];
@@ -308,7 +341,7 @@ class SpinEngine {
     generateTrackHTML(itemList) {
         return itemList.map(item => `
             <div class="item-card ${item.rarity}" data-id="${item.id}">
-                <img src="${item.img}" alt="${item.name}" loading="lazy">
+                <img src="${item.img}" alt="${item.name}" loading="lazy" onerror="handleImgError(this, '${item.name.replace(/'/g, "\\'")}', '${item.color}')">
                 <div class="item-name">${item.name}</div>
                 <div class="item-price">${LUX_CONFIG.CURRENCY_SYMBOL}${item.price.toFixed(2)}</div>
             </div>
@@ -341,7 +374,6 @@ class SpinEngine {
             const winnerItem = this.rollSkinByOdds();
             winners.push(winnerItem);
 
-            // Genereálunk egy 80 elemű tömböt
             const trackItems = [];
             for (let i = 0; i < 80; i++) {
                 if (i === LUX_CONFIG.WIN_INDEX) {
@@ -355,19 +387,15 @@ class SpinEngine {
             track.style.transform = "translateX(0px)";
             track.innerHTML = this.generateTrackHTML(trackItems);
 
-            // Eltolás kiszámítása középre igazítással + egy kis véletlenszerű eltolással a kártyán belül
             const viewportWidth = viewport.clientWidth;
             const randomOffsetWithinCard = Math.floor(Math.random() * (LUX_CONFIG.CARD_WIDTH - 20)) - (LUX_CONFIG.CARD_WIDTH / 2 - 10);
             const targetX = -(LUX_CONFIG.WIN_INDEX * totalStep) + (viewportWidth / 2) - (LUX_CONFIG.CARD_WIDTH / 2) + randomOffsetWithinCard;
 
-            // Trigger Reflow
             void track.offsetWidth;
 
-            // Transzformáció futtatása
             track.style.transition = `transform ${duration}s cubic-bezier(0.08, 0.8, 0.1, 1)`;
             track.style.transform = `translateX(${targetX}px)`;
 
-            // Hang effekt időzítés
             if (!State.fastMode) {
                 let currentStep = 0;
                 const interval = setInterval(() => {
@@ -378,7 +406,6 @@ class SpinEngine {
             }
         }
 
-        // Animáció vége
         setTimeout(() => {
             State.isSpinning = false;
             winners.forEach(win => {
@@ -411,7 +438,6 @@ class LiveFeedSystem {
         this.container = document.getElementById("live-feed-track");
         if (!this.container) return;
 
-        // Kezdő kamu nyitások generálása
         for (let i = 0; i < 12; i++) {
             const randomSkin = MASTER_ITEMS[Math.floor(Math.random() * MASTER_ITEMS.length)];
             this.addDrop(randomSkin, false);
@@ -424,7 +450,7 @@ class LiveFeedSystem {
         const card = document.createElement("div");
         card.className = `feed-card ${item.rarity}`;
         card.innerHTML = `
-            <img src="${item.img}" alt="${item.name}">
+            <img src="${item.img}" alt="${item.name}" onerror="handleImgError(this, '${item.name.replace(/'/g, "\\'")}', '${item.color}')">
             <div class="info">
                 <span class="name">${item.name}</span>
                 <span class="price">${LUX_CONFIG.CURRENCY_SYMBOL}${item.price.toFixed(2)}</span>
@@ -468,7 +494,7 @@ class InventorySystem {
 
         this.grid.innerHTML = State.inventory.map((item, index) => `
             <div class="inventory-card ${item.rarity}">
-                <img src="${item.img}" alt="${item.name}">
+                <img src="${item.img}" alt="${item.name}" onerror="handleImgError(this, '${item.name.replace(/'/g, "\\'")}', '${item.color}')">
                 <div class="name">${item.name}</div>
                 <div class="price">${LUX_CONFIG.CURRENCY_SYMBOL}${item.price.toFixed(2)}</div>
                 <button class="btn-sell" onclick="InventoryUI.sellItem(${index})">ELADÁS</button>
@@ -501,19 +527,17 @@ const InventoryUI = new InventorySystem();
 // 9. CASE SELECTOR & UI EVENT LISTENERS
 // --------------------------------------------------------------------------
 function initUIEvents() {
-    // Láda választó grid feltöltése
     const casesGrid = document.getElementById("cases-grid");
     if (casesGrid) {
         casesGrid.innerHTML = CASE_COLLECTION.map(c => `
             <div class="case-card" onclick="selectCase('${c.id}')">
-                <img src="${c.img}" alt="${c.name}">
+                <img src="${c.img}" alt="${c.name}" onerror="handleImgError(this, '${c.name.replace(/'/g, "\\'")}', '${c.color}')">
                 <h3>${c.name}</h3>
                 <div class="price">${LUX_CONFIG.CURRENCY_SYMBOL}${c.price.toFixed(2)}</div>
             </div>
         `).join("");
     }
 
-    // Gyors nyitás kapcsoló
     const fastToggle = document.getElementById("fast-spin-toggle");
     if (fastToggle) {
         fastToggle.addEventListener("change", (e) => {
@@ -521,7 +545,6 @@ function initUIEvents() {
         });
     }
 
-    // Tab Navigáció
     const navBtns = document.querySelectorAll(".nav-btn");
     navBtns.forEach(btn => {
         btn.addEventListener("click", function() {
@@ -561,14 +584,14 @@ function renderCasePreview() {
 
     previewGrid.innerHTML = itemsToDisplay.map(item => `
         <div class="item-card ${item.rarity}">
-            <img src="${item.img}" alt="${item.name}">
+            <img src="${item.img}" alt="${item.name}" onerror="handleImgError(this, '${item.name.replace(/'/g, "\\'")}', '${item.color}')">
             <div class="item-name">${item.name}</div>
             <div class="item-price">${LUX_CONFIG.CURRENCY_SYMBOL}${item.price.toFixed(2)}</div>
         </div>
     `).join("");
 }
 
-// Globális függvények a gombokhoz (onclick kötés)
+// Globális függvények
 window.setMultiOpen = (count) => Spinner.setMulti(count);
 window.handleOpenCase = () => Spinner.spin();
 window.selectCase = (id) => selectCase(id);
