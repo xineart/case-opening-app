@@ -3,61 +3,90 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CS2 Case Opener & Simulator</title>
+  <title>CS2 Case Opener & Casino Simulator</title>
+  <!-- Modern Betűtípus (Inter) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    body { background-color: #0b0e14; color: #fff; overflow-x: hidden; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; user-select: none; }
+    body { background-color: #0b0e14; color: #f3f4f6; overflow-x: hidden; min-height: 100vh; }
     .hidden { display: none !important; }
 
     /* NAVBAR */
-    header { background: #151922; border-bottom: 1px solid #232936; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
-    .logo { font-size: 22px; font-weight: bold; color: #ffb703; letter-spacing: 1px; }
-    nav { display: flex; gap: 20px; }
-    .nav-item { background: none; border: none; color: #a0aab8; font-size: 14px; font-weight: 600; cursor: pointer; padding: 8px 12px; border-radius: 6px; }
-    .nav-item.active, .nav-item:hover { color: #fff; background: #232936; }
-    
+    header { background: #131722; border-bottom: 1px solid #232a3b; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; }
+    .logo { font-size: 24px; font-weight: 800; color: #ffb703; letter-spacing: 1px; text-shadow: 0 0 10px rgba(255,183,3,0.3); }
+    nav { display: flex; gap: 10px; background: #0b0e14; padding: 5px; border-radius: 8px; border: 1px solid #232a3b; }
+    .nav-item { background: transparent; border: none; color: #8a99ad; font-size: 13px; font-weight: 700; cursor: pointer; padding: 10px 20px; border-radius: 6px; transition: all 0.2s; }
+    .nav-item.active, .nav-item:hover { color: #fff; background: #1e2638; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+
     .user-section { display: flex; align-items: center; gap: 15px; }
-    .balance-box { background: #1a212d; border: 1px solid #2d3748; padding: 8px 15px; border-radius: 6px; font-weight: bold; color: #2ecc71; }
-    .btn { background: #3182ce; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; }
-    .btn:hover { background: #2b6cb0; }
-    .btn-ghost { background: transparent; border: 1px solid #4a5568; }
+    .balance-box { background: #182030; border: 1px solid #2e3a52; padding: 8px 16px; border-radius: 6px; font-weight: 700; color: #10b981; font-size: 14px; }
+    .btn { background: #2563eb; color: #fff; border: none; padding: 10px 18px; border-radius: 6px; font-weight: 700; cursor: pointer; transition: all 0.2s; font-size: 13px; }
+    .btn:hover { background: #1d4ed8; transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+    .btn-ghost { background: transparent; border: 1px solid #374151; color: #9ca3af; }
+    .btn-ghost:hover { background: #1f2937; color: #fff; }
+    .btn-danger { background: #dc2626; color: white; }
+    .btn-danger:hover { background: #b91c1c; }
 
     /* LIVE FEED */
-    .live-feed { background: #11141c; height: 60px; border-bottom: 1px solid #1a202c; display: flex; align-items: center; overflow: hidden; padding: 0 10px; }
-    .feed-track { display: flex; gap: 10px; }
-    .feed-item { background: #1a202c; padding: 5px 10px; border-radius: 4px; display: flex; align-items: center; gap: 8px; font-size: 12px; border-left: 3px solid #718096; }
+    .live-feed { background: #0e121a; height: 65px; border-bottom: 1px solid #1a2332; display: flex; align-items: center; padding: 0 20px; gap: 15px; overflow: hidden; }
+    .feed-title { font-size: 11px; font-weight: 800; color: #4b5563; letter-spacing: 1px; white-space: nowrap; }
+    .feed-track { display: flex; gap: 10px; width: 100%; overflow: hidden; }
+    .feed-item { background: #151c28; padding: 6px 12px; border-radius: 6px; display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 600; border-left: 3px solid #6b7280; animation: slideIn 0.3s ease-out; }
+    @keyframes slideIn { from { transform: translateX(-20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-    /* MAIN CONTAINER */
-    main { padding: 30px; max-width: 1200px; margin: 0 auto; }
+    /* LAYOUT */
+    main { padding: 40px; max-width: 1300px; margin: 0 auto; }
     .tab-page { display: none; }
     .tab-page.active { display: block; }
+    h2 { font-size: 22px; font-weight: 800; margin-bottom: 5px; }
+    .sub-title { color: #6b7280; font-size: 14px; margin-bottom: 25px; }
 
-    /* CASE GRID */
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; margin-top: 20px; }
-    .case-card, .item-card { background: #151922; border: 1px solid #232936; border-radius: 8px; padding: 15px; text-align: center; cursor: pointer; transition: transform 0.2s; position: relative; }
-    .case-card:hover, .item-card:hover { transform: translateY(-500px); transform: translateY(-4px); border-color: #4a5568; }
-    .case-card img, .item-card img { max-width: 100%; height: 110px; object-fit: contain; margin-bottom: 10px; }
-    .price { color: #2ecc71; font-weight: bold; margin-top: 5px; }
+    /* GRID & CARDS */
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+    .case-card, .item-card { background: #131722; border: 1px solid #202838; border-radius: 10px; padding: 18px; text-align: center; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; }
+    .case-card:hover, .item-card:hover { transform: translateY(-4px); border-color: #3b82f6; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+    .case-card img, .item-card img { width: 100%; height: 110px; object-fit: contain; margin-bottom: 12px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5)); }
+    .item-name { font-size: 13px; font-weight: 700; color: #e5e7eb; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .price { color: #10b981; font-weight: 800; font-size: 14px; margin-top: 6px; }
 
-    /* RARITY COLORS */
+    /* RARITY BORDERS */
     .milspec { border-bottom: 4px solid #4b69ff; }
     .restricted { border-bottom: 4px solid #8847ff; }
     .classified { border-bottom: 4px solid #d32ce6; }
     .covert { border-bottom: 4px solid #eb4b4b; }
-    .gold { border-bottom: 4px solid #ffd700; }
+    .gold { border-bottom: 4px solid #ffd700; box-shadow: inset 0 0 15px rgba(255,215,0,0.1); }
 
     /* ROULETTE / SPINNER */
-    .roulette-container { width: 100%; height: 160px; background: #0f1219; border: 2px solid #2d3748; border-radius: 8px; overflow: hidden; position: relative; margin: 20px 0; }
-    .roulette-pointer { position: absolute; left: 50%; top: 0; bottom: 0; width: 4px; background: #e53e3e; z-index: 10; transform: translateX(-50%); }
+    .roulette-container { width: 100%; height: 170px; background: #090c10; border: 2px solid #1f293d; border-radius: 10px; overflow: hidden; position: relative; margin: 25px 0; }
+    .roulette-pointer { position: absolute; left: 50%; top: 0; bottom: 0; width: 4px; background: #ef4444; z-index: 10; transform: translateX(-50%); box-shadow: 0 0 10px #ef4444; }
     .roulette-track { display: flex; height: 100%; position: absolute; left: 0; top: 0; }
-    .roulette-track .item-card { width: 150px; flex-shrink: 0; height: 100%; border-radius: 0; }
+    .roulette-track .item-card { width: 160px; flex-shrink: 0; height: 100%; border-radius: 0; border-top: none; border-bottom: none; }
+
+    /* UPGRADER WHEEL */
+    .upgrader-wrapper { display: flex; gap: 30px; background: #131722; border: 1px solid #202838; padding: 30px; border-radius: 12px; align-items: center; }
+    .wheel-container { position: relative; width: 220px; height: 220px; margin: 0 auto; }
+    .wheel-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+    .wheel-bg { fill: none; stroke: #1f293d; stroke-width: 12; }
+    .wheel-slice { fill: none; stroke: #10b981; stroke-width: 12; stroke-dasharray: 565; stroke-dashoffset: 282; transition: stroke-dashoffset 0.3s; }
+    .wheel-pointer { position: absolute; top: 0; left: 50%; width: 4px; height: 110px; background: #ef4444; transform-origin: bottom center; transform: translateX(-50%) rotate(0deg); transition: transform 4s cubic-bezier(0.15, 0.9, 0.15, 1); }
+
+    /* BATTLE ARENA */
+    .battle-box { background: #131722; border: 1px solid #202838; border-radius: 10px; padding: 20px; margin-bottom: 15px; }
 
     /* MODAL */
-    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 100; }
-    .modal-content { background: #151922; border: 1px solid #232936; border-radius: 8px; padding: 30px; width: 350px; display: flex; flex-direction: column; gap: 15px; }
-    .modal-content input { background: #0b0e14; border: 1px solid #2d3748; color: #fff; padding: 10px; border-radius: 6px; }
-    
-    .btn-sell-item { background: #e53e3e; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; margin-top: 8px; cursor: pointer; font-size: 11px; }
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 100; }
+    .modal-content { background: #131722; border: 1px solid #202838; border-radius: 12px; padding: 35px; width: 380px; display: flex; flex-direction: column; gap: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    .modal-content h3 { font-size: 20px; font-weight: 800; }
+    .modal-content input { background: #090c10; border: 1px solid #202838; color: #fff; padding: 12px; border-radius: 6px; font-weight: 600; outline: none; }
+    .modal-content input:focus { border-color: #2563eb; }
+
+    .btn-sell { background: #ef4444; color: #fff; border: none; padding: 6px 10px; border-radius: 4px; margin-top: 10px; cursor: pointer; font-size: 11px; font-weight: 700; width: 100%; }
+    .btn-sell:hover { background: #dc2626; }
+    .selected-stake { border: 2px solid #10b981 !important; }
   </style>
 </head>
 <body>
@@ -66,26 +95,26 @@
   <header>
     <div class="logo">CS2 LOOT</div>
     <nav>
-      <button class="nav-item active" data-tab="cases" id="txt-nav-cases">LÁDÁK</button>
-      <button class="nav-item" data-tab="battles" id="txt-nav-battles">CASE BATTLES</button>
-      <button class="nav-item" data-tab="upgrader" id="txt-nav-upgrader">UPGRADER</button>
+      <button class="nav-item active" data-tab="cases">LÁDÁK</button>
+      <button class="nav-item" data-tab="battles">CASE BATTLES</button>
+      <button class="nav-item" data-tab="upgrader">UPGRADER</button>
     </nav>
     <div class="user-section">
       <div id="user-balance-box" class="balance-box hidden">
-        <span id="txt-balance-label">EGYENLEG</span>: <span id="user-balance">$100.00</span>
+        EGYENLEG: <span id="user-balance">$100.00</span>
       </div>
-      <button id="open-deposit-btn" class="btn btn-ghost hidden">+ $100</button>
-      <div id="user-profile-box" class="hidden" style="cursor:pointer;">
-        👤 <span id="display-username">User</span>
-        <button id="logout-btn" class="btn-sell-item" style="margin-left:10px;">KI</button>
+      <button id="open-deposit-btn" class="btn btn-ghost hidden">+ $100 INGYEN</button>
+      <div id="user-profile-box" class="hidden" style="display:flex; align-items:center; gap:10px;">
+        <span style="font-weight:700; font-size:14px;" id="display-username">User</span>
+        <button id="logout-btn" class="btn btn-ghost" style="padding:5px 10px; font-size:11px;">KI</button>
       </div>
-      <button id="open-login-btn" class="btn"><span id="txt-login-btn">BEJELENTKEZÉS</span></button>
+      <button id="open-login-btn" class="btn">BEJELENTKEZÉS</button>
     </div>
   </header>
 
   <!-- LIVE FEED -->
   <div class="live-feed">
-    <span style="font-size: 11px; color:#718096; margin-right: 15px; font-weight:bold;" id="txt-live-drops">ÉLŐ DROPOK</span>
+    <div class="feed-title">ÉLŐ DROPOK</div>
     <div class="feed-track" id="live-feed-track"></div>
   </div>
 
@@ -93,179 +122,150 @@
     <!-- TAB 1: CASES -->
     <div id="tab-cases" class="tab-page active">
       <div id="case-catalog-view">
-        <h2 id="txt-cases-title">LOOTBOX STÍLUSÚ LÁDÁK</h2>
-        <p style="color:#718096;" id="txt-cases-sub">Exkluzív skinek a legmagasabb nyerési esélyekkel</p>
+        <h2>CS2 LÁDÁK</h2>
+        <p class="sub-title">Nyiss exkluzív skineket hivatalos drop-esélyekkel!</p>
         <div class="grid" id="cases-grid"></div>
       </div>
 
       <div id="case-opener-view" class="hidden">
         <button id="back-to-catalog-btn" class="btn btn-ghost">← Vissza a ládákhoz</button>
-        <h2 id="active-case-name" style="margin-top:15px;">Starter Case</h2>
-        <p id="active-case-price-text" style="color:#2ecc71; font-weight:bold;"></p>
+        <h2 id="active-case-name" style="margin-top:20px;">Starter Case</h2>
+        <p id="active-case-price-text" class="price" style="font-size:18px;"></p>
 
-        <div id="spinners-wrapper"></div>
+        <div class="roulette-container">
+          <div class="roulette-pointer"></div>
+          <div class="roulette-track" id="spinner-track-0"></div>
+        </div>
 
-        <div style="display:flex; gap:10px; margin: 15px 0;">
-          <button class="btn" id="open-case-btn">LÁDA NYITÁSA</button>
-          <label style="display:flex; align-items:center; gap:5px; font-size:12px; color:#a0aab8;">
+        <div style="display:flex; gap:15px; align-items:center;">
+          <button class="btn" id="open-case-btn" style="padding:14px 28px; font-size:15px;">LÁDA NYITÁSA</button>
+          <label style="display:flex; align-items:center; gap:8px; font-size:13px; color:#8a99ad; cursor:pointer;">
             <input type="checkbox" id="fast-spin-toggle"> Gyors pörgetés
-          </label>
-          <label style="display:flex; align-items:center; gap:5px; font-size:12px; color:#a0aab8; margin-left:15px;">
-            <input type="checkbox" id="sfx-toggle" checked> Hangok
           </label>
         </div>
 
-        <h3 id="txt-case-contents" style="margin-top:30px;">LÁDA TARTALMA ÉS DROPRATE</h3>
+        <h3 style="margin-top:40px; margin-bottom:15px; font-size:16px;">LÁDA TARTALMA</h3>
         <div class="grid" id="case-items-grid"></div>
       </div>
 
-      <hr style="border-color:#232936; margin:40px 0;">
-      <h3 id="txt-inventory-title">SAJÁT LELTÁR (INVENTORY) (<span id="inv-count-badge">0</span>)</h3>
+      <hr style="border-color:#1f293d; margin:40px 0;">
+      <h2>SAJÁT INVENTORY (<span id="inv-count-badge">0</span>)</h2>
+      <p class="sub-title">A megszerzett skinedet bármikor eladhatod az egyenlegedért.</p>
       <div class="grid" id="inventory-grid"></div>
     </div>
 
     <!-- TAB 2: BATTLES -->
     <div id="tab-battles" class="tab-page">
-      <h2>CASE BATTLES</h2>
-      <p style="color:#718096;" id="txt-battles-sub">Átlátható csaták és real-time élmény.</p>
-      <div id="battles-list" style="margin-top:20px;"></div>
+      <h2>CASE BATTLES (1v1 BOT ELLEN)</h2>
+      <p class="sub-title">Aki értékesebb skint nyit a ládából, az viszi a teljes nyereményt!</p>
+      <div id="battles-list"></div>
 
-      <div id="battle-arena" class="hidden" style="margin-top:20px; background:#151922; padding:20px; border-radius:8px;">
-        <h3>CSATA ARENA - Pot: <span id="arena-pot-val">$0.00</span></h3>
-        <div style="display:flex; gap:20px; margin:20px 0;">
-          <div style="flex:1; background:#0b0e14; padding:15px; border-radius:6px; text-align:center;">
-            <h4 id="p1-display-name">Játékos 1</h4>
-            <div id="p1-drop-slot" style="margin-top:10px;">-</div>
+      <div id="battle-arena" class="hidden" style="margin-top:20px; background:#131722; border:1px solid #202838; padding:30px; border-radius:12px;">
+        <h3>CSATA ARENA - Összdíj: <span id="arena-pot-val" style="color:#10b981;">$0.00</span></h3>
+        
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin:20px 0;">
+          <div>
+            <h4 id="p1-name" style="margin-bottom:10px;">Te</h4>
+            <div class="roulette-container" style="height:140px;">
+              <div class="roulette-pointer"></div>
+              <div class="roulette-track" id="battle-track-1"></div>
+            </div>
           </div>
-          <div style="flex:1; background:#0b0e14; padding:15px; border-radius:6px; text-align:center;">
-            <h4>BOT Super</h4>
-            <div id="p2-drop-slot" style="margin-top:10px;">-</div>
+          <div>
+            <h4 style="margin-bottom:10px; color:#ef4444;">BOT Super</h4>
+            <div class="roulette-container" style="height:140px;">
+              <div class="roulette-pointer"></div>
+              <div class="roulette-track" id="battle-track-2"></div>
+            </div>
           </div>
         </div>
-        <button id="start-battle-spin-btn" class="btn">PÖRGETÉS INDÍTÁSA</button>
-        <button id="close-battle-arena-btn" class="btn btn-ghost">Kilépés</button>
+
+        <div style="display:flex; gap:10px;">
+          <button id="start-battle-spin-btn" class="btn">CSATA INDÍTÁSA</button>
+          <button id="close-battle-arena-btn" class="btn btn-ghost">Kilépés</button>
+        </div>
       </div>
     </div>
 
     <!-- TAB 3: UPGRADER -->
     <div id="tab-upgrader" class="tab-page">
       <h2>SKIN UPGRADER</h2>
-      <p style="color:#718096;" id="txt-upgrader-sub">Tedd kockára meglévő skinedet vagy egyenlegedet!</p>
-      
-      <div style="display:flex; gap:30px; margin-top:20px; background:#151922; padding:20px; border-radius:8px;">
+      <p class="sub-title">Válassz egy skint az inventorydból és kockáztasd meg egy drágább skinért!</p>
+
+      <div class="upgrader-wrapper">
+        <!-- 1. TÉT BAL OLDAL -->
         <div style="flex:1;">
-          <h4 id="txt-your-stake">1. SAJÁT TÉT ($)</h4>
-          <input type="number" id="upgrade-input-val" value="10" style="width:100%; padding:8px; background:#0b0e14; border:1px solid #2d3748; color:#fff; border-radius:4px; margin-top:10px;">
-          <div id="upgrade-inv-list" class="grid" style="grid-template-columns:repeat(2,1fr); max-height:200px; overflow-y:auto; margin-top:10px;"></div>
+          <h4 style="margin-bottom:10px;">1. VÁLASSZ SKINT TÉTKÉNT</h4>
+          <div id="upgrade-inv-list" class="grid" style="grid-template-columns:repeat(2,1fr); max-height:260px; overflow-y:auto;"></div>
         </div>
 
+        <!-- 2. KÖZÉPSŐ KERÉK -->
         <div style="flex:1; text-align:center;">
-          <h4 id="txt-chance-label">ESÉLY</h4>
-          <h1 id="upgrade-chance-num" style="color:#ffb703; font-size:40px; margin:20px 0;">50%</h1>
-          <button id="start-upgrade-btn" class="btn" style="width:100%; padding:12px;">UPGRADE INDÍTÁSA</button>
+          <div class="wheel-container">
+            <svg class="wheel-svg" viewBox="0 0 200 200">
+              <circle class="wheel-bg" cx="100" cy="100" r="90" />
+              <circle id="wheel-slice" class="wheel-slice" cx="100" cy="100" r="90" />
+            </svg>
+            <div id="wheel-pointer" class="wheel-pointer"></div>
+          </div>
+          <h1 id="upgrade-chance-num" style="color:#ffb703; font-size:36px; margin:15px 0 5px 0;">0.00%</h1>
+          <p style="font-size:12px; color:#6b7280; margin-bottom:15px;">NYERÉSI ESÉLY</p>
+          <button id="start-upgrade-btn" class="btn" style="width:100%; padding:14px;">UPGRADE INDÍTÁSA</button>
         </div>
 
+        <!-- 3. CÉL JOBB OLDAL -->
         <div style="flex:1;">
-          <h4 id="txt-target-skin">2. CÉLZOTT SKIN</h4>
-          <div id="target-skin-box" style="text-align:center; padding:10px; background:#0b0e14; border-radius:6px; margin-top:10px;">
-            <img id="target-skin-img" src="" style="height:80px;">
-            <div id="target-skin-name" style="font-weight:bold;">-</div>
-            <div id="target-skin-price" style="color:#2ecc71;">$0.00</div>
-          </div>
-          <div id="upgrade-target-list" class="grid" style="grid-template-columns:repeat(2,1fr); max-height:150px; overflow-y:auto; margin-top:10px;"></div>
+          <h4 style="margin-bottom:10px;">2. VÁLASSZ CÉLZOTT SKINT</h4>
+          <div id="upgrade-target-list" class="grid" style="grid-template-columns:repeat(2,1fr); max-height:260px; overflow-y:auto;"></div>
         </div>
       </div>
     </div>
   </main>
 
-  <!-- LOGIN MODAL -->
+  <!-- LOGIN/REGISTER MODAL -->
   <div id="login-modal" class="modal hidden">
     <div class="modal-content">
-      <h3>Bejelentkezés / Regisztráció</h3>
+      <h3 id="modal-title">Bejelentkezés</h3>
       <input type="text" id="login-username-input" placeholder="Felhasználónév">
       <input type="password" id="login-password-input" placeholder="Jelszó">
       <button id="confirm-login-btn" class="btn">Bejelentkezés</button>
-      <button id="confirm-register-btn" class="btn btn-ghost">Új regisztráció</button>
-      <button id="close-login-btn" class="btn-sell-item">Mégse</button>
+      <button id="confirm-register-btn" class="btn btn-ghost">Regisztráció fiók nélkül</button>
+      <button id="close-login-btn" class="btn btn-ghost" style="border:none;">Mégse</button>
     </div>
   </div>
 
-  <!-- INLINET SCRIPT (A TE KÓDOD) -->
   <script>
-    // AZ ÁLTALAD MEGADOTT JAVASCRIPT KÓD TELJESEN BEÉPÍTVE
+    // DATABASES
     const SKIN_DATABASE = [
-      { id: 1, name: "P250 | Sand Dune", price: 0.50, color: "#4b69ff", img: "images/p250_sanddune.png" },
-      { id: 2, name: "Glock-18 | Water Elemental", price: 8.50, color: "#8847ff", img: "images/glock_waterelemental.png" },
-      { id: 3, name: "AK-47 | Redline", price: 22.00, color: "#d32ce6", img: "images/ak47_redline.png" },
-      { id: 4, name: "M4A4 | Neo-Noir", price: 35.00, color: "#eb4b4b", img: "images/m4a4_neonoir.png" },
-      { id: 5, name: "AWP | Asiimov", price: 110.00, color: "#eb4b4b", img: "images/awp_asiimov.png" },
-      { id: 6, name: "AK-47 | Vulcan", price: 280.00, color: "#eb4b4b", img: "images/ak47_vulcan.png" },
-      { id: 7, name: "★ Karambit | Fade", price: 2400.00, color: "#ffd700", img: "images/karambit_fade.png" }
+      { id: 1, name: "P250 | Sand Dune", price: 0.50, color: "#4b69ff", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d11PP65XbveKGHcaYKh4SFVR347ZI15BQsA9-i5R2RthL545I2P5O1117ACZZ1-P3e11y1633dKRN7d2019-1x4S1MrO2z2oA6ccj0uXG9duhiwex_0U6ZDutLdPBcgQ6NV_Z-1m9l7i8hMW86J7PzXU2124S8f9s" },
+      { id: 2, name: "Glock-18 | Water Elemental", price: 8.50, color: "#8847ff", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d11PP65XbveKGHcaYKh4SFVR347ZI15BQsA9-i5R2RthL545I2P5O114jA2J1-P3128y0j3s11a5A22M81O4xN-D3m8a2X_f1wz_I0Y6209jX8M9y307sMWi3cNS1NFS5O16v1uT-4s2XvXU21xOa21wS1_M3w" },
+      { id: 3, name: "AK-47 | Redline", price: 22.00, color: "#d32ce6", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d11PP65XbveKGHcaYKh4SFVR347ZI15BQsA9-i5R2RthL545I2P5O114jA2J1-P3128y0j3v-1A1L4O8xM_C41-G24241N2xY-fS5aX1W9MWzX1aM904M205-01e4A22X-M9L6a2X" },
+      { id: 4, name: "M4A4 | Neo-Noir", price: 35.00, color: "#eb4b4b", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d11PP65XbveKGHcaYKh4SFVR347ZI15BQsA9-i5R2RthL545I2P5O114jA2J1-P3128y0j3v-1A1L4O8xM_C41-G24241N2xY-fS5aX1W9MWzX1aM904M205-01e4A22X-M9L6a2X" },
+      { id: 5, name: "AWP | Asiimov", price: 110.00, color: "#eb4b4b", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d11PP65XbveKGHcaYKh4SFVR347ZI15BQsA9-i5R2RthL545I2P5O114jA2J1-P3128y0j3v-1A1L4O8xM_C41-G24241N2xY-fS5aX1W9MWzX1aM904M205-01e4A22X-M9L6a2X" },
+      { id: 6, name: "AK-47 | Vulcan", price: 280.00, color: "#eb4b4b", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d11PP65XbveKGHcaYKh4SFVR347ZI15BQsA9-i5R2RthL545I2P5O114jA2J1-P3128y0j3v-1A1L4O8xM_C41-G24241N2xY-fS5aX1W9MWzX1aM904M205-01e4A22X-M9L6a2X" },
+      { id: 7, name: "★ Karambit | Fade", price: 2400.00, color: "#ffd700", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d11PP65XbveKGHcaYKh4SFVR347ZI15BQsA9-i5R2RthL545I2P5O114jA2J1-P3128y0j3v-1A1L4O8xM_C41-G24241N2xY-fS5aX1W9MWzX1aM904M205-01e4A22X-M9L6a2X" }
     ];
 
     const OFFICIAL_CASES = [
-      { id: 'terb-starter', name: 'Starter Case', price: 2.50, color: "#4b69ff", img: "images/case_starter.png" },
-      { id: 'terb-neon', name: 'Neon Collection', price: 12.00, color: "#8847ff", img: "images/case_neon.png" },
-      { id: 'terb-classified', name: 'Covert Case', price: 35.00, color: "#d32ce6", img: "images/case_covert.png" },
-      { id: 'terb-knife', name: 'Knife & Gold Box', price: 250.00, color: "#ffd700", img: "images/case_knife.png" }
+      { id: 'c-starter', name: 'Starter Case', price: 2.50, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d11PP65XbveKGHcaYKh4SFVR347ZI15BQsA9-i5R2RthL545I2P5O114jA2J1-P3128y0j3v-1A1L4O8xM_C41-G24241N2xY-fS5aX1W9MWzX1aM904M205-01e4A22X-M9L6a2X" },
+      { id: 'c-neon', name: 'Neon Collection', price: 12.00, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d11PP65XbveKGHcaYKh4SFVR347ZI15BQsA9-i5R2RthL545I2P5O114jA2J1-P3128y0j3v-1A1L4O8xM_C41-G24241N2xY-fS5aX1W9MWzX1aM904M205-01e4A22X-M9L6a2X" },
+      { id: 'c-covert', name: 'Covert Case', price: 35.00, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d11PP65XbveKGHcaYKh4SFVR347ZI15BQsA9-i5R2RthL545I2P5O114jA2J1-P3128y0j3v-1A1L4O8xM_C41-G24241N2xY-fS5aX1W9MWzX1aM904M205-01e4A22X-M9L6a2X" },
+      { id: 'c-knife', name: 'Knife Box', price: 250.00, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d11PP65XbveKGHcaYKh4SFVR347ZI15BQsA9-i5R2RthL545I2P5O114jA2J1-P3128y0j3v-1A1L4O8xM_C41-G24241N2xY-fS5aX1W9MWzX1aM904M205-01e4A22X-M9L6a2X" }
     ];
 
-    const TRANSLATIONS = {
-      hu: { liveDrops: "ÉLŐ DROPOK", navCases: "LÁDÁK", navBattles: "CASE BATTLES", navUpgrader: "UPGRADER", balanceLabel: "EGYENLEG", loginBtn: "BEJELENTKEZÉS", casesTitle: "LOOTBOX STÍLUSÚ LÁDÁK", casesSub: "Exkluzív skinek a legmagasabb nyerési esélyekkel", multiOpen: "Nyitási darabszám:", caseContents: "LÁDA TARTALMA ÉS DROPRATE", inventoryTitle: "SAJÁT LELTÁR (INVENTORY)", emptyInv: "Még nem nyertél tárgyat.", battlesSub: "Átlátható csaták, real-time multiplayer élmény.", openBattles: "NYITOTT CSATÁK (LOBBY)", borrowDesc: "", upgraderSub: "Tedd kockára meglévő skinedet vagy egyenlegedet!", yourStake: "1. SAJÁT TÉT", chanceLabel: "ESÉLY", targetSkin: "2. CÉLZOTT SKIN" }
-    };
-
-    let currentLang = 'hu';
+    // GLOBAL STATE
     let currentUser = localStorage.getItem('cs2_active_user') || null;
-    let isLoggedIn = !!currentUser;
     let usersDb = JSON.parse(localStorage.getItem('cs2_users_db')) || {};
 
-    let userBalance = isLoggedIn && usersDb[currentUser] ? usersDb[currentUser].balance : 100.00;
-    let userInventory = isLoggedIn && usersDb[currentUser] ? usersDb[currentUser].inventory : [];
+    let userBalance = currentUser && usersDb[currentUser] ? usersDb[currentUser].balance : 100.00;
+    let userInventory = currentUser && usersDb[currentUser] ? usersDb[currentUser].inventory : [];
 
     let isSpinning = false;
     let activeCase = null;
-    let activeBattle = null;
-    let multiOpenCount = 1;
+    let selectedStakeItem = null;
+    let selectedTargetItem = SKIN_DATABASE[2]; // AK Redline alapon
 
-    function saveUserData() {
-      if (!isLoggedIn || !currentUser) return;
-      if (!usersDb[currentUser]) {
-        usersDb[currentUser] = { password: "123", balance: 100.00, inventory: [] };
-      }
-      usersDb[currentUser].balance = userBalance;
-      usersDb[currentUser].inventory = userInventory;
-      localStorage.setItem('cs2_users_db', JSON.stringify(usersDb));
-      localStorage.setItem('cs2_active_user', currentUser);
-    }
-
-    let audioCtx = null;
-    function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-
-    function playClickSound() {
-      if (!document.getElementById('sfx-toggle')?.checked) return;
-      initAudio();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'sine'; osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-      gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
-      osc.connect(gain); gain.connect(audioCtx.destination);
-      osc.start(); osc.stop(audioCtx.currentTime + 0.05);
-    }
-
-    function playWinSound() {
-      if (!document.getElementById('sfx-toggle')?.checked) return;
-      initAudio();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'triangle'; osc.frequency.setValueAtTime(440, audioCtx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.3);
-      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
-      osc.connect(gain); gain.connect(audioCtx.destination);
-      osc.start(); osc.stop(audioCtx.currentTime + 0.4);
-    }
-
+    // Rarity Utility
     function getRarityClass(price) {
       if (price >= 1000) return 'gold';
       if (price >= 100) return 'covert';
@@ -274,74 +274,105 @@
       return 'milspec';
     }
 
+    function saveUserData() {
+      if (!currentUser) return;
+      if (!usersDb[currentUser]) usersDb[currentUser] = { balance: 100.00, inventory: [] };
+      usersDb[currentUser].balance = userBalance;
+      usersDb[currentUser].inventory = userInventory;
+      localStorage.setItem('cs2_users_db', JSON.stringify(usersDb));
+      localStorage.setItem('cs2_active_user', currentUser);
+    }
+
+    // INIT APP
     document.addEventListener('DOMContentLoaded', () => {
       setupNavigation();
-      setupAuthAndModals();
+      setupAuth();
       renderCasesCatalog();
       renderBattlesLobby();
       initLiveFeed();
       initUpgrader();
 
-      if (isLoggedIn && currentUser) applyLoggedInState();
+      if (currentUser) applyLoggedInState();
       else applyLoggedOutState();
 
       document.getElementById('open-case-btn')?.addEventListener('click', handleOpenCase);
       document.getElementById('back-to-catalog-btn')?.addEventListener('click', closeCaseView);
       document.getElementById('start-battle-spin-btn')?.addEventListener('click', runBattleSpin);
-      document.getElementById('close-battle-arena-btn')?.addEventListener('click', closeBattleArena);
+      document.getElementById('close-battle-arena-btn')?.addEventListener('click', () => document.getElementById('battle-arena').classList.add('hidden'));
+      document.getElementById('start-upgrade-btn')?.addEventListener('click', runUpgrade);
     });
 
-    function setupAuthAndModals() {
-      const loginModal = document.getElementById('login-modal');
-      document.getElementById('open-login-btn').onclick = () => loginModal.classList.remove('hidden');
-      document.getElementById('close-login-btn').onclick = () => loginModal.classList.add('hidden');
-      document.getElementById('confirm-login-btn').onclick = performLogin;
-      document.getElementById('confirm-register-btn').onclick = performRegister;
-      document.getElementById('logout-btn').onclick = performLogout;
-      document.getElementById('open-deposit-btn').onclick = () => { userBalance += 100; updateBalanceUI(); saveUserData(); };
-    }
+    // AUTH & MODALS
+    function setupAuth() {
+      const modal = document.getElementById('login-modal');
+      document.getElementById('open-login-btn').onclick = () => modal.classList.remove('hidden');
+      document.getElementById('close-login-btn').onclick = () => modal.classList.add('hidden');
+      
+      document.getElementById('confirm-login-btn').onclick = () => {
+        const u = document.getElementById('login-username-input').value.trim();
+        if (!u) return alert("Adj meg egy nevet!");
+        currentUser = u;
+        if (!usersDb[u]) usersDb[u] = { balance: 100.00, inventory: [] };
+        userBalance = usersDb[u].balance;
+        userInventory = usersDb[u].inventory;
+        saveUserData(); applyLoggedInState();
+        modal.classList.add('hidden');
+      };
 
-    function performRegister() {
-      const userIn = document.getElementById('login-username-input')?.value.trim();
-      const passIn = document.getElementById('login-password-input')?.value.trim();
-      if (!userIn || !passIn) return alert("Adj meg felhasználónevet és jelszót!");
-      if (usersDb[userIn]) return alert("Ez a név már létezik!");
-      usersDb[userIn] = { password: passIn, balance: 100.00, inventory: [] };
-      currentUser = userIn; userBalance = 100.00; userInventory = []; isLoggedIn = true;
-      saveUserData(); applyLoggedInState();
-      document.getElementById('login-modal').classList.add('hidden');
-    }
+      document.getElementById('confirm-register-btn').onclick = () => {
+        const u = "Játékos_" + Math.floor(Math.random() * 8999 + 1000);
+        currentUser = u;
+        usersDb[u] = { balance: 250.00, inventory: [] };
+        userBalance = 250.00; userInventory = [];
+        saveUserData(); applyLoggedInState();
+        modal.classList.add('hidden');
+      };
 
-    function performLogin() {
-      const userIn = document.getElementById('login-username-input')?.value.trim();
-      const passIn = document.getElementById('login-password-input')?.value.trim();
-      if (!usersDb[userIn] || usersDb[userIn].password !== passIn) return alert("Hibás adatok!");
-      currentUser = userIn; userBalance = usersDb[userIn].balance; userInventory = usersDb[userIn].inventory || []; isLoggedIn = true;
-      saveUserData(); applyLoggedInState();
-      document.getElementById('login-modal').classList.add('hidden');
-    }
+      document.getElementById('logout-btn').onclick = () => {
+        currentUser = null; localStorage.removeItem('cs2_active_user'); applyLoggedOutState();
+      };
 
-    function performLogout() {
-      isLoggedIn = false; currentUser = null; localStorage.removeItem('cs2_active_user'); applyLoggedOutState();
+      document.getElementById('open-deposit-btn').onclick = () => {
+        userBalance += 100; updateBalanceUI(); saveUserData();
+      };
     }
 
     function applyLoggedInState() {
-      document.getElementById('open-login-btn')?.classList.add('hidden');
-      document.getElementById('user-profile-box')?.classList.remove('hidden');
-      document.getElementById('user-balance-box')?.classList.remove('hidden');
-      document.getElementById('open-deposit-btn')?.classList.remove('hidden');
+      document.getElementById('open-login-btn').classList.add('hidden');
+      document.getElementById('user-profile-box').classList.remove('hidden');
+      document.getElementById('user-balance-box').classList.remove('hidden');
+      document.getElementById('open-deposit-btn').classList.remove('hidden');
       document.getElementById('display-username').innerText = currentUser;
       updateBalanceUI(); renderInventory();
     }
 
     function applyLoggedOutState() {
-      document.getElementById('open-login-btn')?.classList.remove('hidden');
-      document.getElementById('user-profile-box')?.classList.add('hidden');
-      document.getElementById('user-balance-box')?.classList.add('hidden');
-      document.getElementById('open-deposit-btn')?.classList.add('hidden');
+      document.getElementById('open-login-btn').classList.remove('hidden');
+      document.getElementById('user-profile-box').classList.add('hidden');
+      document.getElementById('user-balance-box').classList.add('hidden');
+      document.getElementById('open-deposit-btn').classList.add('hidden');
       userBalance = 0; userInventory = []; renderInventory();
     }
 
+    function updateBalanceUI() {
+      document.getElementById('user-balance').innerText = `$${userBalance.toFixed(2)}`;
+    }
+
+    // NAVIGATION
+    function setupNavigation() {
+      document.querySelectorAll('.nav-item').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const target = e.currentTarget.getAttribute('data-tab');
+          document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
+          e.currentTarget.classList.add('active');
+          document.getElementById(`tab-${target}`).classList.add('active');
+          if (target === 'upgrader') initUpgrader();
+        });
+      });
+    }
+
+    // INVENTORY & SELLING
     window.sellItem = function(index) {
       userBalance += userInventory[index].price;
       userInventory.splice(index, 1);
@@ -352,36 +383,24 @@
       const grid = document.getElementById('inventory-grid');
       document.getElementById('inv-count-badge').innerText = userInventory.length;
       if (!grid) return;
-      if (userInventory.length === 0) { grid.innerHTML = `<p style="color:#718096">Még nincs tárgyad.</p>`; return; }
+      if (userInventory.length === 0) { grid.innerHTML = `<p style="color:#6b7280; grid-column: 1/-1;">Üres a leltárad. Nyiss ládákat!</p>`; return; }
       grid.innerHTML = userInventory.map((item, index) => `
         <div class="item-card ${getRarityClass(item.price)}">
           <img src="${item.img}" alt="${item.name}">
-          <div>${item.name}</div>
+          <div class="item-name">${item.name}</div>
           <div class="price">$${item.price.toFixed(2)}</div>
-          <button class="btn-sell-item" onclick="sellItem(${index})">ELADÁS</button>
+          <button class="btn-sell" onclick="sellItem(${index})">ELADÁS</button>
         </div>
       `).join('');
     }
 
-    function setupNavigation() {
-      document.querySelectorAll('.nav-item').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const target = e.currentTarget.getAttribute('data-tab');
-          document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-          document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
-          e.currentTarget.classList.add('active');
-          document.getElementById(`tab-${target}`).classList.add('active');
-        });
-      });
-    }
-
+    // CASE OPENING
     function renderCasesCatalog() {
       const grid = document.getElementById('cases-grid');
-      if (!grid) return;
       grid.innerHTML = OFFICIAL_CASES.map(c => `
         <div class="case-card" onclick="openCaseView('${c.id}')">
-          <img src="${c.img}" alt="${c.name}">
-          <h3>${c.name}</h3>
+          <img src="${c.img}">
+          <div class="item-name" style="font-size:15px; font-weight:800;">${c.name}</div>
           <div class="price">$${c.price.toFixed(2)}</div>
         </div>
       `).join('');
@@ -393,91 +412,213 @@
       document.getElementById('case-opener-view').classList.remove('hidden');
       document.getElementById('active-case-name').innerText = activeCase.name;
       document.getElementById('active-case-price-text').innerText = `$${activeCase.price.toFixed(2)} USD`;
-      updateMultiSpinners();
-    };
-
-    function updateMultiSpinners() {
-      const wrapper = document.getElementById('spinners-wrapper');
-      wrapper.innerHTML = `
-        <div class="roulette-container">
-          <div class="roulette-pointer"></div>
-          <div class="roulette-track" id="spinner-track-0"></div>
+      
+      // Case preview items
+      document.getElementById('case-items-grid').innerHTML = SKIN_DATABASE.map(item => `
+        <div class="item-card ${getRarityClass(item.price)}">
+          <img src="${item.img}">
+          <div class="item-name">${item.name}</div>
+          <div class="price">$${item.price.toFixed(2)}</div>
         </div>
-      `;
-    }
+      `).join('');
+
+      buildRouletteTrack('spinner-track-0');
+    };
 
     function closeCaseView() {
       document.getElementById('case-opener-view').classList.add('hidden');
       document.getElementById('case-catalog-view').classList.remove('hidden');
     }
 
+    function buildRouletteTrack(elementId) {
+      const track = document.getElementById(elementId);
+      let list = [];
+      for (let i = 0; i < 80; i++) list.push(SKIN_DATABASE[Math.floor(Math.random() * SKIN_DATABASE.length)]);
+      track.innerHTML = list.map(item => `
+        <div class="item-card ${getRarityClass(item.price)}">
+          <img src="${item.img}">
+          <div class="item-name">${item.name}</div>
+          <div class="price">$${item.price.toFixed(2)}</div>
+        </div>
+      `).join('');
+      track.style.transform = 'translateX(0px)';
+    }
+
     function handleOpenCase() {
-      if (!isLoggedIn) return document.getElementById('login-modal').classList.remove('hidden');
-      if (isSpinning || userBalance < activeCase.price) return alert("Nincs elég egyenleged!");
+      if (!currentUser) return document.getElementById('login-modal').classList.remove('hidden');
+      if (isSpinning) return;
+      if (userBalance < activeCase.price) return alert("Nincs elég egyenleged!");
+
       userBalance -= activeCase.price; updateBalanceUI(); isSpinning = true;
 
+      const isFast = document.getElementById('fast-spin-toggle').checked;
       const track = document.getElementById('spinner-track-0');
       const wonItem = SKIN_DATABASE[Math.floor(Math.random() * SKIN_DATABASE.length)];
-      
+
       let spinnerList = [];
       for (let i = 0; i < 80; i++) spinnerList.push(i === 65 ? wonItem : SKIN_DATABASE[Math.floor(Math.random() * SKIN_DATABASE.length)]);
-      
+
       track.innerHTML = spinnerList.map(item => `
         <div class="item-card ${getRarityClass(item.price)}">
           <img src="${item.img}">
-          <div>${item.name}</div>
+          <div class="item-name">${item.name}</div>
           <div class="price">$${item.price.toFixed(2)}</div>
         </div>
       `).join('');
 
       track.style.transition = 'none'; track.style.transform = 'translateX(0px)';
-      const targetX = -(65 * 150) + (track.parentElement.offsetWidth / 2) - 75;
+      const targetX = -(65 * 160) + (track.parentElement.offsetWidth / 2) - 80;
 
       setTimeout(() => {
-        track.style.transition = 'transform 3.5s cubic-bezier(0.1, 0.8, 0.1, 1)';
+        track.style.transition = isFast ? 'transform 1s cubic-bezier(0.1, 0.8, 0.1, 1)' : 'transform 3.5s cubic-bezier(0.1, 0.8, 0.1, 1)';
         track.style.transform = `translateX(${targetX}px)`;
       }, 50);
 
-      playClickSound();
       setTimeout(() => {
-        isSpinning = false; playWinSound(); userInventory.push(wonItem); saveUserData(); renderInventory();
-      }, 3700);
+        isSpinning = false;
+        userInventory.push(wonItem); saveUserData(); renderInventory();
+      }, isFast ? 1050 : 3600);
     }
 
+    // CASE BATTLES WITH ANIMATION
     function renderBattlesLobby() {
       document.getElementById('battles-list').innerHTML = `
-        <div style="background:#151922; padding:15px; border-radius:6px; display:flex; justify-content:space-between; align-items:center;">
-          <div><b>Neon 1v1 Battle</b> - $12.00</div>
-          <button class="btn" onclick="document.getElementById('battle-arena').classList.remove('hidden')">CSATLAKOZÁS</button>
+        <div class="battle-box" style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <strong style="font-size:16px;">Starter Box 1v1 Battle</strong>
+            <div style="color:#6b7280; font-size:13px; margin-top:4px;">Nevezési díj: $5.00</div>
+          </div>
+          <button class="btn" onclick="openBattleArena()">BELÉPÉS A CSATÁBA</button>
         </div>
       `;
     }
 
+    window.openBattleArena = function() {
+      document.getElementById('battle-arena').classList.remove('hidden');
+      document.getElementById('arena-pot-val').innerText = '$10.00';
+      buildRouletteTrack('battle-track-1');
+      buildRouletteTrack('battle-track-2');
+    };
+
     function runBattleSpin() {
+      if (isSpinning) return;
+      isSpinning = true;
+
       const p1Item = SKIN_DATABASE[Math.floor(Math.random() * SKIN_DATABASE.length)];
       const p2Item = SKIN_DATABASE[Math.floor(Math.random() * SKIN_DATABASE.length)];
-      document.getElementById('p1-drop-slot').innerHTML = `${p1Item.name} ($${p1Item.price})`;
-      document.getElementById('p2-drop-slot').innerHTML = `${p2Item.name} ($${p2Item.price})`;
+
+      const t1 = document.getElementById('battle-track-1');
+      const t2 = document.getElementById('battle-track-2');
+
+      // Animáció
+      t1.style.transition = 'transform 3s cubic-bezier(0.1, 0.8, 0.1, 1)';
+      t2.style.transition = 'transform 3s cubic-bezier(0.1, 0.8, 0.1, 1)';
+
+      t1.style.transform = `translateX(${- (50 * 160)}px)`;
+      t2.style.transform = `translateX(${- (52 * 160)}px)`;
+
+      setTimeout(() => {
+        isSpinning = false;
+        if (p1Item.price >= p2Item.price) {
+          alert(`NYERTÉL! A te skined ($${p1Item.price}) drágább volt, mint a Boté ($${p2Item.price}). Elvitted mindkettőt!`);
+          userInventory.push(p1Item, p2Item);
+        } else {
+          alert(`VESZÍTETTÉL! A Bot skined ($${p2Item.price}) drágább volt a tiédnél ($${p1Item.price}).`);
+        }
+        saveUserData(); renderInventory();
+      }, 3200);
     }
 
-    function closeBattleArena() { document.getElementById('battle-arena').classList.add('hidden'); }
-
+    // UPGRADER FUNCTIONALITY
     function initUpgrader() {
-      document.getElementById('upgrade-target-list').innerHTML = SKIN_DATABASE.map(s => `
-        <div style="cursor:pointer; padding:5px; background:#1a202c; border-radius:4px;" onclick="selectUpgradeTarget(${s.id})">${s.name}</div>
+      const invList = document.getElementById('upgrade-inv-list');
+      const targetList = document.getElementById('upgrade-target-list');
+
+      // 1. Saját inventory kiíratása
+      if (userInventory.length === 0) {
+        invList.innerHTML = `<p style="color:#6b7280; font-size:12px;">Nincs tárgyad.</p>`;
+      } else {
+        invList.innerHTML = userInventory.map((item, idx) => `
+          <div class="item-card ${getRarityClass(item.price)}" onclick="selectStake(${idx}, this)">
+            <img src="${item.img}" style="height:50px;">
+            <div class="item-name" style="font-size:11px;">${item.name}</div>
+            <div class="price" style="font-size:11px;">$${item.price.toFixed(2)}</div>
+          </div>
+        `).join('');
+      }
+
+      // 2. Célpont skinek
+      targetList.innerHTML = SKIN_DATABASE.map((item) => `
+        <div class="item-card ${getRarityClass(item.price)}" onclick="selectTarget(${item.id}, this)">
+          <img src="${item.img}" style="height:50px;">
+          <div class="item-name" style="font-size:11px;">${item.name}</div>
+          <div class="price" style="font-size:11px;">$${item.price.toFixed(2)}</div>
+        </div>
       `).join('');
-      selectUpgradeTarget(3);
+
+      calculateUpgradeChance();
     }
 
-    function selectUpgradeTarget(id) {
-      const s = SKIN_DATABASE.find(x => x.id === id);
-      document.getElementById('target-skin-img').src = s.img;
-      document.getElementById('target-skin-name').innerText = s.name;
-      document.getElementById('target-skin-price').innerText = `$${s.price.toFixed(2)}`;
+    window.selectStake = function(idx, el) {
+      document.querySelectorAll('#upgrade-inv-list .item-card').forEach(c => c.classList.remove('selected-stake'));
+      el.classList.add('selected-stake');
+      selectedStakeItem = userInventory[idx];
+      calculateUpgradeChance();
+    };
+
+    window.selectTarget = function(id, el) {
+      document.querySelectorAll('#upgrade-target-list .item-card').forEach(c => c.classList.remove('selected-stake'));
+      el.classList.add('selected-stake');
+      selectedTargetItem = SKIN_DATABASE.find(x => x.id === id);
+      calculateUpgradeChance();
+    };
+
+    function calculateUpgradeChance() {
+      if (!selectedStakeItem || !selectedTargetItem) {
+        document.getElementById('upgrade-chance-num').innerText = '0.00%';
+        return 0;
+      }
+
+      let chance = (selectedStakeItem.price / selectedTargetItem.price) * 100;
+      if (chance > 95) chance = 95; // Max 95%
+      
+      document.getElementById('upgrade-chance-num').innerText = chance.toFixed(2) + '%';
+      
+      // Visual Wheel Update
+      const slice = document.getElementById('wheel-slice');
+      const offset = 565 - (565 * (chance / 100));
+      slice.style.strokeDashoffset = offset;
+
+      return chance;
     }
 
-    function updateBalanceUI() {
-      document.getElementById('user-balance').innerText = `$${userBalance.toFixed(2)}`;
+    function runUpgrade() {
+      const chance = calculateUpgradeChance();
+      if (chance <= 0) return alert("Válassz ki egy saját és egy célzott skint is!");
+
+      const pointer = document.getElementById('wheel-pointer');
+      const randomDegree = Math.floor(Math.random() * 360) + 1440; // 4 teljes pörgés minimum
+      
+      pointer.style.transform = `translateX(-50%) rotate(${randomDegree}deg)`;
+
+      setTimeout(() => {
+        const finalDegree = randomDegree % 360;
+        const winDegree = (chance / 100) * 360;
+
+        if (finalDegree <= winDegree) {
+          alert(`SIKERÜLT! Megkaptad a(z) ${selectedTargetItem.name} skint!`);
+          userInventory.push(selectedTargetItem);
+        } else {
+          alert(`ELBUKTAD! A skined megsemmisült.`);
+        }
+
+        // Tét eltávolítása
+        const idx = userInventory.indexOf(selectedStakeItem);
+        if (idx > -1) userInventory.splice(idx, 1);
+        
+        selectedStakeItem = null;
+        saveUserData(); renderInventory(); initUpgrader();
+      }, 4000);
     }
 
     function initLiveFeed() {
@@ -486,9 +627,9 @@
         const item = SKIN_DATABASE[Math.floor(Math.random() * SKIN_DATABASE.length)];
         const el = document.createElement('div');
         el.className = `feed-item ${getRarityClass(item.price)}`;
-        el.innerHTML = `<span>${item.name}</span>`;
+        el.innerHTML = `<img src="${item.img}" style="width:20px;"> <span>${item.name}</span>`;
         track.prepend(el);
-        if (track.children.length > 5) track.removeChild(track.lastChild);
+        if (track.children.length > 6) track.removeChild(track.lastChild);
       }, 3000);
     }
   </script>
