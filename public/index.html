@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LOOTBOX.GG - Next-Gen Case Battles</title>
+  <title>LOOTBOX.GG - Case Battles & Upgrader</title>
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700;800&family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
 </head>
@@ -29,10 +29,12 @@
       <button class="nav-item" data-tab="battles">
         <span class="nav-icon">⚔️</span> CASE BATTLES
       </button>
+      <button class="nav-item" data-tab="upgrader">
+        <span class="nav-icon">⚡</span> UPGRADER
+      </button>
     </nav>
 
     <div class="header-right">
-      <!-- NYELVVÁLASZTÓ -->
       <select id="lang-select" class="lang-dropdown">
         <option value="hu">🇭🇺 HU</option>
         <option value="en">🇬🇧 EN</option>
@@ -65,7 +67,7 @@
         <div class="cases-grid" id="cases-grid"></div>
       </div>
 
-      <!-- PÖRGETŐ FELÜLET -->
+      <!-- PÖRGETŐ FELÜLET (MULTI-OPEN PULL) -->
       <div id="case-opener-view" class="hidden">
         <button class="btn btn-ghost back-btn" id="back-to-catalog-btn">← VISSZA A LÁDÁKHOZ</button>
         
@@ -75,11 +77,17 @@
             <div class="case-price-tag" id="active-case-price-text">$0.00</div>
           </div>
 
-          <!-- ROULETTE SPINNER -->
-          <div class="roulette-container">
-            <div class="roulette-pointer"></div>
-            <div class="roulette-track" id="spinner-track"></div>
+          <!-- MULTI-CASE DARABSZÁM VÁLASZTÓ -->
+          <div class="multi-open-selector">
+            <span>Darabszám:</span>
+            <button class="btn-multi active" data-count="1">1x</button>
+            <button class="btn-multi" data-count="2">2x</button>
+            <button class="btn-multi" data-count="3">3x</button>
+            <button class="btn-multi" data-count="5">5x</button>
           </div>
+
+          <!-- DYNAMIC SPINNER CONTAINERS -->
+          <div id="spinners-wrapper"></div>
 
           <button class="btn btn-launch" id="open-case-btn">LÁDA NYITÁSA</button>
         </div>
@@ -101,7 +109,7 @@
       </div>
     </div>
 
-    <!-- ==================== 2. MODUL: CASE BATTLES (BORROW INTEGRÁCIÓVAL) ==================== -->
+    <!-- ==================== 2. MODUL: CASE BATTLES ==================== -->
     <div id="tab-battles" class="tab-page">
       <div class="page-title flex-title">
         <div>
@@ -111,7 +119,7 @@
         <button class="btn btn-primary btn-lg" id="create-battle-modal-btn">+ CSATA LÉTREHOZÁSA</button>
       </div>
 
-      <!-- CSATA ARÉNA (ÉLŐ CSATA FELÜLET) -->
+      <!-- CSATA ARÉNA -->
       <div id="battle-arena" class="battle-arena hidden">
         <div class="battle-arena-header">
           <div>
@@ -122,7 +130,6 @@
         </div>
 
         <div class="battle-players-grid">
-          <!-- PLAYER 1 (TE) -->
           <div class="battle-player-card">
             <div class="player-info">
               <span class="player-name">TE (Játékos)</span>
@@ -135,7 +142,6 @@
 
           <div class="battle-vs">VS</div>
 
-          <!-- PLAYER 2 (BOT / HITELEZŐ) -->
           <div class="battle-player-card">
             <div class="player-info">
               <span class="player-name" id="p2-name">BOT Alpha</span>
@@ -153,14 +159,12 @@
         </div>
       </div>
 
-      <!-- LOBBY LISTA ÉS BORROW FEED -->
       <div class="battles-layout">
         <div class="battles-section">
           <h3>AKTÍV CSATÁK</h3>
           <div class="battles-lobby" id="battles-list"></div>
         </div>
 
-        <!-- INTEGRÁLT BORROW SZPONZORÁCIÓS PANEL -->
         <div class="borrow-panel">
           <h3>⚡ BORROW SZPONZORÁCIÓ (80/20)</h3>
           <p class="panel-desc">Fektess be más játékosok csatáiba! Te állod a belépő 80%-át, cserébe a nyereményük 80%-a a tiéd.</p>
@@ -169,7 +173,61 @@
       </div>
     </div>
 
+    <!-- ==================== 3. MODUL: UPGRADER ==================== -->
+    <div id="tab-upgrader" class="tab-page">
+      <div class="page-title">
+        <h1>SKIN UPGRADER</h1>
+        <p>Válassz ki egy elemet vagy egyenlegösszeget, célozz meg egy értékesebb skint, és pörgesd meg a szerencsekereked!</p>
+      </div>
+
+      <div class="upgrader-container">
+        <!-- BAL OLDAL: BEVITEL -->
+        <div class="upgrader-card">
+          <h3>1. SAJÁT TÉT</h3>
+          <div class="form-field">
+            <label>Tét összege ($)</label>
+            <input type="number" id="upgrade-input-val" value="10.00" min="1" step="1">
+          </div>
+          <div class="inventory-selector-box">
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">Vagy válassz tárgyat a leltárodból:</p>
+            <div id="upgrade-inv-list" class="mini-inv-list"></div>
+          </div>
+        </div>
+
+        <!-- KÖZÉP: ANIMÁLT KERÉK -->
+        <div class="upgrader-center">
+          <div class="upgrade-wheel-wrapper">
+            <svg class="upgrade-svg" viewBox="0 0 200 200">
+              <circle class="wheel-bg" cx="100" cy="100" r="80" />
+              <circle class="wheel-chance" id="upgrade-chance-slice" cx="100" cy="100" r="80" />
+            </svg>
+            <div class="wheel-pointer" id="upgrade-needle"></div>
+            <div class="wheel-center-info">
+              <span id="upgrade-chance-num">50.00%</span>
+              <small>ESÉLY</small>
+            </div>
+          </div>
+          <button class="btn btn-launch width-100" id="start-upgrade-btn">UPGRADE INDÍTÁSA</button>
+        </div>
+
+        <!-- JOBB OLDAL: CÉL SKIN -->
+        <div class="upgrader-card">
+          <h3>2. CÉLZOTT SKIN</h3>
+          <div id="upgrade-target-display" class="target-display-box">
+            <img id="target-skin-img" src="https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d1844vf45gA484_45Q1feDjVsJP1bJ413qA" alt="Target">
+            <h4 id="target-skin-name">AK-47 | Redline</h4>
+            <span class="target-price" id="target-skin-price">$20.00</span>
+          </div>
+          <p style="font-size:0.8rem; color:var(--text-muted); margin-top:10px;">Kattints egy skinre az alábbi listából a célpont módosításához:</p>
+          <div id="upgrade-target-list" class="mini-target-list"></div>
+        </div>
+      </div>
+    </div>
+
   </main>
+
+  <!-- CANVAS RESZECSKÉKHEZ ÉS KONFETTIHEZ -->
+  <canvas id="effects-canvas"></canvas>
 
   <!-- BEÁLLÍTÁSOK MODAL -->
   <div id="settings-modal" class="modal-backdrop hidden">
