@@ -67,9 +67,9 @@ body {
   gap: 10px;
   padding-left: 10px;
   overflow-x: auto;
-  scrollbar-width: none; /* Firefox */
+  scrollbar-width: none;
 }
-.drop-track::-webkit-scrollbar { display: none; } /* Chrome/Safari */
+.drop-track::-webkit-scrollbar { display: none; }
 
 .feed-item {
   background: var(--bg-panel);
@@ -149,7 +149,7 @@ body {
   display: flex; 
   align-items: center; 
   gap: 12px; 
-  position: relative; /* A lenyíló modulok pontos igazításához */
+  position: relative;
 }
 
 /* NYELVVÁLTÓ */
@@ -199,7 +199,7 @@ body {
   border: 1px solid var(--border-color);
   font-weight: 700;
   font-size: 0.9rem;
-  position: relative; /* Emiatt nem tolja el a fenti dobozokat a felugró leltár */
+  position: relative;
   cursor: pointer;
 }
 
@@ -314,6 +314,7 @@ body {
   background: rgba(0, 255, 136, 0.1);
 }
 
+/* ROULETTE CONTAINER (PIXELPONTOSÍTVA) */
 .roulette-container {
   position: relative;
   width: 100%;
@@ -323,26 +324,34 @@ body {
   border: 2px solid var(--border-color);
   margin: 1rem 0;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .roulette-pointer {
   position: absolute;
-  top: 0; left: 50%; transform: translateX(-50%);
-  width: 4px; height: 100%;
+  top: 0; 
+  left: 50%; 
+  transform: translateX(-50%);
+  width: 4px; 
+  height: 100%;
   background: var(--neon-green);
   z-index: 20;
   box-shadow: 0 0 15px var(--neon-green);
+  pointer-events: none;
 }
 
+/* ROULETTE TRACK (JAVÍTVA: ABSOLUTE SIKERESEN ELTÁVOLÍTVA) */
 .roulette-track {
-  display: flex;
-  gap: 12px;
-  position: absolute;
-  left: 0; top: 12px;
-  transition: transform 5s cubic-bezier(0.1, 1, 0.1, 1);
+  display: flex !important;
+  gap: 10px !important; /* SZIGORÚAN MEGEGYEZIK A JS CARD_GAP ÉRTÉKÉVEL */
+  align-items: center;
+  height: 100%;
+  padding: 0 !important;
+  margin: 0 !important;
+  will-change: transform;
 }
 
-/* ITEMS GRID */
+/* ITEMS GRID ÉS ROULETTE KÁRTYÁK MÉRÉTEZÉSE */
 .section-divider { margin: 2rem 0 1.2rem 0; }
 .section-divider h3 { font-family: 'Chakra Petch', sans-serif; color: #64748b; font-size: 1.1rem; }
 
@@ -353,21 +362,31 @@ body {
 }
 
 .item-card {
+  box-sizing: border-box !important;
   background: var(--bg-panel);
   border: 1px solid var(--border-color);
   border-bottom: 4px solid var(--rarity-milspec);
   border-radius: 12px;
   padding: 1rem 0.6rem;
   text-align: center;
-  height: 180px;
+  height: 160px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
+  flex-shrink: 0 !important;
+  margin: 0 !important;
 }
 
-.item-card img { width: 120px; height: 90px; object-fit: contain; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5)); }
-.item-card .name { font-size: 0.75rem; font-weight: 700; }
+/* A pörgetőn belüli kártyák méretének kőkemény rögzítése */
+.roulette-track .item-card {
+  width: 182px !important;
+  min-width: 182px !important;
+  max-width: 182px !important;
+}
+
+.item-card img { width: 120px; height: 80px; object-fit: contain; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5)); }
+.item-card .name { font-size: 0.75rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
 .item-card .price { color: var(--neon-green); font-size: 0.85rem; font-weight: 800; }
 
 .item-card.milspec { border-bottom-color: var(--rarity-milspec); }
@@ -469,7 +488,7 @@ body {
 .slot-placeholder { color: #64748b; font-size: 0.85rem; }
 .battle-controls { display: flex; justify-content: center; gap: 15px; margin-top: 2rem; }
 
-/* UPGRADER (JAVÍTVA) */
+/* UPGRADER */
 .upgrader-container { 
   display: grid; 
   grid-template-columns: 1fr 320px 1fr; 
@@ -519,7 +538,6 @@ body {
   transition: stroke-dashoffset 0.3s ease;
 }
 
-/* JAVÍTOTT MUTATÓ */
 .wheel-pointer {
   position: absolute;
   top: 0; left: 50%;
@@ -568,7 +586,7 @@ body {
 .modal-divider::before, .modal-divider::after { content: ''; flex: 1; border-bottom: 1px solid var(--border-color); }
 .modal-divider span { padding: 0 10px; }
 
-/* LENYÍLÓ LELTÁR PANEL STÍLUSA (JAVÍTVA) */
+/* LENYÍLÓ LELTÁR PANEL */
 .dropdown-inventory {
   position: absolute;
   top: calc(100% + 10px);
