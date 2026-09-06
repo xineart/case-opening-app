@@ -332,7 +332,7 @@ function renderInventory() {
     return;
   }
 
-  // Fő oldali leltár (ha megjelenítésre kerül)
+  // Fő oldali leltár
   if (grid) {
     grid.innerHTML = userInventory.map((item, index) => `
       <div class="item-card ${getRarityClass(item.price)}">
@@ -410,7 +410,7 @@ function setupNavigation() {
 }
 
 // ==========================================
-// LÁDANYITÁS LOGIKA
+// LÁDANYITÁS LOGIKA (JAVÍTVA ÉS PONTOSÍTVA)
 // ==========================================
 function renderCasesCatalog() {
   const grid = document.getElementById('cases-grid');
@@ -484,6 +484,12 @@ function handleOpenCase() {
   const isFast = document.getElementById('fast-spin-toggle')?.checked;
   const spinTime = isFast ? 1.2 : 4.0;
 
+  // KERET ÉS KÁRTYA PONTOS MÉRETEI A KISZÁMÍTÁSHOZ
+  const CARD_WIDTH = 182;   // Kártya szélessége (px)
+  const CARD_GAP = 10;      // CSS Gap a kártyák között (px)
+  const TOTAL_CARD_STEP = CARD_WIDTH + CARD_GAP;
+  const WINNING_INDEX = 65; // A 65. indexű kártyán fog megállni a mutató
+
   for (let s = 0; s < multiOpenCount; s++) {
     const wonItem = SKIN_DATABASE[Math.floor(Math.random() * SKIN_DATABASE.length)];
     const track = document.getElementById(`spinner-track-${s}`);
@@ -494,7 +500,7 @@ function handleOpenCase() {
 
     let spinnerList = [];
     for (let i = 0; i < 80; i++) {
-      if (i === 65) {
+      if (i === WINNING_INDEX) {
         spinnerList.push(wonItem);
       } else {
         spinnerList.push(SKIN_DATABASE[Math.floor(Math.random() * SKIN_DATABASE.length)]);
@@ -502,16 +508,17 @@ function handleOpenCase() {
     }
 
     track.innerHTML = spinnerList.map(item => `
-      <div class="item-card ${getRarityClass(item.price)}">
+      <div class="item-card ${getRarityClass(item.price)}" style="width: ${CARD_WIDTH}px; flex-shrink: 0;">
         <img src="${item.img}" alt="${item.name}">
         <div class="name">${item.name}</div>
         <div class="price">$${item.price.toFixed(2)}</div>
       </div>
     `).join('');
 
-    const cardWidth = 182; 
     const containerWidth = track.parentElement?.offsetWidth || 800;
-    const targetX = -(65 * cardWidth) + (containerWidth / 2) - (cardWidth / 2);
+
+    // POZÍCIÓ EXAKTTÁ TÉTELE
+    const targetX = -(WINNING_INDEX * TOTAL_CARD_STEP) + (containerWidth / 2) - (CARD_WIDTH / 2);
 
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
@@ -520,6 +527,7 @@ function handleOpenCase() {
       });
     });
 
+    // A kisorsolt elemet mentjük el a leltárba
     userInventory.push(wonItem);
   }
 
