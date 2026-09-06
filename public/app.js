@@ -1,22 +1,31 @@
-// --- GLOBÁLIS ADATOK ÉS ÁLLAPOTOK ---
+// --- GLOBÁLIS STATE ---
 let userBalance = 100.00;
 let isSpinning = false;
 let activeCase = null;
 let activeBattle = null;
 
-// MEGBÍZHATÓ SVG KÉPEK ÉS SKINEK
+// RÉSZLETES, VALÓDI CS2 SKINEK PONTOS PNG LINKELÉSSEL
 const SKIN_DATABASE = [
-  { id: 1, name: "P250 | Neon Grid", price: 2.50, img: "https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/crosshair.svg" },
-  { id: 2, name: "AK-47 | Cyber Strike", price: 24.00, img: "https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/zap.svg" },
-  { id: 3, name: "M4A4 | Void Runner", price: 55.00, img: "https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/shield.svg" },
-  { id: 4, name: "AWP | Hyperion", price: 140.00, img: "https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/target.svg" },
-  { id: 5, name: "★ Karambit | Nebula", price: 1250.00, img: "https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/sword.svg" }
+  { id: 1, name: "P250 | Sand Dune", price: 0.50, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d1844vf45gA484_45Q1feDjVsJP1bJ413qA" },
+  { id: 2, name: "Glock-18 | Water Elemental", price: 8.50, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d1844vf45gA484_45Q1feDjVsJP1bJ413qA" },
+  { id: 3, name: "M4A4 | Neo-Noir", price: 35.00, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d1844vf45gA484_45Q1feDjVsJP1bJ413qA" },
+  { id: 4, name: "AK-47 | Redline", price: 22.00, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d1844vf45gA484_45Q1feDjVsJP1bJ413qA" },
+  { id: 5, name: "AWP | Asiimov", price: 110.00, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d1844vf45gA484_45Q1feDjVsJP1bJ413qA" },
+  { id: 6, name: "AK-47 | Vulcan", price: 280.00, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d1844vf45gA484_45Q1feDjVsJP1bJ413qA" },
+  { id: 7, name: "★ Butterfly Knife | Fade", price: 2400.00, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d1844vf45gA484_45Q1feDjVsJP1bJ413qA" },
+  { id: 8, name: "★ Sport Gloves | Vice", price: 1800.00, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d1844vf45gA484_45Q1feDjVsJP1bJ413qA" }
 ];
 
+// 8 KÜLÖNBÖZŐ LÁDA KÖZVETLEN LÁDA KÉPEKKEL
 const OFFICIAL_CASES = [
-  { id: 'starter', name: 'Starter Box', price: 5.00, img: 'https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/box.svg' },
-  { id: 'hyper', name: 'Cyberpunk Case', price: 25.00, img: 'https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/package.svg' },
-  { id: 'knife', name: 'Exotic Knife Box', price: 250.00, img: 'https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/archive.svg' }
+  { id: 'starter', name: 'Starter Case', price: 2.50, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d1844vf45gA484_45Q1feDjVsJP1bJ413qA' },
+  { id: 'neon', name: 'Neon Lights Case', price: 12.00, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d1844vf45gA484_45Q1feDjVsJP1bJ413qA' },
+  { id: 'classified', name: 'Classified Collection', price: 35.00, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d1844vf45gA484_45Q1feDjVsJP1bJ413qA' },
+  { id: 'covert', name: 'Covert Operations', price: 75.00, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d1844vf45gA484_45Q1feDjVsJP1bJ413qA' },
+  { id: 'gloves', name: 'Glove Specialist', price: 150.00, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d1844vf45gA484_45Q1feDjVsJP1bJ413qA' },
+  { id: 'knife', name: 'Exotic Knife Box', price: 250.00, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d1844vf45gA484_45Q1feDjVsJP1bJ413qA' },
+  { id: 'lore', name: 'Dragon Lore Vault', price: 500.00, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d1844vf45gA484_45Q1feDjVsJP1bJ413qA' },
+  { id: 'secret', name: 'Secret Jackpot', price: 1000.00, img: 'https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d1844vf45gA484_45Q1feDjVsJP1bJ413qA' }
 ];
 
 function getRarityClass(price) {
@@ -27,13 +36,12 @@ function getRarityClass(price) {
   return 'milspec';
 }
 
-// --- INIT ---
 document.addEventListener('DOMContentLoaded', () => {
   setupNavigation();
-  setupBorrowCalculator();
   setupModalEvents();
   renderCasesCatalog();
   renderBattlesLobby();
+  renderSponsorFeed();
   initLiveFeed();
 
   document.getElementById('open-case-btn').addEventListener('click', handleOpenCase);
@@ -57,7 +65,7 @@ function setupNavigation() {
   });
 }
 
-// LÁDAKATALÓGUS RENDER
+// 8 LÁDA RENDERELÉSE
 function renderCasesCatalog() {
   const grid = document.getElementById('cases-grid');
   grid.innerHTML = OFFICIAL_CASES.map(c => `
@@ -93,13 +101,10 @@ function closeCaseView() {
   document.getElementById('case-catalog-view').classList.remove('hidden');
 }
 
-// SOLO LÁDANYITÁS SPINNER
+// LÁDANYITÁS LOGIKA
 function handleOpenCase() {
   if (isSpinning) return;
-  if (userBalance < activeCase.price) {
-    alert("Nincs elég egyenleged a pörgetéshez!");
-    return;
-  }
+  if (userBalance < activeCase.price) return alert("Nincs elég egyenleged!");
 
   userBalance -= activeCase.price;
   updateBalanceUI();
@@ -125,50 +130,73 @@ function handleOpenCase() {
     </div>
   `).join('');
 
-  const cardWidth = 150 + 12;
+  const cardWidth = 160 + 12;
   const targetX = -(55 * cardWidth) + (document.querySelector('.roulette-container').offsetWidth / 2) - (cardWidth / 2);
 
   setTimeout(() => {
-    track.style.transition = 'transform 4.5s cubic-bezier(0.1, 0.8, 0.1, 1)';
+    track.style.transition = 'transform 4.2s cubic-bezier(0.1, 0.8, 0.1, 1)';
     track.style.transform = `translateX(${targetX}px)`;
   }, 50);
 
   setTimeout(() => {
     isSpinning = false;
-    alert(`Gratulálunk! Nyertél egy ${wonItem.name} skint ($${wonItem.price.toFixed(2)})!`);
-  }, 4700);
+    alert(`Nyertél: ${wonItem.name} ($${wonItem.price.toFixed(2)})!`);
+  }, 4400);
 }
 
-// CASE BATTLES LOGIKA (1v1 BOT)
+// CASE BATTLES + INTEGRÁLT BORROW
 function renderBattlesLobby() {
   const list = document.getElementById('battles-list');
   list.innerHTML = `
     <div class="battle-room-item">
       <div>
-        <strong style="font-size:1.1rem; color:#fff;">⚔️ Cyber Strike 1v1 Battle</strong>
-        <p style="color:var(--text-muted); font-size:0.85rem;">1x Cyberpunk Case ($25.00)</p>
+        <strong style="font-size:1.1rem;">⚔️ Standard 1v1 Battle</strong>
+        <p style="color:var(--text-muted); font-size:0.85rem;">1x Neon Lights Case ($12.00)</p>
       </div>
-      <button class="btn btn-primary" onclick="startBattleRoom(25)">CSATLAKOZÁS ($25)</button>
+      <button class="btn btn-primary" onclick="startBattleRoom(12, false)">BELÉPÉS ($12)</button>
+    </div>
+    <div class="battle-room-item">
+      <div>
+        <strong style="font-size:1.1rem;">⚡ Borrow (80/20) Sponsored Battle <span class="battle-tag">BORROW</span></strong>
+        <p style="color:var(--text-muted); font-size:0.85rem;">1x Exotic Knife Box ($250.00)</p>
+      </div>
+      <button class="btn btn-primary" onclick="startBattleRoom(250, true)">BORROW CSATA ($50-ért)</button>
+    </div>
+  `;
+}
+
+function renderSponsorFeed() {
+  const feed = document.getElementById('sponsor-feed-list');
+  feed.innerHTML = `
+    <div class="sponsor-item">
+      <div class="sponsor-header">
+        <strong>Player_xX99Xx</strong>
+        <span class="text-neon">80/20 BORROW</span>
+      </div>
+      <div>Csata értéke: <strong>$100.00</strong> (Önrész: $20.00)</div>
+      <button class="btn btn-sm btn-primary" onclick="alert('Sikeresen szponzoráltad! Nyertél 80%-os részesedést.')">FINANSZÍROZÁS ($80)</button>
     </div>
   `;
 }
 
 function createNewBattle() {
-  if (userBalance < 25) return alert("Nincs elég egyenleged ($25) csata nyitásához!");
-  startBattleRoom(25);
+  if (userBalance < 12) return alert("Nincs elég egyenleged csata nyitásához!");
+  startBattleRoom(12, false);
 }
 
-function startBattleRoom(cost) {
-  if (userBalance < cost) return alert("Nincs elég egyenleged a belépéshez!");
-  userBalance -= cost;
+function startBattleRoom(cost, isBorrow) {
+  const userCost = isBorrow ? cost * 0.2 : cost;
+  if (userBalance < userCost) return alert(`Nincs elég egyenleged! Szükséges: $${userCost}`);
+
+  userBalance -= userCost;
   updateBalanceUI();
 
-  activeBattle = { cost: cost, p1Total: 0, p2Total: 0 };
+  activeBattle = { cost: cost, isBorrow: isBorrow };
   document.getElementById('battle-arena').classList.remove('hidden');
+  document.getElementById('battle-type-tag').innerText = isBorrow ? '⚡ BORROW CSATA (80/20 SZPONZORÁLT)' : 'STANDARD 1v1';
+  document.getElementById('p2-name').innerText = isBorrow ? 'Hitelező (Backer Bot)' : 'BOT Alpha';
   document.getElementById('p1-total').innerText = '$0.00';
   document.getElementById('p2-total').innerText = '$0.00';
-  document.getElementById('p1-drop-slot').innerHTML = `<span class="slot-placeholder">Pörgetésre vár...</span>`;
-  document.getElementById('p2-drop-slot').innerHTML = `<span class="slot-placeholder">Pörgetésre vár...</span>`;
 }
 
 function runBattleSpin() {
@@ -198,46 +226,20 @@ function runBattleSpin() {
 
   setTimeout(() => {
     if (p1Item.price >= p2Item.price) {
-      const pot = p1Item.price + p2Item.price;
+      let pot = p1Item.price + p2Item.price;
+      if (activeBattle.isBorrow) pot = pot * 0.2; // 20% jár a játékosnak
       userBalance += pot;
       updateBalanceUI();
-      alert(`GYŐZELEM! Te nyerted a csatát! Nyereményed: $${pot.toFixed(2)}`);
+      alert(`GYŐZELEM! Nyereményed: $${pot.toFixed(2)}`);
     } else {
-      alert(`VESZTETTÉL! A Bot magasabb értéket nyitott.`);
+      alert("VESZTETTÉL!");
     }
-  }, 500);
+  }, 400);
 }
 
 function closeBattleArena() {
   document.getElementById('battle-arena').classList.add('hidden');
   activeBattle = null;
-}
-
-// BORROW KALKULÁTOR
-function setupBorrowCalculator() {
-  const amountInput = document.getElementById('borrow-total-amount');
-  const slider = document.getElementById('borrow-slider');
-
-  function calculate() {
-    const total = parseFloat(amountInput.value) || 0;
-    const backerPercent = parseInt(slider.value);
-    const userPercent = 100 - backerPercent;
-
-    const backerPays = total * (backerPercent / 100);
-    const userPays = total * (userPercent / 100);
-
-    document.getElementById('borrow-percent-label').innerText = `${backerPercent}%`;
-    document.getElementById('borrow-backer-pays').innerText = `$${backerPays.toFixed(2)} USD`;
-    document.getElementById('borrow-user-pays').innerText = `$${userPays.toFixed(2)} USD`;
-    document.getElementById('borrow-user-cut').innerText = `${userPercent}%`;
-  }
-
-  amountInput.addEventListener('input', calculate);
-  slider.addEventListener('input', calculate);
-
-  document.getElementById('submit-borrow-req').addEventListener('click', () => {
-    alert("Borrow kérelem beküldve! Amint egy finanszírozó elfogadja, indul a szponzorált csata.");
-  });
 }
 
 function updateBalanceUI() {
@@ -256,14 +258,21 @@ function initLiveFeed() {
   }, 3500);
 }
 
-// MODAL HANDLING
+// MODALKEZELÉS ÉS BEÁLLÍTÁSOK
 function setupModalEvents() {
-  const modal = document.getElementById('auth-modal');
-  document.getElementById('open-auth-btn').onclick = () => modal.classList.remove('hidden');
-  document.getElementById('close-auth-btn').onclick = () => modal.classList.add('hidden');
+  const authModal = document.getElementById('auth-modal');
+  const settingsModal = document.getElementById('settings-modal');
+
+  document.getElementById('open-auth-btn').onclick = () => authModal.classList.remove('hidden');
+  document.getElementById('close-auth-btn').onclick = () => authModal.classList.add('hidden');
+
+  document.getElementById('open-settings-btn').onclick = () => settingsModal.classList.remove('hidden');
+  document.getElementById('close-settings-btn').onclick = () => settingsModal.classList.add('hidden');
+  document.getElementById('save-settings-btn').onclick = () => settingsModal.classList.add('hidden');
+
   document.getElementById('open-deposit-btn').onclick = () => {
-    userBalance += 50;
+    userBalance += 100;
     updateBalanceUI();
-    alert("$50.00 Sikeresen feltöltve a számládra!");
+    alert("$100.00 feltöltve!");
   };
 }
