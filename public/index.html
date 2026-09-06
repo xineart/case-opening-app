@@ -3,11 +3,37 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LootBox Casino - CS2 Case Opening</title>
+  <title>LOOTDROP.GG - CS2 Case Opening</title>
   <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
+
+  <!-- ÉLŐ NYEREMÉNYFOLYAM (LIVE DROPS) -->
+  <div class="live-feed-container">
+    <div class="live-feed-track">
+      <div class="feed-item covert">
+        <img src="https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4rdY6WGP-4oXN48558BARLri81EWQo9-i8ig88_9vE4x9i1I4R-O1_RA9mKgNY_L-2aQJ11_33c2A309-8pInczqS1ZevXwW8G7pxwiOyUoIn231a3qENpYWrzcYDDJ1RsaAzV_1K8wOe915K0vpzA13R9seZK2OAn" alt="AWP">
+        <div class="feed-item-info">
+          <span class="user">Slayer99</span>
+          <span class="item">AWP Hyper Beast</span>
+        </div>
+      </div>
+      <div class="feed-item gold">
+        <img src="https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4rdY6WGP-4oXN48558BARLri81EWQo9-i8ig88_9vE4x9i1I4R-O1_RA9mKgNY_L-2aQJ11_33c2A309-8pInczqS1ZevXwW8G7pxwiOyUoIn231a3qENpYWrzcYDDJ1RsaAzV_1K8wOe915K0vpzA13R9seZK2OAn" alt="Karambit">
+        <div class="feed-item-info">
+          <span class="user">GamerGod</span>
+          <span class="item">Karambit Doppler</span>
+        </div>
+      </div>
+      <div class="feed-item restricted">
+        <img src="https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4rdY6WGP-4oXN48558BARLri81EWQo9-i8ig88_9vE4x9i1I4R-O1_RA9mKgNY_L-2aQJ11_33c2A309-8pInczqS1ZevXwW8G7pxwiOyUoIn231a3qENpYWrzcYDDJ1RsaAzV_1K8wOe915K0vpzA13R9seZK2OAn" alt="AK-47">
+        <div class="feed-item-info">
+          <span class="user">Alex21</span>
+          <span class="item">AK-47 Point Disarray</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- HEADER / NAVBAR -->
   <header>
@@ -16,11 +42,11 @@
     </div>
     <div class="user-stats">
       <div class="balance-box">
-        <span>Egyenleg:</span>
+        <span>EGYENLEG:</span>
         <span id="user-balance">$0.00</span>
       </div>
-      <button class="btn btn-success" onclick="openDepositModal()">+ Feltöltés</button>
-      <button class="btn" id="auth-btn" onclick="openAuthModal()">Bejelentkezés</button>
+      <button class="btn btn-success" onclick="openDepositModal()">+ FELTÖLTÉS</button>
+      <button class="btn" id="auth-btn" onclick="openAuthModal()">BEJELENTKEZÉS</button>
     </div>
   </header>
 
@@ -29,8 +55,8 @@
 
     <!-- PÖRGETŐ SECTION -->
     <section class="case-display-area">
-      <h2>Hyper Beast Edition Case</h2>
-      <p style="color: var(--text-muted); margin-top: 5px;">Nyisd ki a ládát $25.00 áron</p>
+      <h2 class="case-title">Hyper Beast Edition Case</h2>
+      <p style="color: var(--text-muted); margin-top: 5px; font-weight: 600;">Nyisd ki a ládát $25.00 áron</p>
 
       <!-- ROULETTE SPINNER -->
       <div class="spinner-wrapper">
@@ -39,13 +65,13 @@
         </div>
       </div>
 
-      <button class="btn btn-gold" id="open-case-btn" style="padding: 1rem 3rem; font-size: 1.1rem;">
+      <button class="btn btn-gold" id="open-case-btn" style="padding: 1.2rem 4rem;">
         LÁDA NYITÁSA ($25.00)
       </button>
     </section>
 
     <!-- SAJÁT LELTÁR (INVENTORY) SECTION -->
-    <section style="margin-bottom: 3rem;">
+    <section style="margin-bottom: 3.5rem;">
       <div class="section-title">Saját Leltár (Inventory)</div>
       <div class="items-grid" id="inventory-grid">
         <!-- A JS ide tölti be a játékos meglévő tárgyait -->
@@ -62,11 +88,11 @@
 
   </main>
 
-  <!-- AUTH MODAL (BEJELENTKEZÉS / REGISZTRÁCIÓ) -->
+  <!-- AUTH MODAL -->
   <div id="auth-modal" class="modal-overlay">
     <div class="modal-content">
       <span class="modal-close" onclick="closeAuthModal()">&times;</span>
-      <h3 id="auth-title">Bejelentkezés</h3>
+      <h3 id="auth-title" style="font-family: 'Rajdhani', sans-serif; font-size: 1.8rem; margin-bottom: 1rem;">BEJELENTKEZÉS</h3>
 
       <div class="form-group">
         <label>Felhasználónév:</label>
@@ -83,22 +109,22 @@
         <input type="password" id="auth-password" placeholder="Jelszó">
       </div>
 
-      <button class="btn btn-gold" id="auth-submit-btn" onclick="handleAuthSubmit()" style="width: 100%; margin-top: 1rem; padding: 0.8rem;">
+      <button class="btn btn-gold" id="auth-submit-btn" onclick="handleAuthSubmit()" style="width: 100%; margin-top: 1rem;">
         BEJELENTKEZÉS
       </button>
 
-      <p style="text-align: center; margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted);">
+      <p style="text-align: center; margin-top: 1.2rem; font-size: 0.85rem; color: var(--text-muted);">
         <span id="auth-toggle-text">Nincs még fiókod?</span> 
         <a href="#" id="auth-toggle-btn" onclick="toggleAuthMode(event)" style="color: var(--accent-gold); text-decoration: none; font-weight: bold;">Regisztráció</a>
       </p>
     </div>
   </div>
 
-  <!-- DEPOSIT MODAL (BEFIZETÉSI ABLAK) -->
+  <!-- DEPOSIT MODAL -->
   <div id="deposit-modal" class="modal-overlay">
     <div class="modal-content">
       <span class="modal-close" onclick="closeDepositModal()">&times;</span>
-      <h3>Egyenleg Feltöltése</h3>
+      <h3 style="font-family: 'Rajdhani', sans-serif; font-size: 1.8rem; margin-bottom: 0.5rem;">EGYENLEG FELTÖLTÉSE</h3>
       <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">
         Válassz összeget és kriptovalutát a feltöltéshez.
       </p>
@@ -118,7 +144,7 @@
         </select>
       </div>
 
-      <button class="btn btn-gold" onclick="processDeposit()" style="width: 100%; margin-top: 1rem; padding: 0.8rem;">
+      <button class="btn btn-gold" onclick="processDeposit()" style="width: 100%; margin-top: 1rem;">
         FIZETÉS INDÍTÁSA
       </button>
     </div>
