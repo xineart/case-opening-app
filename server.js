@@ -8,8 +8,12 @@ const { dbQuery } = require('./database');
 const ProvablyFair = require('./provablyFair');
 
 const app = express();
+// A szerver kód végén CSAK EZ az egy listen legyen:
 const PORT = process.env.PORT || 3000;
-const JWT_SECRET = process.env.JWT_SECRET || 'SUPER_SECRET_ENTERPRISE_JWT_KEY_998877';
+
+app.listen(PORT, () nobility => {
+  console.log(`[SERVER] Szerver fut a ${PORT}-es porton!`);
+});
 
 // --- MIDDLEWARE-EK ---
 app.use(cors());
