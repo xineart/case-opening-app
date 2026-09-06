@@ -8,12 +8,8 @@ const { dbQuery } = require('./database');
 const ProvablyFair = require('./provablyFair');
 
 const app = express();
-// A szerver kód végén CSAK EZ az egy listen legyen:
 const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () nobility => {
-  console.log(`[SERVER] Szerver fut a ${PORT}-es porton!`);
-});
+const JWT_SECRET = process.env.JWT_SECRET || 'SUPER_SECRET_ENTERPRISE_JWT_KEY_998877';
 
 // --- MIDDLEWARE-EK ---
 app.use(cors());
@@ -225,9 +221,14 @@ app.post('/api/user/sell-item', authenticateToken, async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`[SERVER] Enterprise Kaszinó Szerver elindult a ${PORT}-es porton!`);
+// BIZTONSÁGOS SZERVER INDÍTÁS (PORT ÉS SIGINT KEZELÉS)
+const server = app.listen(PORT, () => {
+  console.log(`[SERVER] Szerver elindult a ${PORT}-es porton!`);
 });
-app.listen(PORT, () => {
-  console.log(`Lootbox Enterprise Szerver fut a ${PORT}-es porton!`);
+
+process.on('SIGINT', () => {
+  server.close(() => {
+    console.log('[SERVER] Szerver biztonságosan leállítva.');
+    process.exit(0);
+  });
 });
