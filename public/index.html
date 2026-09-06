@@ -3,110 +3,87 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Enterprise Lootbox Platform</title>
+  <title>LootBox Casino - CS2 Case Opening</title>
   <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
 
-  <!-- HEADER -->
+  <!-- HEADER / ENGINES -->
   <header>
-    <div class="logo">ENTERPRISE CASINO</div>
-    <div class="user-control">
-      <div id="authContainer">
-        <button class="btn btn-secondary" onclick="openAuthModal('login')">Bejelentkezés</button>
-        <button class="btn btn-primary" onclick="openAuthModal('register')">Regisztráció</button>
+    <div class="logo">
+      <span>📦</span> LOOTDROP.GG
+    </div>
+    <div class="user-stats">
+      <div class="balance-box">
+        <span>Egyenleg:</span>
+        <span id="user-balance">$100.00</span>
       </div>
-      <div id="userProfile" class="user-profile hidden">
-        <div class="balance-card">
-          <span>Egyenleg:</span>
-          <strong id="userBalance">$0.00</strong>
-        </div>
-        <div class="username-tag" id="userNameTag">User</div>
-        <button class="btn btn-secondary btn-sm" onclick="logout()">Kijelentkezés</button>
-      </div>
+      <button class="btn btn-success" onclick="openDepositModal()">+ Feltöltés</button>
+      <button class="btn" id="auth-btn">Bejelentkezés</button>
     </div>
   </header>
 
-  <!-- FŐ TARTALOM -->
-  <main>
-    <!-- PÖRGETŐ ARÉNA -->
-    <section class="arena-card">
-      <div class="case-header">
-        <h1 class="case-title">Hyper Beast Edition Case</h1>
-        <div class="case-price">Ár: $25.00</div>
+  <!-- MAIN CONTAINER -->
+  <main class="main-container">
+
+    <!-- PÖRGETŐ SECTOIN -->
+    <section class="case-display-area">
+      <h2>Hyper Beast Edition Case</h2>
+      <p style="color: var(--text-muted); margin-top: 5px;">Nyisd ki a ládát $25.00 áron</p>
+
+      <!-- ROULETTE SPINNER -->
+      <div class="spinner-wrapper">
+        <div class="spinner-track" id="spinner-track">
+          <!-- A JS ide generálja majd a pörgető kártyákat -->
+        </div>
       </div>
 
-      <!-- ANIMÁCIÓS SZALAG -->
-      <div class="spinner-viewport">
-        <div class="pointer"></div>
-        <div class="spinner-track" id="spinnerTrack"></div>
-      </div>
+      <button class="btn btn-gold" id="open-case-btn" style="padding: 1rem 3rem; font-size: 1.1rem;">
+        LÁDA NYITÁSA ($25.00)
+      </button>
+    </section>
 
-      <div class="controls">
-        <button class="btn btn-action" id="spinBtn" onclick="spinCase()">LÁDA NYITÁSA ($25.00)</button>
+    <!-- LÁDA TARTALMA (LOOT TABLE) -->
+    <section>
+      <div class="section-title">Láda Tartalma</div>
+      <div class="items-grid" id="case-items-grid">
+        
+        <!-- PÉLDA TÁRGY KÁRTYÁK -->
+        <div class="item-card milspec">
+          <img src="https://via.placeholder.com/150/4b69ff?text=P250" alt="Item">
+          <div class="item-name">P250 | Ripple</div>
+          <div class="item-price">$1.20</div>
+        </div>
+
+        <div class="item-card restricted">
+          <img src="https://via.placeholder.com/150/8847ff?text=AK-47" alt="Item">
+          <div class="item-name">AK-47 | Point Disarray</div>
+          <div class="item-price">$18.50</div>
+        </div>
+
+        <div class="item-card classified">
+          <img src="https://via.placeholder.com/150/d32ce6?text=M4A4" alt="Item">
+          <div class="item-name">M4A4 | Desolate Space</div>
+          <div class="item-price">$45.00</div>
+        </div>
+
+        <div class="item-card covert">
+          <img src="https://via.placeholder.com/150/eb4b4b?text=AWP+Hyper" alt="Item">
+          <div class="item-name">AWP | Hyper Beast</div>
+          <div class="item-price">$120.00</div>
+        </div>
+
+        <div class="item-card gold">
+          <img src="https://via.placeholder.com/150/caab05?text=Karambit" alt="Item">
+          <div class="item-name">★ Karambit | Gamma Doppler</div>
+          <div class="item-price">$1,450.00</div>
+        </div>
+
       </div>
     </section>
 
-    <!-- PROVABLY FAIR INFORMÁCIÓK -->
-    <section class="pf-card hidden" id="pfCard">
-      <h3>Provably Fair Védelem (SHA-256)</h3>
-      <div class="pf-grid">
-        <div><span>Server Seed Hash:</span> <code id="pfServerHash">-</code></div>
-        <div><span>Client Seed:</span> <code id="pfClientSeed">-</code></div>
-        <div><span>Nonce:</span> <code id="pfNonce">-</code></div>
-      </div>
-    </section>
-
-    <!-- RAKTÁR / INVENTORY -->
-    <section class="inventory-section">
-      <h2>Saját Raktár (Inventory)</h2>
-      <div class="inventory-grid" id="inventoryGrid">
-        <div class="empty-msg">Jelentkezz be a raktárad megtekintéséhez!</div>
-      </div>
-    </section>
   </main>
-
-  <!-- AUTH MODAL (Regisztráció / Bejelentkezés) -->
-  <div class="modal-overlay hidden" id="authModal">
-    <div class="modal-card">
-      <button class="modal-close" onclick="closeAuthModal()">&times;</button>
-      <h2 id="modalTitle">Bejelentkezés</h2>
-      
-      <form id="authForm" onsubmit="handleAuthSubmit(event)">
-        <div class="form-group">
-          <label>Felhasználónév</label>
-          <input type="text" id="authUsername" required placeholder="Felhasználónév">
-        </div>
-
-        <div class="form-group hidden" id="emailGroup">
-          <label>E-mail cím</label>
-          <input type="email" id="authEmail" placeholder="email@domain.hu">
-        </div>
-
-        <div class="form-group">
-          <label>Jelszó</label>
-          <input type="password" id="authPassword" required placeholder="••••••••">
-        </div>
-
-        <div class="error-msg hidden" id="authError"></div>
-
-        <button type="submit" class="btn btn-primary btn-full" id="authSubmitBtn">Bejelentkezés</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- NYEREMÉNY MODAL -->
-  <div class="modal-overlay hidden" id="winModal">
-    <div class="modal-card win-card">
-      <h2>GRATULÁLUNK!</h2>
-      <div class="win-image-wrap">
-        <img id="winImg" src="" alt="Nyeremény">
-      </div>
-      <h3 id="winName">Item Name</h3>
-      <div class="win-price" id="winPrice">$0.00</div>
-      <button class="btn btn-action btn-full" onclick="closeWinModal()">Rendben</button>
-    </div>
-  </div>
 
   <script src="app.js"></script>
 </body>
