@@ -260,6 +260,20 @@ function applyLoggedOutState() {
   renderInventory();
 }
 
+document.getElementById('tab-btn-login').addEventListener('click', () => {
+  document.getElementById('auth-form-login').classList.remove('hidden');
+  document.getElementById('auth-form-register').classList.add('hidden');
+  document.getElementById('tab-btn-login').classList.add('active-auth-tab');
+  document.getElementById('tab-btn-register').classList.remove('active-auth-tab');
+});
+
+document.getElementById('tab-btn-register').addEventListener('click', () => {
+  document.getElementById('auth-form-register').classList.remove('hidden');
+  document.getElementById('auth-form-login').classList.add('hidden');
+  document.getElementById('tab-btn-register').classList.add('active-auth-tab');
+  document.getElementById('tab-btn-login').classList.remove('active-auth-tab');
+});
+
 // LENYÍLÓ INVENTORY
 function setupDropdownInventory() {
   const profileBox = document.getElementById('user-profile-box');
