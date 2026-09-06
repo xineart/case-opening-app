@@ -2,8 +2,8 @@
 let authToken = localStorage.getItem('token') || null;
 let currentUser = null;
 let isSpinning = false;
+let isRegisterMode = false;
 
-// CSS Osztály leképezés a tárgyak ára és ritkasága alapján
 function getRarityClass(price) {
   if (price >= 1000) return 'gold';
   if (price >= 100) return 'covert';
@@ -37,20 +37,157 @@ async function fetchUserProfile() {
     console.warn('Munkamenet lejárt vagy érvénytelen token.');
     localStorage.removeItem('token');
     authToken = null;
+    updateUIUserStats();
   }
 }
 
 function updateUIUserStats() {
+  const authBtn = document.getElementById('auth-btn');
+  const balanceEl = document.getElementById('user-balance');
+
   if (currentUser) {
-    document.getElementById('user-balance').innerText = `$${currentUser.balance.toFixed(2)}`;
-    const authBtn = document.getElementById('auth-btn');
-    if (authBtn) authBtn.innerText = currentUser.username;
+    balanceEl.innerText = `$${currentUser.balance.toFixed(2)}`;
+    authBtn.innerText = `${currentUser.username} (Kijelentkezés)`;
+    authBtn.onclick = logout;
+  } else {
+    balanceEl.innerText = '$0.00';
+    authBtn.innerText = 'Bejelentkezés';
+    authBtn.onclick = openAuthModal;
   }
 }
 
-// --- LÁDA TARTALMÁNAK BETÖLTÉSE (LOOT TABLE) ---
+function logout() {
+  localStorage.removeItem('token');
+  authToken = null;
+  currentUser = null;
+  updateUIUserStats();
+  loadInventory();
+}
+
+// --- AUTH MODAL KEZELÉS (BEJELENTKEZÉS / REGISZTRÁCIÓ) ---
+function openAuthModal() {
+  document.getElementById('auth-modal').style.display = 'flex';
+}
+
+function closeAuthModal() {
+  document.getElementById('auth-modal').style.display = 'none';
+}
+
+function toggleAuthMode(e) {
+  if (e) e.preventDefault();
+  isRegisterMode = !isRegisterMode;
+
+  const title = document.getElementById('auth-title');
+  const submitBtn = document.getElementById('auth-submit-btn');
+  const emailGroup = document.getElementById('email-group');
+  const toggleText = document.getElementById('auth-toggle-text');
+  const toggleBtn = document.getElementById('auth-toggle-btn');
+
+  if (isRegisterMode) {
+    title.innerText = 'Regisztráció';
+    submitBtn.innerText = 'REGISZTRÁCIÓ';
+    emailGroup.style.display = 'flex';
+    toggleText.innerText = 'Már van fiókod?';
+    toggleBtn.innerText = 'Bejelentkezés';
+  } else {
+    title.innerText = 'Bejelentkezés';
+    submitBtn.innerText = 'BEJELENTKEZÉS';
+    emailGroup.style.display = 'none';
+    toggleText.innerText = 'Nincs még fiókod?';
+    toggleBtn.innerText = 'Regisztráció';
+  }
+}
+
+async function handleAuthSubmit() {
+  const username = document.getElementById('auth-username').value;
+  const password = document.getElementById('auth-password').value;
+  const email = document.getElementById('auth-email').value;
+
+  if (!username || !password || (isRegisterMode && !email)) {
+    alert('Kérlek tölts ki minden mezőt!');
+    return;
+  }
+
+  const endpoint = isRegisterMode ? '/api/auth/register' : '/api/auth/login';
+  const bodyData = isRegisterMode ? { username, email, password } : { username, password };
+
+  try {
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(bodyData)
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.error || 'Azonosítási hiba!');
+      return;
+    }
+
+    // Sikeres Auth
+    authToken = data.token;
+    localStorage.setItem('token', authToken);
+    currentUser = data.user;
+
+    updateUIUserStats();
+    closeAuthModal();
+    loadInventory();
+
+  } catch (err) {
+    alert('Szerver hiba az azonosítás során!');
+  }
+}
+
+// --- DEPOSIT MODAL KEZELÉS ---
+function openDepositModal() {
+  if (!authToken) {
+    alert('Befizetéshez először jelentkezz be!');
+    openAuthModal();
+    return;
+  }
+  document.getElementById('deposit-modal').style.display = 'flex';
+}
+
+function closeDepositModal() {
+  document.getElementById('deposit-modal').style.display = 'none';
+}
+
+async function processDeposit() {
+  const amount = parseFloat(document.getElementById('deposit-amount').value);
+  const currency = document.getElementById('deposit-currency').value;
+
+  if (!amount || amount < 5) {
+    alert('A minimális befizetés $5.00!');
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/payments/create-deposit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`
+      },
+      body: JSON.stringify({ amount, currency })
+    });
+
+    const data = await res.json();
+
+    if (res.ok && data.paymentUrl) {
+      alert(`Fizetési hivatkozás létrehozva!\nTranzakció ID: ${data.orderId}`);
+      window.open(data.paymentUrl, '_blank');
+      closeDepositModal();
+    } else {
+      alert(data.error || 'A fizetési hivatkozás létrehozása nem sikerült.');
+    }
+  } catch (err) {
+    alert('Szerver hiba a fizetés indításakor.');
+  }
+}
+
+// --- LÁDA TARTALMA (LOOT TABLE) ---
 function loadCaseItems() {
-  // Példa adatok a felület kezdeti feltöltéséhez (a backend hívás ezt írja felül)
   const defaultItems = [
     { name: "P250 | Ripple", price: 1.20, img: "https://via.placeholder.com/150/4b69ff?text=P250" },
     { name: "AK-47 | Point Disarray", price: 18.50, img: "https://via.placeholder.com/150/8847ff?text=AK-47" },
@@ -69,11 +206,12 @@ function loadCaseItems() {
   `).join('');
 }
 
-// --- PÖRGETÉSI LOGIKA ÉS ANIMÁCIÓ (ROULETTE SPINNER) ---
+// --- PÖRGETÉSI LOGIKA ÉS ANIMÁCIÓ ---
 async function handleOpenCase() {
   if (isSpinning) return;
   if (!authToken) {
     alert('Kérlek, jelentkezz be a ládanyitáshoz!');
+    openAuthModal();
     return;
   }
 
@@ -102,23 +240,17 @@ async function handleOpenCase() {
       return;
     }
 
-    // Egyenleg azonnali levonásának megjelenítése (optimista frissítés)
     currentUser.balance = data.newBalance;
     updateUIUserStats();
 
-    // Pörgető csík feltöltése és az animáció elindítása
     startSpinnerAnimation(data.allItems, data.wonItem, () => {
-      // Animáció vége callback
       isSpinning = false;
       openBtn.disabled = false;
       openBtn.innerText = "LÁDA NYITÁSA ($25.00)";
-      
-      // Leltár frissítése az új tárggyal
       loadInventory();
     });
 
   } catch (err) {
-    console.error(err);
     alert('Hálózati hiba történt.');
     isSpinning = false;
     openBtn.disabled = false;
@@ -131,7 +263,6 @@ function startSpinnerAnimation(allItems, wonItem, onComplete) {
   track.style.transition = 'none';
   track.style.transform = 'translateX(0px)';
 
-  // 1. Pörgetési sorozat összeállítása (80 véletlenszerű tárgy + a nyert tárgy a 75. helyen)
   const spinnerList = [];
   const totalCards = 80;
   const winningIndex = 75;
@@ -145,38 +276,38 @@ function startSpinnerAnimation(allItems, wonItem, onComplete) {
     }
   }
 
-  // 2. Kártyák renderelése a pörgető sávba
   track.innerHTML = spinnerList.map(item => `
-    <div class="item-card ${getRarityClass(item.price)}">
+    <div class="item-card ${getRarityClass(item.price || item.item_price)}">
       <img src="${item.img || item.item_image}" alt="${item.name || item.item_name}">
       <div class="item-name">${item.name || item.item_name}</div>
       <div class="item-price">$${(item.price || item.item_price).toFixed(2)}</div>
     </div>
   `).join('');
 
-  // 3. Eltolás kiszámítása pixelben (Kártya szélesség + Margó)
-  const cardWidth = 140 + 10; // 140px széles kártya + 10px gap
+  const cardWidth = 140 + 10;
   const wrapperWidth = document.querySelector('.spinner-wrapper').offsetWidth;
-  
-  // Kis véletlenszerű eltolás (offset), hogy ne pontosan a kártya közepén álljon meg mindig
   const randomOffset = Math.floor(Math.random() * 80) - 40; 
   const targetX = -(winningIndex * cardWidth) + (wrapperWidth / 2) - (cardWidth / 2) + randomOffset;
 
-  // 4. Animáció elindítása CSS tranzícióval
   setTimeout(() => {
     track.style.transition = 'transform 5s cubic-bezier(0.15, 0.88, 0.1, 0.98)';
     track.style.transform = `translateX(${targetX}px)`;
   }, 50);
 
-  // 5. Animáció befejezése 5 másodperc múlva
   setTimeout(() => {
     if (onComplete) onComplete();
   }, 5050);
 }
 
-// --- LELTÁR (INVENTORY) ÉS TÁRGY ELADÁS LOGIKA ---
+// --- LELTÁR (INVENTORY) ÉS TÁRGY ELADÁS ---
 async function loadInventory() {
-  if (!authToken) return;
+  const container = document.getElementById('inventory-grid');
+  if (!container) return;
+
+  if (!authToken) {
+    container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 2rem;">Jelentkezz be a leltárad megtekintéséhez.</div>`;
+    return;
+  }
 
   try {
     const res = await fetch('/api/user/inventory', {
@@ -206,14 +337,14 @@ function renderInventory(items) {
       <img src="${item.item_image}" alt="${item.item_name}">
       <div class="item-name">${item.item_name}</div>
       <div class="item-price">$${item.item_price.toFixed(2)}</div>
-      <button class="btn btn-sell" onclick="sellItem(${item.id}, ${item.item_price})">
+      <button class="btn btn-sell" onclick="sellItem(${item.id})">
         ELADÁS
       </button>
     </div>
   `).join('');
 }
 
-async function sellItem(inventoryId, price) {
+async function sellItem(inventoryId) {
   if (!authToken) return;
 
   try {
@@ -229,11 +360,9 @@ async function sellItem(inventoryId, price) {
     const data = await res.json();
 
     if (res.ok && data.success) {
-      // Egyenleg frissítése
       currentUser.balance = data.newBalance;
       updateUIUserStats();
 
-      // Tárgy eltávolítása a felületről animációval
       const itemElement = document.getElementById(`inv-item-${inventoryId}`);
       if (itemElement) {
         itemElement.style.transform = 'scale(0.8)';
