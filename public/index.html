@@ -3,334 +3,212 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TerBDrop - CS2 Case Opening & Battles</title>
+  <title>CS2 Case Opening & Gambling Simulator</title>
   <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700;800&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
 
-  <!-- ÉLŐ DROPOK SÁV -->
-  <div class="drop-bar">
-    <div class="drop-bar-label" id="txt-live-drops">ÉLŐ DROPOK</div>
-    <div class="drop-track" id="live-feed-track"></div>
-  </div>
-
-  <!-- NAVBAR -->
+  <!-- ==========================================
+       1. FEJLÉC (NAVBAR)
+       ========================================== -->
   <header class="navbar">
     <div class="logo">
-      <div class="logo-icon">🎁</div>
-      <span>TerB<span class="highlight">Drop</span></span>
+      <span class="logo-bold">CS2</span>DROP
     </div>
 
     <nav class="nav-links">
-      <button class="nav-item active" data-tab="cases">
-        <span class="nav-icon">📦</span> <span id="txt-nav-cases">LÁDÁK</span>
-      </button>
-      <button class="nav-item" data-tab="battles">
-        <span class="nav-icon">⚔️</span> <span id="txt-nav-battles">CASE BATTLES</span>
-      </button>
-      <button class="nav-item" data-tab="upgrader">
-        <span class="nav-icon">⚡</span> <span id="txt-nav-upgrader">UPGRADER</span>
-      </button>
+      <button class="nav-item active" data-tab="cases" data-i18n="cases">Ládák</button>
+      <button class="nav-item" data-tab="battles" data-i18n="battles">Csaták</button>
+      <button class="nav-item" data-tab="upgrader" data-i18n="upgrader">Fejlesztő</button>
+      <button class="nav-item" data-tab="borrow" data-i18n="borrowTitle">Kölcsönzés</button>
     </nav>
 
-    <div class="header-right">
-      <!-- NYELVVÁLTÓ -->
+    <div class="user-area">
+      <!-- Egyenleg kijelző -->
+      <div class="balance-container">
+        <span class="balance-label">Egyenleg:</span>
+        <span id="user-balance" class="balance-value">$250.00</span>
+      </div>
+
+      <!-- Nyelvváltó gombok -->
       <div class="lang-selector">
-        <button class="lang-btn active" id="lang-hu" onclick="switchLanguage('hu')">HU</button>
-        <button class="lang-btn" id="lang-en" onclick="switchLanguage('en')">EN</button>
+        <button class="lang-btn active" data-lang="hu">HU</button>
+        <button class="lang-btn" data-lang="en">EN</button>
       </div>
 
-      <!-- EGYENLEG (Ha be van jelentkezve) -->
-      <div class="balance-display hidden" id="user-balance-box">
-        <span class="balance-label" id="txt-balance-label">EGYENLEG</span>
-        <span class="balance-value" id="user-balance">$100.00</span>
+      <!-- Bejelentkezés / Profil gomb -->
+      <button id="btn-login-nav" class="btn btn-login" data-i18n="login">Bejelentkezés</button>
+    </div>
+  </header>
+
+  <!-- LELTÁR DROPDOWN (PROFILRA KATTINTVA) -->
+  <div id="dropdown-inventory" class="dropdown-inventory hidden">
+    <div class="dropdown-header">
+      <h3 data-i18n="inventory">Leltárad</h3>
+      <button class="modal-close" onclick="toggleInventoryDropdown()">×</button>
+    </div>
+    <div id="dropdown-inventory-list" class="dropdown-inventory-list">
+      <!-- JavaScript ide rendereli a saját skineket -->
+    </div>
+  </div>
+
+  <!-- LIVE DROP FEED (Legutóbb nyitott skinek) -->
+  <div class="live-feed-bar">
+    <div class="live-feed-title">LIVE DROPS</div>
+    <div class="drop-track-wrapper">
+      <div id="drop-track" class="drop-track">
+        <!-- JS generálja a folyamatos nyitásokat -->
       </div>
+    </div>
+  </div>
 
-      <button class="btn btn-primary hidden" id="open-deposit-btn">+ FELTÖLTÉS</button>
+  <main class="main-content">
 
-      <!-- BEJELENTKEZÉS GOMB -->
-      <button class="btn btn-login" id="open-login-btn">
-        <span class="steam-icon">🎮</span> <span id="txt-login-btn">BEJELENTKEZÉS</span>
-      </button>
+    <!-- ==========================================
+         2. TAB 1: LÁDANYITÁS (CASES)
+         ========================================== -->
+    <section id="tab-cases" class="tab-page active">
+      <div class="case-opening-stage">
+        <h1 id="active-case-title">Kilowatt Case</h1>
 
-      <!-- USER PROFILE & LENYÍLÓ LELTÁR FÜL -->
-      <div class="user-profile-tag hidden" id="user-profile-box" style="position: relative;">
-        <button class="btn btn-ghost" id="toggle-inventory-btn" style="display: flex; align-items: center; gap: 8px;">
-          <span class="avatar">👤</span>
-          <span class="username" id="display-username">Player</span>
-          <span>🎒 <small style="color: #ffd700;">(Leltár ▼)</small></span>
-        </button>
-
-        <!-- LENYÍLÓ LELTÁR PANEL -->
-        <div id="dropdown-inventory-panel" class="dropdown-inventory hidden">
-          <div class="dropdown-header">
-            <h4>SAJÁT LELTÁR</h4>
-            <span id="close-dropdown-inv" style="cursor: pointer;">&times;</span>
-          </div>
-          <div id="dropdown-inventory-grid" class="dropdown-items-list">
-            <p class="empty-inv-msg">Még nincs tárgyad.</p>
-          </div>
+        <!-- PÖRGETŐ SÁVOK (Többszörös nyitáshoz is) -->
+        <div id="roulette-tracks-wrapper" class="roulette-tracks-wrapper">
+          <!-- JS ide rendereli a 1x, 2x, 3x, 4x, 5x sávokat -->
         </div>
-      </div> <!-- Javítva: lezárva a user-profile-tag -->
-    </div> <!-- Javítva: lezárva a header-right -->
-  </header> <!-- Javítva: lezárva a header -->
 
-  <!-- FŐ TARTALOM -->
-  <main class="app-container">
-
-    <!-- ==================== 1. MODUL: LÁDÁK ==================== -->
-    <div id="tab-cases" class="tab-page active">
-      <div id="case-catalog-view">
-        <div class="page-title">
-          <h1 id="txt-cases-title">LOOTBOX STÍLUSÚ LÁDÁK</h1>
-          <p id="txt-cases-sub">Exkluzív skinek a legmagasabb nyerési esélyekkel</p>
-        </div>
-        <div class="cases-grid" id="cases-grid"></div>
-      </div>
-
-      <!-- PÖRGETŐ -->
-      <div id="case-opener-view" class="hidden">
-        <button class="btn btn-ghost back-btn" id="back-to-catalog-btn">← VISSZA A LÁDÁKHOZ</button>
-        
-        <div class="unboxing-stage">
-          <div class="case-header-info">
-            <h2 id="active-case-name">Case Name</h2>
-            <div class="case-price-tag" id="active-case-price-text">$0.00</div>
-          </div>
-
-          <div class="multi-open-selector">
-            <span id="txt-multi-open">Nyitási darabszám:</span>
+        <!-- VEZÉRLŐPULT (Multi-open & Gyors pörgetés) -->
+        <div class="controls-panel">
+          <div class="multi-open-group">
             <button class="btn-multi active" data-count="1">1x</button>
             <button class="btn-multi" data-count="2">2x</button>
             <button class="btn-multi" data-count="3">3x</button>
+            <button class="btn-multi" data-count="4">4x</button>
             <button class="btn-multi" data-count="5">5x</button>
           </div>
 
-          <div id="spinners-wrapper"></div>
+          <label class="fast-spin-toggle">
+            <input type="checkbox" id="fast-spin-toggle">
+            <span data-i18n="quickOpen">Gyors Nyitás</span>
+          </label>
 
-          <button class="btn btn-launch" id="open-case-btn">LÁDA NYITÁSA</button>
-        </div>
-
-        <div class="section-divider">
-          <h3 id="txt-case-contents">LÁDA TARTALMA ÉS DROPRATE</h3>
-        </div>
-        <div class="items-grid" id="case-items-grid"></div>
-      </div>
-
-      <div class="inventory-section">
-        <div class="section-divider">
-          <h3 id="txt-inventory-title">SAJÁT LELTÁR (INVENTORY)</h3>
-        </div>
-        <div class="items-grid" id="inventory-grid">
-          <p class="empty-inv-msg" id="txt-empty-inv">Még nem nyertél tárgyat.</p>
+          <button id="btn-open-case" class="btn btn-open" onclick="handleOpenCase()" data-i18n="openCase">
+            Láda Nyitása ($2.50)
+          </button>
         </div>
       </div>
-    </div>
 
-    <!-- ==================== 2. MODUL: CASE BATTLES ==================== -->
-    <div id="tab-battles" class="tab-page">
-      <div class="page-title flex-title">
-        <div>
-          <h1>CASE BATTLES & BORROW</h1>
-          <p id="txt-battles-sub">Átlátható csaták, real-time multiplayer élmény és 80/20 Borrow szponzoráció.</p>
-        </div>
-        <button class="btn btn-primary btn-lg" id="create-battle-modal-btn">+ CSATA LÉTREHOZÁSA</button>
+      <!-- LÁDA VÁLASZTÓ GRID -->
+      <div class="section-title">Válassz Ládát</div>
+      <div id="cases-grid" class="cases-grid">
+        <!-- JS tölti fel a ládákkal -->
       </div>
 
-      <!-- LIVE BATTLE ARENA -->
-      <div id="battle-arena" class="battle-arena hidden">
-        <div class="battle-arena-header">
-          <div>
-            <h2 id="arena-title">⚔️ CSATA #40291</h2>
-            <span class="battle-mode-badge" id="arena-mode-badge">1v1 BATTLE</span>
+      <!-- ELŐNÉZET: A LÁDÁBAN LÉVŐ SKINEK -->
+      <div class="section-title">Láda Tartalma</div>
+      <div id="case-items-preview" class="case-items-preview">
+        <!-- JS tölti fel a skinekkel -->
+      </div>
+    </section>
+
+    <!-- ==========================================
+         3. TAB 2: CASE BATTLES (CSATÁK)
+         ========================================== -->
+    <section id="tab-battles" class="tab-page">
+      <div class="battles-header">
+        <h2 data-i18n="battleTitle">Case Battles (Láda Csaták)</h2>
+        <button id="btn-create-battle" class="btn btn-primary" data-i18n="createBattle">Csata Létrehozása</button>
+      </div>
+      <div class="battles-list">
+        <div class="battle-card">
+          <div class="battle-info">
+            <span class="battle-case-name">3x Kilowatt Case</span>
+            <span class="battle-price">$7.50</span>
           </div>
-          <div class="arena-total-pot">ÖSSZDÍJ: <span id="arena-pot-val">$0.00</span></div>
-        </div>
-
-        <div class="battle-players-grid">
-          <div class="battle-player-card">
-            <div class="player-info">
-              <span class="player-avatar">👤</span>
-              <div>
-                <div class="player-name" id="p1-display-name">TE</div>
-                <div class="player-total" id="p1-total">$0.00</div>
-              </div>
-            </div>
-            <div class="battle-drop-slot" id="p1-drop-slot">
-              <span class="slot-placeholder">Várakozás...</span>
-            </div>
+          <div class="battle-players">
+            <div class="player-slot filled">👤 Player1</div>
+            <div class="player-slot empty">Várakozás...</div>
           </div>
-
-          <div class="battle-vs-badge">VS</div>
-
-          <div class="battle-player-card">
-            <div class="player-info">
-              <span class="player-avatar">🤖</span>
-              <div>
-                <div class="player-name">BOT TerB</div>
-                <div class="player-total" id="p2-total">$0.00</div>
-              </div>
-            </div>
-            <div class="battle-drop-slot" id="p2-drop-slot">
-              <span class="slot-placeholder">Várakozás...</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="battle-controls">
-          <button class="btn btn-launch" id="start-battle-spin-btn">CSATA INDÍTÁSA</button>
-          <button class="btn btn-ghost" id="close-battle-arena-btn">KILÉPÉS</button>
+          <button class="btn btn-success" data-i18n="joinBattle">Csatlakozás</button>
         </div>
       </div>
+    </section>
 
-      <!-- BATTLES LAYOUT -->
-      <div class="battles-main-layout">
-        <div class="battles-section">
-          <h3 id="txt-open-battles">NYITOTT CSATÁK (LOBBY)</h3>
-          <div class="battles-list-grid" id="battles-list"></div>
-        </div>
-
-        <div class="borrow-panel">
-          <div class="borrow-header">
-            <h3>⚡ BORROW SZPONZORÁCIÓ</h3>
-            <span class="borrow-badge">80 / 20</span>
-          </div>
-          <p class="panel-desc" id="txt-borrow-desc">
-            Finanszírozd más játékos belépőjének 80%-át! Cserébe a nyereményének 80%-a a tiéd lesz.
-          </p>
-          <div class="sponsor-feed" id="sponsor-feed-list"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ==================== 3. MODUL: UPGRADER ==================== -->
-    <div id="tab-upgrader" class="tab-page">
-      <div class="page-title">
-        <h1>SKIN UPGRADER</h1>
-        <p id="txt-upgrader-sub">Tedd kockára meglévő skinedet vagy egyenlegedet a magasabb értékű tárgyakért!</p>
-      </div>
-
+    <!-- ==========================================
+         4. TAB 3: UPGRADGER (FEJLESZTŐ)
+         ========================================== -->
+    <section id="tab-upgrader" class="tab-page">
       <div class="upgrader-container">
-        <div class="upgrader-card">
-          <h3 id="txt-your-stake">1. SAJÁT TÉT</h3>
-          <div class="form-field">
-            <label>Összeg ($)</label>
-            <input type="number" id="upgrade-input-val" value="10.00" min="1" step="1">
+        <!-- Bal oldal: Saját kiválasztott skin -->
+        <div class="upgrader-box">
+          <h3>Saját Tárgyad</h3>
+          <div id="upgrade-my-item-display" class="selected-item-box">
+            <span id="upgrade-my-item-name">Válassz a leltáradból!</span>
+            <span id="upgrade-my-item-price" class="price">$0.00</span>
           </div>
-          <div id="upgrade-inv-list" class="mini-inv-list"></div>
+          <div id="upgrader-inventory-list" class="mini-inventory-grid">
+            <!-- JS tölti fel a saját leltárad tárgyaival -->
+          </div>
         </div>
 
+        <!-- Közép: Százalékos Kerék & Indítás -->
         <div class="upgrader-center">
-          <div class="upgrade-wheel-wrapper">
-            <svg class="upgrade-svg" viewBox="0 0 200 200">
-              <circle class="wheel-bg" cx="100" cy="100" r="80" />
-              <circle class="wheel-chance" id="upgrade-chance-slice" cx="100" cy="100" r="80" />
+          <div class="circle-wrapper">
+            <svg class="circle-svg" viewBox="0 0 180 180">
+              <circle class="circle-bg" cx="90" cy="90" r="80"></circle>
+              <circle id="upgrade-svg-circle" class="circle-progress" cx="90" cy="90" r="80"></circle>
             </svg>
-            <div class="wheel-pointer" id="upgrade-needle"></div>
-            <div class="wheel-center-info">
-              <span id="upgrade-chance-num">50.00%</span>
-              <small id="txt-chance-label">ESÉLY</small>
-            </div>
+            <div id="upgrade-wheel-pointer" class="wheel-pointer"></div>
+            <div id="upgrade-chance-text" class="chance-text">0.00%</div>
           </div>
-          <button class="btn btn-launch width-100" id="start-upgrade-btn">UPGRADE INDÍTÁSA</button>
+          <button id="btn-start-upgrade" class="btn btn-upgrade" data-i18n="upgradeBtn">Fejlesztés Indítása</button>
         </div>
 
-        <div class="upgrader-card">
-          <h3 id="txt-target-skin">2. CÉLZOTT SKIN</h3>
-          <div id="upgrade-target-display" class="target-display-box">
-            <img id="target-skin-img" src="" alt="Target Skin">
-            <h4 id="target-skin-name">AK-47 | Redline</h4>
-            <span class="target-price" id="target-skin-price">$22.00</span>
+        <!-- Jobb oldal: Cél skin -->
+        <div class="upgrader-box">
+          <h3>Cél Tárgy</h3>
+          <div id="upgrade-target-display" class="selected-item-box">
+            <img id="upgrade-target-img" src="" style="max-height: 50px; display:none;">
+            <span id="upgrade-target-name">Válassz a listából!</span>
+            <span id="upgrade-target-price" class="price">$0.00</span>
           </div>
-          <div id="upgrade-target-list" class="mini-target-list"></div>
+          <div id="upgrader-target-list" class="mini-inventory-grid">
+            <!-- JS tölti fel a megszerezhető skinekkel -->
+          </div>
         </div>
       </div>
-    </div>
+    </section>
+
+    <!-- ==========================================
+         5. TAB 4: BORROW (SZPONZORÁCIÓ)
+         ========================================== -->
+    <section id="tab-borrow" class="tab-page">
+      <div class="borrow-container">
+        <h2 data-i18n="borrowTitle">Tőke Kölcsönzés / Szponzoráció</h2>
+        <p data-i18n="borrowDesc">Nincs elég pénzed? Kérj szponzorációt más játékosoktól!</p>
+        <div class="borrow-form">
+          <input type="number" id="borrow-amount" placeholder="Igényelt összegh ($)" min="1" max="100">
+          <button id="btn-request-borrow" class="btn btn-primary">Kérelem Beküldése</button>
+        </div>
+      </div>
+    </section>
 
   </main>
 
-  <!-- BEJELENTKEZÉS ÉS REGISZTRÁCIÓ MODAL -->
+  <!-- ==========================================
+       6. MODAL: BEJELENTKEZÉS
+       ========================================== -->
   <div id="login-modal" class="modal-backdrop hidden">
-    <div class="modal-box">
-      <span class="modal-close" id="close-login-btn">&times;</span>
-
-      <!-- TAB VÁLASZTÓ (Bejelentkezés vs Regisztráció) -->
-      <div class="auth-tabs" style="display: flex; gap: 10px; margin-bottom: 1.5rem; border-bottom: 2px solid #222; padding-bottom: 10px;">
-        <button class="btn btn-ghost active-auth-tab" id="tab-btn-login" style="flex: 1; font-weight: bold;">BEJELENTKEZÉS</button>
-        <button class="btn btn-ghost" id="tab-btn-register" style="flex: 1; font-weight: bold;">REGISZTRÁCIÓ</button>
-      </div>
-
-      <!-- BEJELENTKEZÉS FORM -->
-      <div id="auth-form-login">
-        <div class="form-group" style="margin-bottom: 1rem;">
-          <label style="display: block; margin-bottom: 5px; font-size: 0.9rem; color: #888;">Felhasználónév vagy E-mail</label>
-          <input type="text" id="login-username-input" placeholder="Pl. CsGoPro99" style="width: 100%; padding: 10px; background: #151518; border: 1px solid #333; color: #fff; border-radius: 6px;">
-        </div>
-
-        <div class="form-group" style="margin-bottom: 1rem;">
-          <label style="display: block; margin-bottom: 5px; font-size: 0.9rem; color: #888;">Jelszó</label>
-          <input type="password" id="login-password-input" placeholder="••••••••" style="width: 100%; padding: 10px; background: #151518; border: 1px solid #333; color: #fff; border-radius: 6px;">
-        </div>
-
-        <button class="btn btn-primary width-100" id="confirm-login-btn" style="margin-top: 0.5rem; width: 100%;">BEJELENTKEZÉS</button>
-      </div>
-
-      <!-- REGISZTRÁCIÓ FORM -->
-      <div id="auth-form-register" class="hidden">
-        <div class="form-group" style="margin-bottom: 1rem;">
-          <label style="display: block; margin-bottom: 5px; font-size: 0.9rem; color: #888;">Felhasználónév</label>
-          <input type="text" id="reg-username-input" placeholder="Pl. CsGoPro99" style="width: 100%; padding: 10px; background: #151518; border: 1px solid #333; color: #fff; border-radius: 6px;">
-        </div>
-
-        <div class="form-group" style="margin-bottom: 1rem;">
-          <label style="display: block; margin-bottom: 5px; font-size: 0.9rem; color: #888;">E-mail cím</label>
-          <input type="email" id="reg-email-input" placeholder="pelda@email.hu" style="width: 100%; padding: 10px; background: #151518; border: 1px solid #333; color: #fff; border-radius: 6px;">
-        </div>
-
-        <div class="form-group" style="margin-bottom: 1rem;">
-          <label style="display: block; margin-bottom: 5px; font-size: 0.9rem; color: #888;">Jelszó</label>
-          <input type="password" id="reg-password-input" placeholder="••••••••" style="width: 100%; padding: 10px; background: #151518; border: 1px solid #333; color: #fff; border-radius: 6px;">
-        </div>
-
-        <div class="form-group" style="margin-bottom: 1rem;">
-          <label style="display: block; margin-bottom: 5px; font-size: 0.9rem; color: #888;">Jelszó megerősítése</label>
-          <input type="password" id="reg-password-confirm-input" placeholder="••••••••" style="width: 100%; padding: 10px; background: #151518; border: 1px solid #333; color: #fff; border-radius: 6px;">
-        </div>
-
-        <button class="btn btn-primary width-100" id="confirm-register-btn" style="margin-top: 0.5rem; width: 100%;">REGISZTRÁCIÓ LEGYEN</button>
-      </div>
-
-      <div class="modal-divider" style="margin: 1.5rem 0; text-align: center; position: relative;">
-        <span style="background: #111; padding: 0 10px; color: #666; font-size: 0.8rem;">VAGY</span>
-      </div>
-
-      <button class="btn btn-steam width-100" id="steam-login-action" style="width: 100%;">
-        🎮 Bejelentkezés Steam Fiókkal
-      </button>
+    <div class="modal-card">
+      <button class="modal-close">×</button>
+      <h2 data-i18n="login">Bejelentkezés</h2>
+      <p>A pörgetéshez és mentéshez adj meg egy nevet!</p>
+      <input type="text" id="login-username-input" placeholder="Felhasználónév...">
+      <button id="btn-submit-login" class="btn btn-primary" style="width: 100%; margin-top: 15px;">Belépés</button>
     </div>
   </div>
 
-  <!-- BEÁLLÍTÁSOK MODAL -->
-  <div id="settings-modal" class="modal-backdrop hidden">
-    <div class="modal-box">
-      <span class="modal-close" id="close-settings-btn">&times;</span>
-      <h2>⚙️ BEÁLLÍTÁSOK</h2>
-
-      <div class="form-field margin-v">
-        <label>Hanghatások (SFX)</label>
-        <input type="checkbox" id="sfx-toggle" checked>
-      </div>
-
-      <div class="form-field margin-v">
-        <label>Gyors Pörgetés (Fast Spin)</label>
-        <input type="checkbox" id="fast-spin-toggle">
-      </div>
-
-      <button class="btn btn-primary width-100" id="save-settings-btn">MENTÉS</button>
-    </div>
-  </div>
-
+  <!-- JS MOTOR BEKÖTÉSE -->
   <script src="app.js"></script>
 </body>
 </html>
