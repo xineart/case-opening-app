@@ -3,35 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LOOTDROP.GG - CS2 Case Opening</title>
+  <title>LOOTDROP.GG - CS2 Case Opening & Battles</title>
   <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Teko:wght@600;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 </head>
 <body>
 
   <!-- ÉLŐ NYEREMÉNYFOLYAM (LIVE DROPS) -->
   <div class="live-feed-container">
-    <div class="live-feed-track">
-      <div class="feed-item covert">
-        <img src="https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4rdY6WGP-4oXN48558BARLri81EWQo9-i8ig88_9vE4x9i1I4R-O1_RA9mKgNY_L-2aQJ11_33c2A309-8pInczqS1ZevXwW8G7pxwiOyUoIn231a3qENpYWrzcYDDJ1RsaAzV_1K8wOe915K0vpzA13R9seZK2OAn" alt="AWP">
-        <div class="feed-item-info">
-          <span class="user">Slayer99</span>
-          <span class="item">AWP Hyper Beast</span>
-        </div>
-      </div>
-      <div class="feed-item gold">
-        <img src="https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4rdY6WGP-4oXN48558BARLri81EWQo9-i8ig88_9vE4x9i1I4R-O1_RA9mKgNY_L-2aQJ11_33c2A309-8pInczqS1ZevXwW8G7pxwiOyUoIn231a3qENpYWrzcYDDJ1RsaAzV_1K8wOe915K0vpzA13R9seZK2OAn" alt="Karambit">
-        <div class="feed-item-info">
-          <span class="user">GamerGod</span>
-          <span class="item">Karambit Doppler</span>
-        </div>
-      </div>
-      <div class="feed-item restricted">
-        <img src="https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4rdY6WGP-4oXN48558BARLri81EWQo9-i8ig88_9vE4x9i1I4R-O1_RA9mKgNY_L-2aQJ11_33c2A309-8pInczqS1ZevXwW8G7pxwiOyUoIn231a3qENpYWrzcYDDJ1RsaAzV_1K8wOe915K0vpzA13R9seZK2OAn" alt="AK-47">
-        <div class="feed-item-info">
-          <span class="user">Alex21</span>
-          <span class="item">AK-47 Point Disarray</span>
-        </div>
-      </div>
+    <div class="live-feed-track" id="live-feed-track">
+      <!-- A JS ide tölti az élő nyereményeket -->
     </div>
   </div>
 
@@ -40,6 +21,15 @@
     <div class="logo">
       <span>📦</span> LOOTDROP.GG
     </div>
+
+    <!-- MAIN NAVIGATION -->
+    <nav class="main-nav">
+      <button class="nav-btn active" onclick="switchTab('cases')">📦 LÁDÁK</button>
+      <button class="nav-btn" onclick="switchTab('battles')">⚔️ CASE BATTLES</button>
+      <button class="nav-btn" onclick="switchTab('creator')">🛠️ LÁDA ÉPÍTŐ</button>
+      <button class="nav-btn highlight" onclick="switchTab('borrow')">💎 BORROW MÓD</button>
+    </nav>
+
     <div class="user-stats">
       <div class="balance-box">
         <span>EGYENLEG:</span>
@@ -53,38 +43,111 @@
   <!-- MAIN CONTAINER -->
   <main class="main-container">
 
-    <!-- PÖRGETŐ SECTION -->
-    <section class="case-display-area">
-      <h2 class="case-title">Hyper Beast Edition Case</h2>
-      <p style="color: var(--text-muted); margin-top: 5px; font-weight: 600;">Nyisd ki a ládát $25.00 áron</p>
-
-      <!-- ROULETTE SPINNER -->
-      <div class="spinner-wrapper">
-        <div class="spinner-track" id="spinner-track">
-          <!-- A JS ide generálja a pörgető kártyákat -->
+    <!-- ==================== 1. MODUL: LÁDAKATALÓGUS & NYITÓ ==================== -->
+    <div id="tab-cases" class="tab-content active">
+      
+      <!-- HA NINCSEEN KIVÁLASZTVA LÁDA: KATALÓGUS NÉZET -->
+      <div id="case-catalog-view">
+        <div class="section-title">Hivatalos Ládák</div>
+        <div class="cases-grid" id="cases-grid">
+          <!-- A JS generálja a láda kártyákat -->
         </div>
       </div>
 
-      <button class="btn btn-gold" id="open-case-btn" style="padding: 1.2rem 4rem;">
-        LÁDA NYITÁSA ($25.00)
-      </button>
-    </section>
+      <!-- HA KI VAN VÁLASZTVA EGY LÁDA: PÖRGETŐ NÉZET -->
+      <div id="case-opener-view" style="display: none;">
+        <button class="btn btn-secondary" onclick="closeCaseView()" style="margin-bottom: 1rem;">← VISSZA A LÁDÁKHOZ</button>
+        
+        <section class="case-display-area">
+          <h2 class="case-title" id="active-case-name">Case Name</h2>
+          <p style="color: var(--text-muted); margin-top: 5px;" id="active-case-price-text">Nyisd ki a ládát</p>
 
-    <!-- SAJÁT LELTÁR (INVENTORY) SECTION -->
-    <section style="margin-bottom: 3.5rem;">
-      <div class="section-title">Saját Leltár (Inventory)</div>
-      <div class="items-grid" id="inventory-grid">
-        <!-- A JS ide tölti be a játékos meglévő tárgyait -->
-      </div>
-    </section>
+          <!-- ROULETTE SPINNER -->
+          <div class="spinner-wrapper">
+            <div class="spinner-track" id="spinner-track"></div>
+          </div>
 
-    <!-- LÁDA TARTALMA (LOOT TABLE) -->
-    <section>
-      <div class="section-title">Láda Tartalma</div>
-      <div class="items-grid" id="case-items-grid">
-        <!-- A JS ide tölti be a láda tartalmát -->
+          <button class="btn btn-gold" id="open-case-btn" style="padding: 1.2rem 4rem;">
+            LÁDA NYITÁSA
+          </button>
+        </section>
+
+        <section style="margin-top: 2rem;">
+          <div class="section-title">Láda Tartalma</div>
+          <div class="items-grid" id="case-items-grid"></div>
+        </section>
       </div>
-    </section>
+
+      <!-- SAJÁT LELTÁR -->
+      <section style="margin-top: 3.5rem;">
+        <div class="section-title">Saját Leltár (Inventory)</div>
+        <div class="items-grid" id="inventory-grid"></div>
+      </section>
+    </div>
+
+    <!-- ==================== 2. MODUL: CASE BATTLES (LÁDA CSATÁK) ==================== -->
+    <div id="tab-battles" class="tab-content">
+      <div class="battles-header">
+        <div class="section-title">Aktív Case Battles</div>
+        <button class="btn btn-gold" onclick="openCreateBattleModal()">+ CSATA LÉTREHOZÁSA</button>
+      </div>
+
+      <!-- CSATA LOBBY-K LISTÁJA -->
+      <div class="battles-grid" id="battles-list">
+        <!-- A JS ide tölti be az aktív csatákat -->
+      </div>
+    </div>
+
+    <!-- ==================== 3. MODUL: LÁDA ÉPÍTŐ (CASE CREATOR) ==================== -->
+    <div id="tab-creator" class="tab-content">
+      <div class="section-title">Saját Láda Létrehozása</div>
+      <div class="creator-container">
+        <div class="creator-form">
+          <div class="form-group">
+            <label>Láda Neve:</label>
+            <input type="text" id="custom-case-name" placeholder="pl. Hyper Dragon Edition">
+          </div>
+          <div class="form-group">
+            <label>Láda Nyitási Ára ($):</label>
+            <input type="number" id="custom-case-price" value="50" readonly>
+          </div>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">
+            A láda ára a kiválasztott skinek értékéből és esélyeiből számolódik automatikusan.
+          </p>
+          <button class="btn btn-gold" onclick="saveCustomCase()" style="width: 100%;">LÁDA PUBLIKÁLÁSA</button>
+        </div>
+
+        <div class="creator-selector">
+          <h3>Válassz Skineket a Ládába:</h3>
+          <div class="items-grid" id="creator-skins-grid">
+            <!-- Választható CS2 skinek -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== 4. MODUL: BORROW (KÖLCSÖNZŐ MÓD) ==================== -->
+    <div id="tab-borrow" class="tab-content">
+      <div class="borrow-card">
+        <h2>💎 BORROW / HITELEZETT JÁTÉK MÓD</h2>
+        <p>Nincs egyenleged? Kérj azonnali hitelkeretet, játssz bármelyik ládával vagy csatával, és a nyereményedből fizesd vissza a kölcsönt!</p>
+        
+        <div class="borrow-stats">
+          <div class="borrow-box">
+            <span>Igényelhető Keret:</span>
+            <strong>$100.00 USD</strong>
+          </div>
+          <div class="borrow-box">
+            <span>Kamat:</span>
+            <strong>0% (Első 24 óra)</strong>
+          </div>
+        </div>
+
+        <button class="btn btn-gold" onclick="claimBorrowCredit()" style="padding: 1rem 3rem; margin-top: 1.5rem;">
+          $100 HITELKERET FELVÉTELE
+        </button>
+      </div>
+    </div>
 
   </main>
 
@@ -125,28 +188,19 @@
     <div class="modal-content">
       <span class="modal-close" onclick="closeDepositModal()">&times;</span>
       <h3 style="font-family: 'Rajdhani', sans-serif; font-size: 1.8rem; margin-bottom: 0.5rem;">EGYENLEG FELTÖLTÉSE</h3>
-      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">
-        Válassz összeget és kriptovalutát a feltöltéshez.
-      </p>
-
       <div class="form-group">
         <label>Összeg ($ USD):</label>
         <input type="number" id="deposit-amount" min="5" value="25" step="5">
       </div>
-
       <div class="form-group">
         <label>Fizetési Mód:</label>
         <select id="deposit-currency">
           <option value="USDT">Tether (USDT - TRC20)</option>
           <option value="BTC">Bitcoin (BTC)</option>
           <option value="ETH">Ethereum (ETH)</option>
-          <option value="LTC">Litecoin (LTC)</option>
         </select>
       </div>
-
-      <button class="btn btn-gold" onclick="processDeposit()" style="width: 100%; margin-top: 1rem;">
-        FIZETÉS INDÍTÁSA
-      </button>
+      <button class="btn btn-gold" onclick="processDeposit()" style="width: 100%; margin-top: 1rem;">FIZETÉS INDÍTÁSA</button>
     </div>
   </div>
 
