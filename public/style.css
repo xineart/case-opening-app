@@ -1,500 +1,71 @@
-@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700;800&family=Inter:wght@400;600;700;900&display=swap');
-
 :root {
-  --bg-dark: #06080e;
-  --bg-panel: #0b0e17;
-  --bg-card: #121824;
-  --bg-card-hover: #192233;
-  --border-color: #1e293b;
-
-  --neon-green: #00ff88;
-  --neon-green-glow: rgba(0, 255, 136, 0.35);
-  --cyan-accent: #00e5ff;
-  --purple-accent: #8b5cf6;
-  --gold-accent: #f59e0b;
-  --text-main: #ffffff;
-  --text-muted: #64748b;
-
-  --rarity-milspec: #3b82f6;
-  --rarity-restricted: #8b5cf6;
-  --rarity-classified: #d946ef;
-  --rarity-covert: #f43f5e;
-  --rarity-gold: #eab308;
+  --bg-primary: #0b0e14;
+  --bg-secondary: #151a23;
+  --accent-terb: #ff0055;
+  --text-main: #f0f2f5;
+  
+  /* CS2 Ritkaság Színek */
+  --rarity-consumer: #b0c3d9;
+  --rarity-restricted: #8847ff;
+  --rarity-classified: #d32ce6;
+  --rarity-covert: #eb4b4b;
+  --rarity-gold: #ffd700;
 }
-
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
 
 body {
-  background-color: var(--bg-dark);
+  background-color: var(--bg-primary);
   color: var(--text-main);
-  min-height: 100vh;
-  overflow-x: hidden;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
 }
 
-#effects-canvas {
-  position: fixed;
-  top: 0; left: 0; width: 100vw; height: 100vh;
-  pointer-events: none;
-  z-index: 999;
-}
-
-/* LIVE DROP BAR */
-.drop-bar {
-  background: #020305;
-  border-bottom: 1px solid var(--border-color);
-  height: 52px;
-  display: flex;
-  align-items: center;
-  overflow: hidden;
-}
-
-.drop-bar-label {
-  background: linear-gradient(135deg, var(--purple-accent), #6d28d9);
-  color: #fff;
-  font-family: 'Chakra Petch', sans-serif;
-  font-weight: 800;
-  font-size: 0.75rem;
-  padding: 0 1.2rem;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  white-space: nowrap;
-  z-index: 5;
-}
-
-.drop-track { display: flex; gap: 10px; padding-left: 10px; }
-
-.feed-item {
-  background: var(--bg-panel);
-  border: 1px solid var(--border-color);
-  border-bottom: 3px solid var(--rarity-milspec);
-  border-radius: 6px;
-  padding: 4px 12px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 140px;
-}
-
-.feed-item img { width: 36px; height: 32px; object-fit: contain; }
-.feed-item span { font-size: 0.75rem; font-weight: 700; white-space: nowrap; }
-
-/* NAVBAR */
 .navbar {
-  background: rgba(11, 14, 23, 0.95);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border-color);
-  padding: 0.8rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  padding: 15px 30px;
+  background: var(--bg-secondary);
+  border-bottom: 2px solid #222936;
 }
 
 .logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-family: 'Chakra Petch', sans-serif;
-  font-size: 1.8rem;
-  font-weight: 800;
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: 1px;
 }
 
-.logo-icon {
-  background: linear-gradient(135deg, var(--neon-green), var(--cyan-accent));
-  padding: 6px 10px;
+.logo span {
+  color: var(--accent-terb);
+}
+
+/* Skin Kártyák & Ritkaság Glow Effektek */
+.skin-card {
+  background: var(--bg-secondary);
   border-radius: 8px;
-  font-size: 1.2rem;
-}
-
-.logo .highlight { color: var(--neon-green); }
-
-.nav-links { display: flex; gap: 10px; }
-
-.nav-item {
-  background: transparent;
-  border: 1px solid transparent;
-  color: var(--text-muted);
-  font-family: 'Chakra Petch', sans-serif;
-  font-size: 0.95rem;
-  font-weight: 700;
-  padding: 0.6rem 1.2rem;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.nav-item:hover, .nav-item.active {
-  color: #fff;
-  background: var(--bg-card);
-  border-color: var(--border-color);
-}
-
-.header-right { display: flex; align-items: center; gap: 12px; }
-
-.lang-dropdown {
-  background: var(--bg-card);
-  color: #fff;
-  border: 1px solid var(--border-color);
-  padding: 0.5rem;
-  border-radius: 8px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.balance-display {
-  background: #000;
-  border: 1px solid var(--border-color);
-  padding: 0.4rem 1rem;
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-}
-
-.balance-label { font-size: 0.65rem; color: var(--text-muted); font-weight: 700; }
-.balance-value { color: var(--neon-green); font-family: 'Chakra Petch', sans-serif; font-size: 1.1rem; font-weight: 700; }
-
-/* BUTTONS */
-.btn {
-  border: none;
-  padding: 0.7rem 1.4rem;
-  border-radius: 8px;
-  font-family: 'Chakra Petch', sans-serif;
-  font-size: 0.95rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-primary { background: var(--neon-green); color: #000; }
-.btn-primary:hover { background: #00cc6a; box-shadow: 0 0 15px var(--neon-green-glow); }
-.btn-ghost { background: transparent; border: 1px solid var(--border-color); color: #fff; }
-.btn-ghost:hover { background: var(--bg-card); }
-.btn-icon { padding: 0.6rem; font-size: 1.1rem; }
-
-.btn-launch {
-  background: linear-gradient(135deg, var(--neon-green), var(--cyan-accent));
-  color: #000;
-  font-size: 1.2rem;
-  padding: 1rem 2.5rem;
-  border-radius: 10px;
-  box-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
-}
-
-.btn-launch:hover { transform: scale(1.02); }
-.btn-lg { padding: 0.9rem 1.8rem; font-size: 1.1rem; }
-.btn-sm { padding: 0.4rem 0.8rem; font-size: 0.85rem; }
-.width-100 { width: 100%; }
-.hidden { display: none !important; }
-
-/* MAIN APP CONTAINER */
-.app-container { max-width: 1380px; margin: 2rem auto; padding: 0 1.5rem; }
-.tab-page { display: none; }
-.tab-page.active { display: block; }
-
-.page-title { margin-bottom: 2rem; }
-.page-title h1 { font-family: 'Chakra Petch', sans-serif; font-size: 2.2rem; }
-.page-title p { color: var(--text-muted); margin-top: 5px; }
-.flex-title { display: flex; justify-content: space-between; align-items: center; }
-
-/* CASES GRID */
-.cases-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 22px;
-}
-
-.case-card {
-  background: var(--bg-panel);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  padding: 2rem 1rem;
+  padding: 15px;
   text-align: center;
-  cursor: pointer;
-  transition: all 0.25s;
   position: relative;
-  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-bottom: 3px solid #333;
 }
 
-.case-card:hover {
-  transform: translateY(-6px);
-  border-color: var(--cyan-accent);
-  background: var(--bg-card-hover);
+.skin-card:hover {
+  transform: translateY(-5px);
 }
 
-.case-card img { width: 150px; height: 120px; object-fit: contain; margin-bottom: 1rem; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5)); }
-.case-card h3 { font-family: 'Chakra Petch', sans-serif; font-size: 1.3rem; }
-.case-card .price { color: var(--neon-green); font-family: 'Chakra Petch', sans-serif; font-size: 1.2rem; font-weight: 800; margin-top: 8px; }
-
-/* UNBOXING & MULTI-SPINNER */
-.unboxing-stage {
-  background: var(--bg-panel);
-  border: 1px solid var(--border-color);
-  border-radius: 20px;
-  padding: 2.5rem 2rem;
-  text-align: center;
-  margin-bottom: 3rem;
+.skin-card.rarity-covert {
+  border-bottom-color: var(--rarity-covert);
+  box-shadow: 0 0 15px rgba(235, 75, 75, 0.2);
 }
 
-.multi-open-selector {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  margin: 1.5rem 0 1rem 0;
+.skin-card.rarity-extraordinary {
+  border-bottom-color: var(--rarity-gold);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
 }
 
-.btn-multi {
-  background: var(--bg-dark);
-  border: 1px solid var(--border-color);
-  color: #fff;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  font-weight: 700;
-  cursor: pointer;
+.skin-img-wrapper img {
+  max-width: 100%;
+  height: 120px;
+  object-fit: contain;
+  filter: drop-shadow(0px 5px 10px rgba(0,0,0,0.5));
 }
-
-.btn-multi.active {
-  border-color: var(--neon-green);
-  color: var(--neon-green);
-  background: rgba(0, 255, 136, 0.1);
-}
-
-.roulette-container {
-  position: relative;
-  width: 100%;
-  height: 180px;
-  background: #030407;
-  border-radius: 14px;
-  border: 2px solid var(--border-color);
-  margin: 1rem 0;
-  overflow: hidden;
-}
-
-.roulette-pointer {
-  position: absolute;
-  top: 0; left: 50%; transform: translateX(-50%);
-  width: 4px; height: 100%;
-  background: var(--neon-green);
-  z-index: 20;
-  box-shadow: 0 0 15px var(--neon-green);
-}
-
-.roulette-track {
-  display: flex;
-  gap: 12px;
-  position: absolute;
-  left: 0; top: 10px;
-}
-
-/* ITEM CARDS */
-.section-divider { margin: 2rem 0 1.5rem 0; }
-.section-divider h3 { font-family: 'Chakra Petch', sans-serif; color: var(--text-muted); font-size: 1.1rem; }
-
-.items-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 16px;
-}
-
-.item-card {
-  background: var(--bg-panel);
-  border: 1px solid var(--border-color);
-  border-bottom: 4px solid var(--rarity-milspec);
-  border-radius: 12px;
-  padding: 1rem 0.5rem;
-  text-align: center;
-  height: 175px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.item-card img { width: 110px; height: 85px; object-fit: contain; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5)); }
-.item-card .name { font-size: 0.75rem; font-weight: 700; }
-.item-card .price { color: var(--neon-green); font-size: 0.85rem; font-weight: 800; }
-
-.item-card.milspec { border-bottom-color: var(--rarity-milspec); }
-.item-card.restricted { border-bottom-color: var(--rarity-restricted); }
-.item-card.classified { border-bottom-color: var(--rarity-classified); }
-.item-card.covert { border-bottom-color: var(--rarity-covert); }
-.item-card.gold { border-bottom-color: var(--rarity-gold); }
-
-/* BATTLES LAYOUT */
-.battles-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; }
-.battles-lobby { display: flex; flex-direction: column; gap: 15px; }
-
-.battle-room-item {
-  background: var(--bg-panel);
-  border: 1px solid var(--border-color);
-  border-radius: 14px;
-  padding: 1.2rem 1.8rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.borrow-panel {
-  background: var(--bg-panel);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  padding: 1.5rem;
-}
-
-.sponsor-feed { display: flex; flex-direction: column; gap: 12px; }
-.sponsor-item {
-  background: #04060a;
-  border: 1px solid var(--border-color);
-  padding: 1rem;
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.battle-arena {
-  background: var(--bg-panel);
-  border: 2px solid var(--neon-green);
-  border-radius: 16px;
-  padding: 2rem;
-  margin-bottom: 2.5rem;
-}
-
-.battle-arena-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-.battle-players-grid { display: grid; grid-template-columns: 1fr 50px 1fr; gap: 20px; align-items: center; }
-.battle-player-card { background: var(--bg-dark); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: 12px; text-align: center; }
-.battle-vs { text-align: center; font-family: 'Chakra Petch', sans-serif; font-size: 1.8rem; font-weight: 800; color: var(--text-muted); }
-
-.battle-drop-slot {
-  height: 130px;
-  background: var(--bg-panel);
-  border: 1px dashed var(--border-color);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.battle-controls { display: flex; justify-content: center; gap: 15px; margin-top: 2rem; }
-
-/* UPGRADER STYLES */
-.upgrader-container {
-  display: grid;
-  grid-template-columns: 1fr 320px 1fr;
-  gap: 25px;
-  align-items: start;
-}
-
-.upgrader-card {
-  background: var(--bg-panel);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  padding: 1.5rem;
-}
-
-.upgrader-card h3 { font-family: 'Chakra Petch', sans-serif; margin-bottom: 1rem; font-size: 1.1rem; }
-
-.mini-inv-list, .mini-target-list {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  max-height: 280px;
-  overflow-y: auto;
-  margin-top: 10px;
-}
-
-.mini-item-card {
-  background: var(--bg-dark);
-  border: 1px solid var(--border-color);
-  padding: 8px;
-  border-radius: 8px;
-  text-align: center;
-  cursor: pointer;
-}
-
-.mini-item-card.selected { border-color: var(--neon-green); background: rgba(0,255,136,0.1); }
-.mini-item-card img { width: 50px; height: 40px; object-fit: contain; }
-.mini-item-card .name { font-size: 0.65rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.mini-item-card .price { font-size: 0.75rem; color: var(--neon-green); font-weight: 700; }
-
-.upgrader-center {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-}
-
-.upgrade-wheel-wrapper {
-  position: relative;
-  width: 240px;
-  height: 240px;
-}
-
-.upgrade-svg {
-  width: 100%;
-  height: 100%;
-  transform: rotate(-90deg);
-}
-
-.wheel-bg { fill: none; stroke: var(--bg-card); stroke-width: 20; }
-.wheel-chance {
-  fill: none;
-  stroke: var(--neon-green);
-  stroke-width: 20;
-  stroke-dasharray: 502.4;
-  stroke-dashoffset: 251.2;
-  transition: stroke-dashoffset 0.3s ease;
-}
-
-.wheel-pointer {
-  position: absolute;
-  top: 50%; left: 50%;
-  width: 4px; height: 100px;
-  background: var(--cyan-accent);
-  transform-origin: top center;
-  transform: translate(-50%, 0) rotate(0deg);
-  z-index: 10;
-  box-shadow: 0 0 10px var(--cyan-accent);
-}
-
-.wheel-center-info {
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  font-family: 'Chakra Petch', sans-serif;
-}
-
-.wheel-center-info span { display: block; font-size: 1.6rem; font-weight: 800; color: #fff; }
-.wheel-center-info small { color: var(--text-muted); font-weight: 700; }
-
-.target-display-box {
-  background: var(--bg-dark);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 1.5rem;
-  text-align: center;
-}
-
-.target-display-box img { width: 120px; height: 90px; object-fit: contain; margin-bottom: 10px; }
-.target-display-box h4 { font-family: 'Chakra Petch', sans-serif; font-size: 1.1rem; }
-.target-display-box .target-price { color: var(--neon-green); font-weight: 800; font-size: 1.2rem; display: block; margin-top: 5px; }
-
-/* MODALS */
-.modal-backdrop {
-  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px);
-  z-index: 1000; display: flex; justify-content: center; align-items: center;
-}
-
-.modal-box { background: var(--bg-panel); border: 1px solid var(--border-color); padding: 2.5rem; border-radius: 16px; width: 400px; position: relative; }
-.modal-close { position: absolute; top: 15px; right: 20px; font-size: 1.8rem; cursor: pointer; color: var(--text-muted); }
-.form-field { margin-bottom: 1.2rem; display: flex; justify-content: space-between; align-items: center; }
-.form-field label { font-size: 0.9rem; color: var(--text-muted); }
-.form-field input[type="text"], .form-field input[type="password"], .form-field input[type="number"] { width: 100%; background: #000; border: 1px solid var(--border-color); padding: 0.8rem; color: #fff; border-radius: 8px; }
