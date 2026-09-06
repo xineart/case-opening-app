@@ -31,6 +31,13 @@ body {
   overflow-x: hidden;
 }
 
+#effects-canvas {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  pointer-events: none;
+  z-index: 999;
+}
+
 /* LIVE DROP BAR */
 .drop-bar {
   background: #020305;
@@ -195,7 +202,7 @@ body {
 .page-title p { color: var(--text-muted); margin-top: 5px; }
 .flex-title { display: flex; justify-content: space-between; align-items: center; }
 
-/* CASES GRID (8 LÁDA) */
+/* CASES GRID */
 .cases-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -214,44 +221,58 @@ body {
   overflow: hidden;
 }
 
-.case-card::before {
-  content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
-  background: linear-gradient(90deg, transparent, var(--cyan-accent), transparent);
-  opacity: 0; transition: opacity 0.25s;
-}
-
 .case-card:hover {
   transform: translateY(-6px);
   border-color: var(--cyan-accent);
   background: var(--bg-card-hover);
 }
 
-.case-card:hover::before { opacity: 1; }
 .case-card img { width: 150px; height: 120px; object-fit: contain; margin-bottom: 1rem; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5)); }
 .case-card h3 { font-family: 'Chakra Petch', sans-serif; font-size: 1.3rem; }
 .case-card .price { color: var(--neon-green); font-family: 'Chakra Petch', sans-serif; font-size: 1.2rem; font-weight: 800; margin-top: 8px; }
 
-/* UNBOXING STAGE & SPINNER */
+/* UNBOXING & MULTI-SPINNER */
 .unboxing-stage {
   background: var(--bg-panel);
   border: 1px solid var(--border-color);
   border-radius: 20px;
-  padding: 3rem 2rem;
+  padding: 2.5rem 2rem;
   text-align: center;
   margin-bottom: 3rem;
 }
 
-.case-header-info h2 { font-family: 'Chakra Petch', sans-serif; font-size: 2rem; }
-.case-price-tag { color: var(--cyan-accent); font-size: 1.3rem; font-weight: 700; margin-top: 5px; }
+.multi-open-selector {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin: 1.5rem 0 1rem 0;
+}
+
+.btn-multi {
+  background: var(--bg-dark);
+  border: 1px solid var(--border-color);
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-multi.active {
+  border-color: var(--neon-green);
+  color: var(--neon-green);
+  background: rgba(0, 255, 136, 0.1);
+}
 
 .roulette-container {
   position: relative;
   width: 100%;
-  height: 200px;
+  height: 180px;
   background: #030407;
   border-radius: 14px;
   border: 2px solid var(--border-color);
-  margin: 2rem 0;
+  margin: 1rem 0;
   overflow: hidden;
 }
 
@@ -268,7 +289,7 @@ body {
   display: flex;
   gap: 12px;
   position: absolute;
-  left: 0; top: 15px;
+  left: 0; top: 10px;
 }
 
 /* ITEM CARDS */
@@ -293,7 +314,6 @@ body {
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  background-size: cover;
 }
 
 .item-card img { width: 110px; height: 85px; object-fit: contain; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5)); }
@@ -306,11 +326,8 @@ body {
 .item-card.covert { border-bottom-color: var(--rarity-covert); }
 .item-card.gold { border-bottom-color: var(--rarity-gold); }
 
-/* BATTLES LAYOUT (INTEGRÁLT BORROW-VAL) */
+/* BATTLES LAYOUT */
 .battles-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; }
-.battles-section h3, .borrow-panel h3 { font-family: 'Chakra Petch', sans-serif; margin-bottom: 1rem; }
-.panel-desc { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.2rem; }
-
 .battles-lobby { display: flex; flex-direction: column; gap: 15px; }
 
 .battle-room-item {
@@ -323,18 +340,6 @@ body {
   align-items: center;
 }
 
-.battle-tag {
-  background: rgba(139, 92, 246, 0.2);
-  color: var(--purple-accent);
-  border: 1px solid var(--purple-accent);
-  font-size: 0.7rem;
-  font-weight: 800;
-  padding: 2px 8px;
-  border-radius: 4px;
-  margin-left: 8px;
-}
-
-/* BORROW INTEGRÁLT PANEL */
 .borrow-panel {
   background: var(--bg-panel);
   border: 1px solid var(--border-color);
@@ -353,9 +358,6 @@ body {
   gap: 10px;
 }
 
-.sponsor-header { display: flex; justify-content: space-between; font-size: 0.9rem; }
-
-/* BATTLE ARENA */
 .battle-arena {
   background: var(--bg-panel);
   border: 2px solid var(--neon-green);
@@ -365,15 +367,9 @@ body {
 }
 
 .battle-arena-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-.battle-mode-badge { color: var(--cyan-accent); font-weight: 700; font-size: 0.9rem; margin-top: 4px; }
-.battle-status-badge { background: var(--neon-green); color: #000; font-weight: 800; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; }
-
 .battle-players-grid { display: grid; grid-template-columns: 1fr 50px 1fr; gap: 20px; align-items: center; }
 .battle-player-card { background: var(--bg-dark); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: 12px; text-align: center; }
 .battle-vs { text-align: center; font-family: 'Chakra Petch', sans-serif; font-size: 1.8rem; font-weight: 800; color: var(--text-muted); }
-
-.player-info { display: flex; justify-content: space-between; margin-bottom: 1rem; }
-.player-total { color: var(--neon-green); font-weight: 700; }
 
 .battle-drop-slot {
   height: 130px;
@@ -387,6 +383,109 @@ body {
 
 .battle-controls { display: flex; justify-content: center; gap: 15px; margin-top: 2rem; }
 
+/* UPGRADER STYLES */
+.upgrader-container {
+  display: grid;
+  grid-template-columns: 1fr 320px 1fr;
+  gap: 25px;
+  align-items: start;
+}
+
+.upgrader-card {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 1.5rem;
+}
+
+.upgrader-card h3 { font-family: 'Chakra Petch', sans-serif; margin-bottom: 1rem; font-size: 1.1rem; }
+
+.mini-inv-list, .mini-target-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  max-height: 280px;
+  overflow-y: auto;
+  margin-top: 10px;
+}
+
+.mini-item-card {
+  background: var(--bg-dark);
+  border: 1px solid var(--border-color);
+  padding: 8px;
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.mini-item-card.selected { border-color: var(--neon-green); background: rgba(0,255,136,0.1); }
+.mini-item-card img { width: 50px; height: 40px; object-fit: contain; }
+.mini-item-card .name { font-size: 0.65rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mini-item-card .price { font-size: 0.75rem; color: var(--neon-green); font-weight: 700; }
+
+.upgrader-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.upgrade-wheel-wrapper {
+  position: relative;
+  width: 240px;
+  height: 240px;
+}
+
+.upgrade-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.wheel-bg { fill: none; stroke: var(--bg-card); stroke-width: 20; }
+.wheel-chance {
+  fill: none;
+  stroke: var(--neon-green);
+  stroke-width: 20;
+  stroke-dasharray: 502.4;
+  stroke-dashoffset: 251.2;
+  transition: stroke-dashoffset 0.3s ease;
+}
+
+.wheel-pointer {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 4px; height: 100px;
+  background: var(--cyan-accent);
+  transform-origin: top center;
+  transform: translate(-50%, 0) rotate(0deg);
+  z-index: 10;
+  box-shadow: 0 0 10px var(--cyan-accent);
+}
+
+.wheel-center-info {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  font-family: 'Chakra Petch', sans-serif;
+}
+
+.wheel-center-info span { display: block; font-size: 1.6rem; font-weight: 800; color: #fff; }
+.wheel-center-info small { color: var(--text-muted); font-weight: 700; }
+
+.target-display-box {
+  background: var(--bg-dark);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.target-display-box img { width: 120px; height: 90px; object-fit: contain; margin-bottom: 10px; }
+.target-display-box h4 { font-family: 'Chakra Petch', sans-serif; font-size: 1.1rem; }
+.target-display-box .target-price { color: var(--neon-green); font-weight: 800; font-size: 1.2rem; display: block; margin-top: 5px; }
+
 /* MODALS */
 .modal-backdrop {
   position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -398,4 +497,4 @@ body {
 .modal-close { position: absolute; top: 15px; right: 20px; font-size: 1.8rem; cursor: pointer; color: var(--text-muted); }
 .form-field { margin-bottom: 1.2rem; display: flex; justify-content: space-between; align-items: center; }
 .form-field label { font-size: 0.9rem; color: var(--text-muted); }
-.form-field input[type="text"], .form-field input[type="password"] { width: 100%; background: #000; border: 1px solid var(--border-color); padding: 0.8rem; color: #fff; border-radius: 8px; margin-top: 6px; }
+.form-field input[type="text"], .form-field input[type="password"], .form-field input[type="number"] { width: 100%; background: #000; border: 1px solid var(--border-color); padding: 0.8rem; color: #fff; border-radius: 8px; }
