@@ -46,7 +46,6 @@ let currentUser = localStorage.getItem('cs2_active_user') || null;
 let isLoggedIn = !!currentUser;
 let usersDb = JSON.parse(localStorage.getItem('cs2_users_db')) || {};
 
-// Ha be van jelentkezve, töltsük be a mentett adatait, különben alapértelmezett
 let userBalance = isLoggedIn && usersDb[currentUser] ? usersDb[currentUser].balance : 100.00;
 let userInventory = isLoggedIn && usersDb[currentUser] ? usersDb[currentUser].inventory : [];
 
@@ -60,7 +59,7 @@ function saveUserData() {
   if (!isLoggedIn || !currentUser) return;
   
   if (!usersDb[currentUser]) {
-    usersDb[currentUser] = { password: "", balance: 100.00, inventory: [] };
+    usersDb[currentUser] = { password: "123", balance: 100.00, inventory: [] };
   }
   
   usersDb[currentUser].balance = userBalance;
@@ -117,18 +116,17 @@ document.addEventListener('DOMContentLoaded', () => {
   initLiveFeed();
   initUpgrader();
 
-  // Munkamenet ellenőrzése induláskor
   if (isLoggedIn && currentUser) {
     applyLoggedInState();
   } else {
     applyLoggedOutState();
   }
 
-  document.getElementById('open-case-btn').addEventListener('click', handleOpenCase);
-  document.getElementById('back-to-catalog-btn').addEventListener('click', closeCaseView);
-  document.getElementById('create-battle-modal-btn').addEventListener('click', createNewBattle);
-  document.getElementById('start-battle-spin-btn').addEventListener('click', runBattleSpin);
-  document.getElementById('close-battle-arena-btn').addEventListener('click', closeBattleArena);
+  document.getElementById('open-case-btn')?.addEventListener('click', handleOpenCase);
+  document.getElementById('back-to-catalog-btn')?.addEventListener('click', closeCaseView);
+  document.getElementById('create-battle-modal-btn')?.addEventListener('click', createNewBattle);
+  document.getElementById('start-battle-spin-btn')?.addEventListener('click', runBattleSpin);
+  document.getElementById('close-battle-arena-btn')?.addEventListener('click', closeBattleArena);
 
   document.querySelectorAll('.btn-multi').forEach(btn => {
     btn.addEventListener('click', (e) => {
@@ -140,17 +138,22 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// AUTH & MODAL SYSTEM (MŰKÖDŐ REGISZTRÁCIÓ & BEJELENTKEZÉS)
+// AUTH & MODAL SYSTEM (BEJELENTKEZÉS & REGISZTRÁCIÓ VÁLTÁS)
 function setupAuthAndModals() {
   const loginModal = document.getElementById('login-modal');
   const settingsModal = document.getElementById('settings-modal');
 
   document.getElementById('open-login-btn').onclick = () => loginModal.classList.remove('hidden');
   document.getElementById('close-login-btn').onclick = () => loginModal.classList.add('hidden');
-  
-  document.getElementById('confirm-login-btn').onclick = performLogin;
-  document.getElementById('confirm-register-btn').onclick = performRegister;
-  document.getElementById('logout-btn').onclick = performLogout;
+
+  // Modal fülek / gombok eseményei
+  const confirmLoginBtn = document.getElementById('confirm-login-btn');
+  const confirmRegBtn = document.getElementById('confirm-register-btn');
+  const logoutBtn = document.getElementById('logout-btn');
+
+  if (confirmLoginBtn) confirmLoginBtn.onclick = performLogin;
+  if (confirmRegBtn) confirmRegBtn.onclick = performRegister;
+  if (logoutBtn) logoutBtn.onclick = performLogout;
 
   document.getElementById('open-settings-btn').onclick = () => settingsModal.classList.remove('hidden');
   document.getElementById('close-settings-btn').onclick = () => settingsModal.classList.add('hidden');
@@ -163,17 +166,20 @@ function setupAuthAndModals() {
   };
 }
 
+// REGISZTRÁCIÓ LOGIKA
 function performRegister() {
-  const userIn = document.getElementById('login-username-input').value.trim();
-  const passIn = document.getElementById('login-password-input') ? document.getElementById('login-password-input').value.trim() : "1234";
+  const userIn = document.getElementById('login-username-input')?.value.trim();
+  const passIn = document.getElementById('login-password-input')?.value.trim();
 
-  if (!userIn) return alert("Kérlek adj meg egy felhasználónevet!");
-
-  if (usersDb[userIn]) {
-    return alert("Ez a felhasználónév már foglalt! Próbálj meg bejelentkezni.");
+  if (!userIn || !passIn) {
+    return alert("Kérlek adj meg egy felhasználónevet és egy jelszót a regisztrációhoz!");
   }
 
-  // Új fiók létrehozása
+  if (usersDb[userIn]) {
+    return alert("Ez a felhasználónév már létezik! Kérlek válassz másikat vagy jelentkezz be.");
+  }
+
+  // Új felhasználó rögzítése
   usersDb[userIn] = {
     password: passIn,
     balance: 100.00,
@@ -187,21 +193,28 @@ function performRegister() {
 
   saveUserData();
   applyLoggedInState();
+
   document.getElementById('login-modal').classList.add('hidden');
-  alert("Sikeres regisztráció! Gratulálunk!");
+  alert(`Sikeres regisztráció, üdvözlünk ${userIn}! Kaptál $100 kezdőtőkét.`);
 }
 
+// BEJELENTKEZÉS LOGIKA
 function performLogin() {
-  const userIn = document.getElementById('login-username-input').value.trim();
-  const passIn = document.getElementById('login-password-input') ? document.getElementById('login-password-input').value.trim() : "1234";
+  const userIn = document.getElementById('login-username-input')?.value.trim();
+  const passIn = document.getElementById('login-password-input')?.value.trim();
 
-  if (!userIn) return alert("Kérlek adj meg egy felhasználónevet!");
-
-  if (!usersDb[userIn]) {
-    return alert("Nincs ilyen felhasználó! Kattints a REGISZTRÁCIÓ gombra a fiók létrehozásához.");
+  if (!userIn || !passIn) {
+    return alert("Kérlek add meg a felhasználóneved és a jelszavad!");
   }
 
-  // Bejelentkezés ellenőrzés
+  if (!usersDb[userIn]) {
+    return alert("Nincs ilyen fiók! Kattints a REGISZTRÁCIÓ gombra az új fiók nyitásához.");
+  }
+
+  if (usersDb[userIn].password !== passIn) {
+    return alert("Hibás jelszó!");
+  }
+
   currentUser = userIn;
   userBalance = usersDb[userIn].balance;
   userInventory = usersDb[userIn].inventory || [];
@@ -209,6 +222,7 @@ function performLogin() {
 
   saveUserData();
   applyLoggedInState();
+
   document.getElementById('login-modal').classList.add('hidden');
 }
 
@@ -220,60 +234,58 @@ function performLogout() {
 }
 
 function applyLoggedInState() {
-  document.getElementById('open-login-btn').classList.add('hidden');
-  document.getElementById('user-profile-box').classList.remove('hidden');
-  document.getElementById('user-balance-box').classList.remove('hidden');
-  document.getElementById('open-deposit-btn').classList.remove('hidden');
+  document.getElementById('open-login-btn')?.classList.add('hidden');
+  document.getElementById('user-profile-box')?.classList.remove('hidden');
+  document.getElementById('user-balance-box')?.classList.remove('hidden');
+  document.getElementById('open-deposit-btn')?.classList.remove('hidden');
 
-  document.getElementById('display-username').innerText = currentUser;
-  if (document.getElementById('p1-display-name')) {
-    document.getElementById('p1-display-name').innerText = currentUser;
-  }
+  const displayUserEl = document.getElementById('display-username');
+  if (displayUserEl) displayUserEl.innerText = currentUser;
+
+  const p1NameEl = document.getElementById('p1-display-name');
+  if (p1NameEl) p1NameEl.innerText = currentUser;
 
   updateBalanceUI();
   renderInventory();
 }
 
 function applyLoggedOutState() {
-  document.getElementById('open-login-btn').classList.remove('hidden');
-  document.getElementById('user-profile-box').classList.add('hidden');
-  document.getElementById('user-balance-box').classList.add('hidden');
-  document.getElementById('open-deposit-btn').classList.add('hidden');
+  document.getElementById('open-login-btn')?.classList.remove('hidden');
+  document.getElementById('user-profile-box')?.classList.add('hidden');
+  document.getElementById('user-balance-box')?.classList.add('hidden');
+  document.getElementById('open-deposit-btn')?.classList.add('hidden');
   
   userBalance = 0;
   userInventory = [];
   renderInventory();
 }
 
-// LENYÍLÓ INVENTORY FUNKCIÓ
+// LENYÍLÓ INVENTORY
 function setupDropdownInventory() {
-  const invToggleBtn = document.getElementById('toggle-inventory-btn') || document.getElementById('user-profile-box');
+  const profileBox = document.getElementById('user-profile-box');
   const dropdownPanel = document.getElementById('dropdown-inventory-panel');
 
-  if (invToggleBtn && dropdownPanel) {
-    invToggleBtn.addEventListener('click', (e) => {
-      // Megakadályozzuk, hogy a kijelentkezés gombra kattintva is lenyíljon
+  if (profileBox && dropdownPanel) {
+    profileBox.addEventListener('click', (e) => {
       if (e.target.id === 'logout-btn') return;
       dropdownPanel.classList.toggle('open');
     });
   }
 }
 
-// ITEM ELADÁSA (SELL SYSTEM)
+// TÁRGY ELADÁSA
 window.sellItem = function(index) {
   if (index < 0 || index >= userInventory.length) return;
 
   const itemToSell = userInventory[index];
   userBalance += itemToSell.price;
-  
-  // Eltávolítjuk a tömbből
   userInventory.splice(index, 1);
 
-  // Mentjük a változást és frissítjük a felületet
   saveUserData();
   updateBalanceUI();
   renderInventory();
-  if (document.getElementById('tab-upgrader').classList.contains('active')) {
+
+  if (document.getElementById('tab-upgrader')?.classList.contains('active')) {
     updateUpgraderInventory();
   }
 };
@@ -307,24 +319,24 @@ window.switchLanguage = function(lang) {
   document.getElementById(`lang-${lang}`).classList.add('active');
 
   const t = TRANSLATIONS[lang];
-  document.getElementById('txt-live-drops').innerText = t.liveDrops;
-  document.getElementById('txt-nav-cases').innerText = t.navCases;
-  document.getElementById('txt-nav-battles').innerText = t.navBattles;
-  document.getElementById('txt-nav-upgrader').innerText = t.navUpgrader;
-  document.getElementById('txt-balance-label').innerText = t.balanceLabel;
-  document.getElementById('txt-login-btn').innerText = t.loginBtn;
-  document.getElementById('txt-cases-title').innerText = t.casesTitle;
-  document.getElementById('txt-cases-sub').innerText = t.casesSub;
-  document.getElementById('txt-multi-open').innerText = t.multiOpen;
-  document.getElementById('txt-case-contents').innerText = t.caseContents;
-  document.getElementById('txt-inventory-title').innerText = t.inventoryTitle;
-  document.getElementById('txt-battles-sub').innerText = t.battlesSub;
-  document.getElementById('txt-open-battles').innerText = t.openBattles;
-  document.getElementById('txt-borrow-desc').innerText = t.borrowDesc;
-  document.getElementById('txt-upgrader-sub').innerText = t.upgraderSub;
-  document.getElementById('txt-your-stake').innerText = t.yourStake;
-  document.getElementById('txt-chance-label').innerText = t.chanceLabel;
-  document.getElementById('txt-target-skin').innerText = t.targetSkin;
+  if(document.getElementById('txt-live-drops')) document.getElementById('txt-live-drops').innerText = t.liveDrops;
+  if(document.getElementById('txt-nav-cases')) document.getElementById('txt-nav-cases').innerText = t.navCases;
+  if(document.getElementById('txt-nav-battles')) document.getElementById('txt-nav-battles').innerText = t.navBattles;
+  if(document.getElementById('txt-nav-upgrader')) document.getElementById('txt-nav-upgrader').innerText = t.navUpgrader;
+  if(document.getElementById('txt-balance-label')) document.getElementById('txt-balance-label').innerText = t.balanceLabel;
+  if(document.getElementById('txt-login-btn')) document.getElementById('txt-login-btn').innerText = t.loginBtn;
+  if(document.getElementById('txt-cases-title')) document.getElementById('txt-cases-title').innerText = t.casesTitle;
+  if(document.getElementById('txt-cases-sub')) document.getElementById('txt-cases-sub').innerText = t.casesSub;
+  if(document.getElementById('txt-multi-open')) document.getElementById('txt-multi-open').innerText = t.multiOpen;
+  if(document.getElementById('txt-case-contents')) document.getElementById('txt-case-contents').innerText = t.caseContents;
+  if(document.getElementById('txt-inventory-title')) document.getElementById('txt-inventory-title').innerText = t.inventoryTitle;
+  if(document.getElementById('txt-battles-sub')) document.getElementById('txt-battles-sub').innerText = t.battlesSub;
+  if(document.getElementById('txt-open-battles')) document.getElementById('txt-open-battles').innerText = t.openBattles;
+  if(document.getElementById('txt-borrow-desc')) document.getElementById('txt-borrow-desc').innerText = t.borrowDesc;
+  if(document.getElementById('txt-upgrader-sub')) document.getElementById('txt-upgrader-sub').innerText = t.upgraderSub;
+  if(document.getElementById('txt-your-stake')) document.getElementById('txt-your-stake').innerText = t.yourStake;
+  if(document.getElementById('txt-chance-label')) document.getElementById('txt-chance-label').innerText = t.chanceLabel;
+  if(document.getElementById('txt-target-skin')) document.getElementById('txt-target-skin').innerText = t.targetSkin;
   
   renderInventory();
 };
@@ -345,6 +357,7 @@ function setupNavigation() {
 
 function renderCasesCatalog() {
   const grid = document.getElementById('cases-grid');
+  if (!grid) return;
   grid.innerHTML = OFFICIAL_CASES.map(c => `
     <div class="case-card" onclick="openCaseView('${c.id}')">
       <img src="${c.img}" alt="${c.name}">
@@ -375,6 +388,7 @@ window.openCaseView = function(caseId) {
 
 function updateMultiSpinners() {
   const wrapper = document.getElementById('spinners-wrapper');
+  if (!wrapper) return;
   wrapper.innerHTML = '';
   for (let i = 0; i < multiOpenCount; i++) {
     wrapper.innerHTML += `
@@ -385,7 +399,8 @@ function updateMultiSpinners() {
     `;
   }
   const totalCost = activeCase ? activeCase.price * multiOpenCount : 0;
-  document.getElementById('open-case-btn').innerText = `LÁDA NYITÁSA ($${totalCost.toFixed(2)})`;
+  const openBtn = document.getElementById('open-case-btn');
+  if (openBtn) openBtn.innerText = `LÁDA NYITÁSA ($${totalCost.toFixed(2)})`;
 }
 
 function closeCaseView() {
@@ -393,7 +408,7 @@ function closeCaseView() {
   document.getElementById('case-catalog-view').classList.remove('hidden');
 }
 
-// PONTOS 80 KÁRTYÁS LÁDANYITÁS
+// 80 KÁRTYÁS LÁDANYITÁS
 function handleOpenCase() {
   if (!isLoggedIn) return document.getElementById('login-modal').classList.remove('hidden');
   if (isSpinning) return;
