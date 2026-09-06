@@ -109,6 +109,18 @@ header {
   font-weight: 800;
 }
 
+.btn-sell {
+  width: 100%;
+  padding: 0.3rem 0;
+  font-size: 0.7rem;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  margin-top: 5px;
+}
+
+.btn-sell:hover {
+  background: linear-gradient(135deg, #f87171, #ef4444);
+}
+
 /* --- CONTAINER & LAYOUT --- */
 .main-container {
   max-width: 1300px;
@@ -181,6 +193,7 @@ header {
   border-bottom: 4px solid var(--rarity-milspec);
   overflow: hidden;
   user-select: none;
+  transition: transform 0.2s, opacity 0.2s;
 }
 
 .item-card img {
@@ -213,7 +226,7 @@ header {
 .item-card.milspec { border-bottom-color: var(--rarity-milspec); }
 .item-card.gold { border-bottom-color: var(--rarity-gold); }
 
-/* --- CASE CONTENT GRID (LÁDA TARTALMA) --- */
+/* --- CASE CONTENT GRID (LÁDA TARTALMA & LELTÁR) --- */
 .section-title {
   font-size: 1.2rem;
   font-weight: 800;
@@ -225,6 +238,77 @@ header {
 
 .items-grid {
   display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 15px;
+}
+
+/* --- MODAL (BEFIZETÉSI POP-UP ABLAK) --- */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(5px);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 2rem;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 400px;
+  position: relative;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+}
+
+.modal-close {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 1.5rem;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.modal-close:hover {
+  color: #fff;
+}
+
+.form-group {
+  margin-bottom: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.form-group input,
+.form-group select {
+  background: var(--bg-accent);
+  border: 1px solid var(--border-color);
+  color: #fff;
+  padding: 0.7rem;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: var(--accent-gold);
+}
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   gap: 15px;
 }
