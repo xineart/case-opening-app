@@ -28,8 +28,6 @@
     .btn:active { transform: translateY(0); }
     .btn-ghost { background: transparent; border: 1px solid #374151; color: #9ca3af; }
     .btn-ghost:hover { background: #1f2937; color: #fff; }
-    .btn-danger { background: #dc2626; color: white; }
-    .btn-danger:hover { background: #b91c1c; }
 
     /* LIVE FEED */
     .live-feed { background: #0e121a; height: 65px; border-bottom: 1px solid #1a2332; display: flex; align-items: center; padding: 0 20px; gap: 15px; overflow: hidden; }
@@ -49,7 +47,7 @@
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
     .case-card, .item-card { background: #131722; border: 1px solid #202838; border-radius: 10px; padding: 18px; text-align: center; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; }
     .case-card:hover, .item-card:hover { transform: translateY(-4px); border-color: #3b82f6; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
-    .case-card img, .item-card img { width: 100%; height: 110px; object-fit: contain; margin-bottom: 12px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5)); }
+    .case-card img, .item-card img { width: 100%; height: 90px; object-fit: contain; margin-bottom: 12px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5)); }
     .item-name { font-size: 13px; font-weight: 700; color: #e5e7eb; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .price { color: #10b981; font-weight: 800; font-size: 14px; margin-top: 6px; }
 
@@ -71,7 +69,7 @@
     .wheel-container { position: relative; width: 220px; height: 220px; margin: 0 auto; }
     .wheel-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
     .wheel-bg { fill: none; stroke: #1f293d; stroke-width: 12; }
-    .wheel-slice { fill: none; stroke: #10b981; stroke-width: 12; stroke-dasharray: 565; stroke-dashoffset: 282; transition: stroke-dashoffset 0.3s; }
+    .wheel-slice { fill: none; stroke: #10b981; stroke-width: 12; stroke-dasharray: 565; stroke-dashoffset: 565; transition: stroke-dashoffset 0.3s; }
     .wheel-pointer { position: absolute; top: 0; left: 50%; width: 4px; height: 110px; background: #ef4444; transform-origin: bottom center; transform: translateX(-50%) rotate(0deg); transition: transform 4s cubic-bezier(0.15, 0.9, 0.15, 1); }
 
     /* BATTLE ARENA */
@@ -123,7 +121,7 @@
     <div id="tab-cases" class="tab-page active">
       <div id="case-catalog-view">
         <h2>CS2 LÁDÁK</h2>
-        <p class="sub-title">Nyiss exkluzív skineket hivatalos drop-esélyekkel!</p>
+        <p class="sub-title">Nyiss exkluzív skineket garantált működéssel!</p>
         <div class="grid" id="cases-grid"></div>
       </div>
 
@@ -235,22 +233,28 @@
   </div>
 
   <script>
-    // DATABASES
+    // FIX GARANTÁLTAN MŰKÖDŐ SVG KÉPEK
+    const SVG_PISTOL = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='%238a99ad'><path d='M10 35 h50 v15 h-10 v25 h-15 v-25 h-25 z'/></svg>";
+    const SVG_RIFLE = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='%23d32ce6'><path d='M5 40 h80 v10 h-15 v25 h-10 v-25 h-30 v20 h-10 v-20 h-15 z'/></svg>";
+    const SVG_SNIPER = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='%23eb4b4b'><path d='M0 42 h95 v6 h-20 v22 h-10 v-22 h-40 v15 h-8 v-15 h-17 z'/></svg>";
+    const SVG_KNIFE = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='%23ffd700'><path d='M20 65 l50 -45 c10 0 15 10 15 15 l-45 50 z'/></svg>";
+    const SVG_BOX = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='%23ffb703'><rect x='20' y='25' width='60' height='50' rx='5'/><path d='M20 40 h60' stroke='%23131722' stroke-width='4'/></svg>";
+
     const SKIN_DATABASE = [
-      { id: 1, name: "P250 | Sand Dune", price: 0.50, color: "#4b69ff", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d11PP65XbveKGHcaYKh4SFVR347ZI15BQsA9-i5R2RthL545I2P5O1117ACZZ1-P3e11y1633dKRN7d2019-1x4S1MrO2z2oA6ccj0uXG9duhiwex_0U6ZDutLdPBcgQ6NV_Z-1m9l7i8hMW86J7PzXU2124S8f9s" },
-      { id: 2, name: "Glock-18 | Water Elemental", price: 8.50, color: "#8847ff", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d11PP65XbveKGHcaYKh4SFVR347ZI15BQsA9-i5R2RthL545I2P5O114jA2J1-P3128y0j3s11a5A22M81O4xN-D3m8a2X_f1wz_I0Y6209jX8M9y307sMWi3cNS1NFS5O16v1uT-4s2XvXU21xOa21wS1_M3w" },
-      { id: 3, name: "AK-47 | Redline", price: 22.00, color: "#d32ce6", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d11PP65XbveKGHcaYKh4SFVR347ZI15BQsA9-i5R2RthL545I2P5O114jA2J1-P3128y0j3v-1A1L4O8xM_C41-G24241N2xY-fS5aX1W9MWzX1aM904M205-01e4A22X-M9L6a2X" },
-      { id: 4, name: "M4A4 | Neo-Noir", price: 35.00, color: "#eb4b4b", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d11PP65XbveKGHcaYKh4SFVR347ZI15BQsA9-i5R2RthL545I2P5O114jA2J1-P3128y0j3v-1A1L4O8xM_C41-G24241N2xY-fS5aX1W9MWzX1aM904M205-01e4A22X-M9L6a2X" },
-      { id: 5, name: "AWP | Asiimov", price: 110.00, color: "#eb4b4b", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d11PP65XbveKGHcaYKh4SFVR347ZI15BQsA9-i5R2RthL545I2P5O114jA2J1-P3128y0j3v-1A1L4O8xM_C41-G24241N2xY-fS5aX1W9MWzX1aM904M205-01e4A22X-M9L6a2X" },
-      { id: 6, name: "AK-47 | Vulcan", price: 280.00, color: "#eb4b4b", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d11PP65XbveKGHcaYKh4SFVR347ZI15BQsA9-i5R2RthL545I2P5O114jA2J1-P3128y0j3v-1A1L4O8xM_C41-G24241N2xY-fS5aX1W9MWzX1aM904M205-01e4A22X-M9L6a2X" },
-      { id: 7, name: "★ Karambit | Fade", price: 2400.00, color: "#ffd700", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d11PP65XbveKGHcaYKh4SFVR347ZI15BQsA9-i5R2RthL545I2P5O114jA2J1-P3128y0j3v-1A1L4O8xM_C41-G24241N2xY-fS5aX1W9MWzX1aM904M205-01e4A22X-M9L6a2X" }
+      { id: 1, name: "P250 | Sand Dune", price: 0.50, color: "#4b69ff", img: SVG_PISTOL },
+      { id: 2, name: "Glock-18 | Water Elemental", price: 8.50, color: "#8847ff", img: SVG_PISTOL },
+      { id: 3, name: "AK-47 | Redline", price: 22.00, color: "#d32ce6", img: SVG_RIFLE },
+      { id: 4, name: "M4A4 | Neo-Noir", price: 35.00, color: "#eb4b4b", img: SVG_RIFLE },
+      { id: 5, name: "AWP | Asiimov", price: 110.00, color: "#eb4b4b", img: SVG_SNIPER },
+      { id: 6, name: "AK-47 | Vulcan", price: 280.00, color: "#eb4b4b", img: SVG_RIFLE },
+      { id: 7, name: "★ Karambit | Fade", price: 2400.00, color: "#ffd700", img: SVG_KNIFE }
     ];
 
     const OFFICIAL_CASES = [
-      { id: 'c-starter', name: 'Starter Case', price: 2.50, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d11PP65XbveKGHcaYKh4SFVR347ZI15BQsA9-i5R2RthL545I2P5O114jA2J1-P3128y0j3v-1A1L4O8xM_C41-G24241N2xY-fS5aX1W9MWzX1aM904M205-01e4A22X-M9L6a2X" },
-      { id: 'c-neon', name: 'Neon Collection', price: 12.00, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d11PP65XbveKGHcaYKh4SFVR347ZI15BQsA9-i5R2RthL545I2P5O114jA2J1-P3128y0j3v-1A1L4O8xM_C41-G24241N2xY-fS5aX1W9MWzX1aM904M205-01e4A22X-M9L6a2X" },
-      { id: 'c-covert', name: 'Covert Case', price: 35.00, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d11PP65XbveKGHcaYKh4SFVR347ZI15BQsA9-i5R2RthL545I2P5O114jA2J1-P3128y0j3v-1A1L4O8xM_C41-G24241N2xY-fS5aX1W9MWzX1aM904M205-01e4A22X-M9L6a2X" },
-      { id: 'c-knife', name: 'Knife Box', price: 250.00, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZFCb4d11PP65XbveKGHcaYKh4SFVR347ZI15BQsA9-i5R2RthL545I2P5O114jA2J1-P3128y0j3v-1A1L4O8xM_C41-G24241N2xY-fS5aX1W9MWzX1aM904M205-01e4A22X-M9L6a2X" }
+      { id: 'c-starter', name: 'Starter Case', price: 2.50, img: SVG_BOX },
+      { id: 'c-neon', name: 'Neon Collection', price: 12.00, img: SVG_BOX },
+      { id: 'c-covert', name: 'Covert Case', price: 35.00, img: SVG_BOX },
+      { id: 'c-knife', name: 'Knife Box', price: 250.00, img: SVG_BOX }
     ];
 
     // GLOBAL STATE
@@ -263,9 +267,8 @@
     let isSpinning = false;
     let activeCase = null;
     let selectedStakeItem = null;
-    let selectedTargetItem = SKIN_DATABASE[2]; // AK Redline alapon
+    let selectedTargetItem = SKIN_DATABASE[2];
 
-    // Rarity Utility
     function getRarityClass(price) {
       if (price >= 1000) return 'gold';
       if (price >= 100) return 'covert';
@@ -372,7 +375,7 @@
       });
     }
 
-    // INVENTORY & SELLING
+    // INVENTORY
     window.sellItem = function(index) {
       userBalance += userInventory[index].price;
       userInventory.splice(index, 1);
@@ -386,7 +389,7 @@
       if (userInventory.length === 0) { grid.innerHTML = `<p style="color:#6b7280; grid-column: 1/-1;">Üres a leltárad. Nyiss ládákat!</p>`; return; }
       grid.innerHTML = userInventory.map((item, index) => `
         <div class="item-card ${getRarityClass(item.price)}">
-          <img src="${item.img}" alt="${item.name}">
+          <img src="${item.img}">
           <div class="item-name">${item.name}</div>
           <div class="price">$${item.price.toFixed(2)}</div>
           <button class="btn-sell" onclick="sellItem(${index})">ELADÁS</button>
@@ -394,7 +397,7 @@
       `).join('');
     }
 
-    // CASE OPENING
+    // CASES
     function renderCasesCatalog() {
       const grid = document.getElementById('cases-grid');
       grid.innerHTML = OFFICIAL_CASES.map(c => `
@@ -413,7 +416,6 @@
       document.getElementById('active-case-name').innerText = activeCase.name;
       document.getElementById('active-case-price-text').innerText = `$${activeCase.price.toFixed(2)} USD`;
       
-      // Case preview items
       document.getElementById('case-items-grid').innerHTML = SKIN_DATABASE.map(item => `
         <div class="item-card ${getRarityClass(item.price)}">
           <img src="${item.img}">
@@ -480,7 +482,7 @@
       }, isFast ? 1050 : 3600);
     }
 
-    // CASE BATTLES WITH ANIMATION
+    // CASE BATTLES
     function renderBattlesLobby() {
       document.getElementById('battles-list').innerHTML = `
         <div class="battle-box" style="display:flex; justify-content:space-between; align-items:center;">
@@ -510,7 +512,6 @@
       const t1 = document.getElementById('battle-track-1');
       const t2 = document.getElementById('battle-track-2');
 
-      // Animáció
       t1.style.transition = 'transform 3s cubic-bezier(0.1, 0.8, 0.1, 1)';
       t2.style.transition = 'transform 3s cubic-bezier(0.1, 0.8, 0.1, 1)';
 
@@ -529,28 +530,26 @@
       }, 3200);
     }
 
-    // UPGRADER FUNCTIONALITY
+    // UPGRADER
     function initUpgrader() {
       const invList = document.getElementById('upgrade-inv-list');
       const targetList = document.getElementById('upgrade-target-list');
 
-      // 1. Saját inventory kiíratása
       if (userInventory.length === 0) {
         invList.innerHTML = `<p style="color:#6b7280; font-size:12px;">Nincs tárgyad.</p>`;
       } else {
         invList.innerHTML = userInventory.map((item, idx) => `
           <div class="item-card ${getRarityClass(item.price)}" onclick="selectStake(${idx}, this)">
-            <img src="${item.img}" style="height:50px;">
+            <img src="${item.img}" style="height:40px;">
             <div class="item-name" style="font-size:11px;">${item.name}</div>
             <div class="price" style="font-size:11px;">$${item.price.toFixed(2)}</div>
           </div>
         `).join('');
       }
 
-      // 2. Célpont skinek
       targetList.innerHTML = SKIN_DATABASE.map((item) => `
         <div class="item-card ${getRarityClass(item.price)}" onclick="selectTarget(${item.id}, this)">
-          <img src="${item.img}" style="height:50px;">
+          <img src="${item.img}" style="height:40px;">
           <div class="item-name" style="font-size:11px;">${item.name}</div>
           <div class="price" style="font-size:11px;">$${item.price.toFixed(2)}</div>
         </div>
@@ -580,11 +579,10 @@
       }
 
       let chance = (selectedStakeItem.price / selectedTargetItem.price) * 100;
-      if (chance > 95) chance = 95; // Max 95%
+      if (chance > 95) chance = 95;
       
       document.getElementById('upgrade-chance-num').innerText = chance.toFixed(2) + '%';
       
-      // Visual Wheel Update
       const slice = document.getElementById('wheel-slice');
       const offset = 565 - (565 * (chance / 100));
       slice.style.strokeDashoffset = offset;
@@ -597,7 +595,7 @@
       if (chance <= 0) return alert("Válassz ki egy saját és egy célzott skint is!");
 
       const pointer = document.getElementById('wheel-pointer');
-      const randomDegree = Math.floor(Math.random() * 360) + 1440; // 4 teljes pörgés minimum
+      const randomDegree = Math.floor(Math.random() * 360) + 1440;
       
       pointer.style.transform = `translateX(-50%) rotate(${randomDegree}deg)`;
 
@@ -612,7 +610,6 @@
           alert(`ELBUKTAD! A skined megsemmisült.`);
         }
 
-        // Tét eltávolítása
         const idx = userInventory.indexOf(selectedStakeItem);
         if (idx > -1) userInventory.splice(idx, 1);
         
