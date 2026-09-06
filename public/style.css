@@ -21,13 +21,19 @@
   --rarity-gold: #ffd700;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+}
 
 body {
   background-color: var(--bg-dark);
   color: #ffffff;
   min-height: 100vh;
   overflow-x: hidden;
+  width: 100%;
 }
 
 /* ÉLŐ DROP SÁV */
@@ -38,6 +44,7 @@ body {
   display: flex;
   align-items: center;
   overflow: hidden;
+  width: 100%;
 }
 
 .drop-bar-label {
@@ -52,9 +59,17 @@ body {
   align-items: center;
   white-space: nowrap;
   z-index: 5;
+  flex-shrink: 0;
 }
 
-.drop-track { display: flex; gap: 10px; padding-left: 10px; }
+.drop-track {
+  display: flex;
+  gap: 10px;
+  padding-left: 10px;
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+}
+.drop-track::-webkit-scrollbar { display: none; } /* Chrome/Safari */
 
 .feed-item {
   background: var(--bg-panel);
@@ -66,6 +81,7 @@ body {
   align-items: center;
   gap: 10px;
   min-width: 170px;
+  flex-shrink: 0;
 }
 
 .feed-item img { width: 38px; height: 30px; object-fit: contain; }
@@ -83,6 +99,7 @@ body {
   position: sticky;
   top: 0;
   z-index: 100;
+  width: 100%;
 }
 
 .logo {
@@ -92,6 +109,7 @@ body {
   font-family: 'Chakra Petch', sans-serif;
   font-size: 1.8rem;
   font-weight: 800;
+  cursor: pointer;
 }
 
 .logo-icon {
@@ -127,7 +145,12 @@ body {
   border-color: var(--border-color);
 }
 
-.header-right { display: flex; align-items: center; gap: 12px; }
+.header-right { 
+  display: flex; 
+  align-items: center; 
+  gap: 12px; 
+  position: relative; /* A lenyíló modulok pontos igazításához */
+}
 
 /* NYELVVÁLTÓ */
 .lang-selector {
@@ -176,8 +199,11 @@ body {
   border: 1px solid var(--border-color);
   font-weight: 700;
   font-size: 0.9rem;
+  position: relative; /* Emiatt nem tolja el a fenti dobozokat a felugró leltár */
+  cursor: pointer;
 }
 
+/* GOMBOK */
 .btn {
   border: none;
   padding: 0.7rem 1.4rem;
@@ -218,7 +244,7 @@ body {
 .hidden { display: none !important; }
 
 /* MAIN CONTAINER */
-.app-container { max-width: 1400px; margin: 2rem auto; padding: 0 1.5rem; }
+.app-container { max-width: 1400px; margin: 2rem auto; padding: 0 1.5rem; width: 100%; }
 .tab-page { display: none; }
 .tab-page.active { display: block; }
 
@@ -313,6 +339,7 @@ body {
   gap: 12px;
   position: absolute;
   left: 0; top: 12px;
+  transition: transform 5s cubic-bezier(0.1, 1, 0.1, 1);
 }
 
 /* ITEMS GRID */
@@ -354,6 +381,10 @@ body {
   display: grid;
   grid-template-columns: 2.2fr 1fr;
   gap: 25px;
+}
+
+@media (max-width: 900px) {
+  .battles-main-layout { grid-template-columns: 1fr; }
 }
 
 .battles-list-grid { display: flex; flex-direction: column; gap: 14px; }
@@ -438,8 +469,18 @@ body {
 .slot-placeholder { color: #64748b; font-size: 0.85rem; }
 .battle-controls { display: flex; justify-content: center; gap: 15px; margin-top: 2rem; }
 
-/* UPGRADER */
-.upgrader-container { display: grid; grid-template-columns: 1fr 320px 1fr; gap: 25px; align-items: start; }
+/* UPGRADER (JAVÍTVA) */
+.upgrader-container { 
+  display: grid; 
+  grid-template-columns: 1fr 320px 1fr; 
+  gap: 25px; 
+  align-items: start; 
+}
+
+@media (max-width: 1024px) {
+  .upgrader-container { grid-template-columns: 1fr; }
+}
+
 .upgrader-card { background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; }
 .upgrader-card h3 { font-family: 'Chakra Petch', sans-serif; margin-bottom: 1rem; font-size: 1.1rem; }
 
@@ -478,13 +519,14 @@ body {
   transition: stroke-dashoffset 0.3s ease;
 }
 
+/* JAVÍTOTT MUTATÓ */
 .wheel-pointer {
   position: absolute;
-  top: 50%; left: 50%;
-  width: 4px; height: 100px;
+  top: 0; left: 50%;
+  width: 4px; height: 120px;
   background: var(--cyan-accent);
-  transform-origin: top center;
-  transform: translate(-50%, 0) rotate(0deg);
+  transform-origin: bottom center;
+  transform: translateX(-50%) rotate(0deg);
   z-index: 10;
   box-shadow: 0 0 10px var(--cyan-accent);
 }
@@ -495,12 +537,13 @@ body {
   transform: translate(-50%, -50%);
   text-align: center;
   font-family: 'Chakra Petch', sans-serif;
+  z-index: 5;
 }
 
 .wheel-center-info span { display: block; font-size: 1.6rem; font-weight: 800; color: #fff; }
 .wheel-center-info small { color: #64748b; font-weight: 700; }
 
-.target-display-box { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; text-align: center; }
+.target-display-box { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; text-align: center; width: 100%; }
 .target-display-box img { width: 130px; height: 95px; object-fit: contain; margin-bottom: 10px; }
 .target-display-box h4 { font-family: 'Chakra Petch', sans-serif; font-size: 1.1rem; }
 .target-display-box .target-price { color: var(--neon-green); font-weight: 800; font-size: 1.2rem; display: block; margin-top: 5px; }
@@ -512,7 +555,7 @@ body {
   z-index: 1000; display: flex; justify-content: center; align-items: center;
 }
 
-.modal-box { background: var(--bg-panel); border: 1px solid var(--border-color); padding: 2.5rem; border-radius: 16px; width: 400px; position: relative; }
+.modal-box { background: var(--bg-panel); border: 1px solid var(--border-color); padding: 2.5rem; border-radius: 16px; width: 400px; max-width: 90%; position: relative; }
 .modal-close { position: absolute; top: 15px; right: 20px; font-size: 1.8rem; cursor: pointer; color: #64748b; }
 .form-group { margin-bottom: 1rem; display: flex; flex-direction: column; gap: 6px; }
 .form-group label { font-size: 0.85rem; color: #64748b; }
@@ -525,15 +568,15 @@ body {
 .modal-divider::before, .modal-divider::after { content: ''; flex: 1; border-bottom: 1px solid var(--border-color); }
 .modal-divider span { padding: 0 10px; }
 
-/* LENYÍLÓ LELTÁR PANEL STÍLUSA */
+/* LENYÍLÓ LELTÁR PANEL STÍLUSA (JAVÍTVA) */
 .dropdown-inventory {
   position: absolute;
-  top: 110%;
+  top: calc(100% + 10px);
   right: 0;
   width: 320px;
   max-height: 400px;
   background: #151518;
-  border: 2px solid #333;
+  border: 2px solid var(--border-color);
   border-radius: 8px;
   box-shadow: 0 10px 25px rgba(0,0,0,0.8);
   z-index: 1000;
@@ -545,7 +588,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--border-color);
   padding-bottom: 8px;
   margin-bottom: 10px;
 }
@@ -569,7 +612,7 @@ body {
   background: #1c1c21;
   padding: 6px 10px;
   border-radius: 6px;
-  border-left: 4px solid #4b69ff;
+  border-left: 4px solid var(--rarity-milspec);
 }
 
 .dropdown-item-card img {
@@ -596,11 +639,11 @@ body {
 
 .dropdown-item-info .item-price {
   font-size: 0.75rem;
-  color: #ffd700;
+  color: var(--rarity-gold);
 }
 
 .btn-sell-dropdown {
-  background: #eb4b4b;
+  background: var(--rarity-covert);
   color: #fff;
   border: none;
   padding: 4px 8px;
@@ -608,6 +651,7 @@ body {
   font-size: 0.75rem;
   cursor: pointer;
   font-weight: bold;
+  transition: background 0.2s;
 }
 
 .btn-sell-dropdown:hover {
