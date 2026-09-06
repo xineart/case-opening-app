@@ -240,6 +240,7 @@ function closeCaseView() {
   document.getElementById('case-catalog-view').classList.remove('hidden');
 }
 
+// JAVÍTOTT LÁDANYITÁS FÜGGVÉNY
 function handleOpenCase() {
   if (!isLoggedIn) return document.getElementById('login-modal').classList.remove('hidden');
   if (isSpinning) return;
@@ -257,13 +258,19 @@ function handleOpenCase() {
     const wonItem = SKIN_DATABASE[Math.floor(Math.random() * SKIN_DATABASE.length)];
     const track = document.getElementById(`spinner-track-${s}`);
     
+    // Alaphelyzetbe állítás animáció nélkül
     track.style.transition = 'none';
     track.style.transform = 'translateX(0px)';
 
+    // Generálunk 80 kártyát, hogy bőven elég legyen a pörgetésre
     let spinnerList = [];
-    for (let i = 0; i < 60; i++) {
-      if (i === 55) spinnerList.push(wonItem);
-      else spinnerList.push(SKIN_DATABASE[Math.floor(Math.random() * SKIN_DATABASE.length)]);
+    for (let i = 0; i < 80; i++) {
+      if (i === 65) {
+        // A 65. kártya a nyeremény
+        spinnerList.push(wonItem);
+      } else {
+        spinnerList.push(SKIN_DATABASE[Math.floor(Math.random() * SKIN_DATABASE.length)]);
+      }
     }
 
     track.innerHTML = spinnerList.map(item => `
@@ -274,13 +281,18 @@ function handleOpenCase() {
       </div>
     `).join('');
 
-    const cardWidth = 170 + 12;
-    const targetX = -(55 * cardWidth) + (document.querySelector('.roulette-container').offsetWidth / 2) - (cardWidth / 2);
+    // Eltolás kiszámítása a 65. kártya közepére
+    const cardWidth = 182; // 170px card width + 12px gap
+    const containerWidth = track.parentElement.offsetWidth || 800;
+    const targetX = -(65 * cardWidth) + (containerWidth / 2) - (cardWidth / 2);
 
-    setTimeout(() => {
-      track.style.transition = `transform ${spinTime}s cubic-bezier(0.1, 0.8, 0.1, 1)`;
-      track.style.transform = `translateX(${targetX}px)`;
-    }, 50);
+    // Animáció indítása 
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        track.style.transition = `transform ${spinTime}s cubic-bezier(0.1, 0.8, 0.1, 1)`;
+        track.style.transform = `translateX(${targetX}px)`;
+      });
+    });
 
     userInventory.push(wonItem);
   }
