@@ -39,11 +39,13 @@ const authenticateToken = (req, res, next) => {
 };
 
 // --- LÁDA KATALÓGUS ÉS NYEREMÉNY ESÉLYEK ---
+// Dynamic Case Architecture with House Edge Configuration
 const CASES_CATALOG = {
   "hyper_beast": {
     id: "hyper_beast",
     name: "Hyper Beast Edition Case",
     price: 25.00,
+    houseEdge: 0.08, // 8% Kaszinó Haszon (92% RTP)
     items: [
       { id: "p250_ripple", name: "P250 | Ripple", price: 1.20, weight: 75000, color: "#4b69ff", img: "https://via.placeholder.com/150/4b69ff?text=P250" },
       { id: "ak47_point_disarray", name: "AK-47 | Point Disarray", price: 18.50, weight: 18000, color: "#8847ff", img: "https://via.placeholder.com/150/8847ff?text=AK-47" },
