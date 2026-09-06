@@ -1,25 +1,25 @@
-@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700;800&family=Inter:wght@400;600;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700;800&family=Inter:wght@400;600;700;800;900&display=swap');
 
 :root {
-  --bg-dark: #06080e;
-  --bg-panel: #0b0e17;
-  --bg-card: #121824;
-  --bg-card-hover: #192233;
+  --bg-dark: #07090e;
+  --bg-panel: #0d111a;
+  --bg-card: #131a26;
+  --bg-card-hover: #1a2436;
   --border-color: #1e293b;
 
   --neon-green: #00ff88;
-  --neon-green-glow: rgba(0, 255, 136, 0.35);
+  --neon-green-glow: rgba(0, 255, 136, 0.3);
   --cyan-accent: #00e5ff;
   --purple-accent: #8b5cf6;
   --gold-accent: #f59e0b;
   --text-main: #ffffff;
   --text-muted: #64748b;
 
-  --rarity-milspec: #3b82f6;
-  --rarity-restricted: #8b5cf6;
-  --rarity-classified: #d946ef;
-  --rarity-covert: #f43f5e;
-  --rarity-gold: #eab308;
+  --rarity-milspec: #4b69ff;
+  --rarity-restricted: #8847ff;
+  --rarity-classified: #d32ce6;
+  --rarity-covert: #eb4b4b;
+  --rarity-gold: #ffd700;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
@@ -38,11 +38,11 @@ body {
   z-index: 999;
 }
 
-/* LIVE DROP BAR */
+/* ÉLŐ DROP SÁV */
 .drop-bar {
-  background: #020305;
+  background: #030407;
   border-bottom: 1px solid var(--border-color);
-  height: 52px;
+  height: 54px;
   display: flex;
   align-items: center;
   overflow: hidden;
@@ -73,15 +73,15 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  min-width: 140px;
+  min-width: 160px;
 }
 
-.feed-item svg, .feed-item img { width: 36px; height: 32px; object-fit: contain; }
+.feed-item img { width: 38px; height: 30px; object-fit: contain; }
 .feed-item span { font-size: 0.75rem; font-weight: 700; white-space: nowrap; }
 
 /* NAVBAR */
 .navbar {
-  background: rgba(11, 14, 23, 0.95);
+  background: rgba(13, 17, 26, 0.95);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border-color);
   padding: 0.8rem 2rem;
@@ -137,16 +137,6 @@ body {
 
 .header-right { display: flex; align-items: center; gap: 12px; }
 
-.lang-dropdown {
-  background: var(--bg-card);
-  color: #fff;
-  border: 1px solid var(--border-color);
-  padding: 0.5rem;
-  border-radius: 8px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
 .balance-display {
   background: #000;
   border: 1px solid var(--border-color);
@@ -159,7 +149,6 @@ body {
 .balance-label { font-size: 0.65rem; color: var(--text-muted); font-weight: 700; }
 .balance-value { color: var(--neon-green); font-family: 'Chakra Petch', sans-serif; font-size: 1.1rem; font-weight: 700; }
 
-/* BUTTONS */
 .btn {
   border: none;
   padding: 0.7rem 1.4rem;
@@ -180,20 +169,20 @@ body {
 .btn-launch {
   background: linear-gradient(135deg, #ff0055, var(--cyan-accent));
   color: #fff;
-  font-size: 1.2rem;
-  padding: 1rem 2.5rem;
+  font-size: 1.1rem;
+  padding: 0.9rem 2.2rem;
   border-radius: 10px;
   box-shadow: 0 0 20px rgba(255, 0, 85, 0.4);
 }
 
 .btn-launch:hover { transform: scale(1.02); }
 .btn-lg { padding: 0.9rem 1.8rem; font-size: 1.1rem; }
-.btn-sm { padding: 0.4rem 0.8rem; font-size: 0.85rem; }
+.btn-sm { padding: 0.5rem 1rem; font-size: 0.85rem; }
 .width-100 { width: 100%; }
 .hidden { display: none !important; }
 
-/* MAIN APP CONTAINER */
-.app-container { max-width: 1380px; margin: 2rem auto; padding: 0 1.5rem; }
+/* MAIN CONTAINER */
+.app-container { max-width: 1400px; margin: 2rem auto; padding: 0 1.5rem; }
 .tab-page { display: none; }
 .tab-page.active { display: block; }
 
@@ -205,40 +194,39 @@ body {
 /* CASES GRID */
 .cases-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 22px;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
 }
 
 .case-card {
   background: var(--bg-panel);
   border: 1px solid var(--border-color);
   border-radius: 16px;
-  padding: 2rem 1rem;
+  padding: 1.8rem 1rem;
   text-align: center;
   cursor: pointer;
   transition: all 0.25s;
   position: relative;
-  overflow: hidden;
 }
 
 .case-card:hover {
-  transform: translateY(-6px);
+  transform: translateY(-5px);
   border-color: var(--cyan-accent);
   background: var(--bg-card-hover);
 }
 
-.case-card svg, .case-card img { width: 150px; height: 120px; object-fit: contain; margin-bottom: 1rem; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5)); }
-.case-card h3 { font-family: 'Chakra Petch', sans-serif; font-size: 1.3rem; }
-.case-card .price { color: var(--neon-green); font-family: 'Chakra Petch', sans-serif; font-size: 1.2rem; font-weight: 800; margin-top: 8px; }
+.case-card img { width: 160px; height: 130px; object-fit: contain; margin-bottom: 1rem; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.6)); }
+.case-card h3 { font-family: 'Chakra Petch', sans-serif; font-size: 1.2rem; }
+.case-card .price { color: var(--neon-green); font-family: 'Chakra Petch', sans-serif; font-size: 1.2rem; font-weight: 800; margin-top: 6px; }
 
-/* UNBOXING & MULTI-SPINNER */
+/* UNBOXING STAGE */
 .unboxing-stage {
   background: var(--bg-panel);
   border: 1px solid var(--border-color);
   border-radius: 20px;
-  padding: 2.5rem 2rem;
+  padding: 2rem;
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 2.5rem;
 }
 
 .multi-open-selector {
@@ -246,7 +234,7 @@ body {
   justify-content: center;
   align-items: center;
   gap: 10px;
-  margin: 1.5rem 0 1rem 0;
+  margin: 1.2rem 0;
 }
 
 .btn-multi {
@@ -289,16 +277,16 @@ body {
   display: flex;
   gap: 12px;
   position: absolute;
-  left: 0; top: 10px;
+  left: 0; top: 12px;
 }
 
-/* ITEM CARDS */
-.section-divider { margin: 2rem 0 1.5rem 0; }
+/* ITEMS GRID */
+.section-divider { margin: 2rem 0 1.2rem 0; }
 .section-divider h3 { font-family: 'Chakra Petch', sans-serif; color: var(--text-muted); font-size: 1.1rem; }
 
 .items-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
   gap: 16px;
 }
 
@@ -307,16 +295,16 @@ body {
   border: 1px solid var(--border-color);
   border-bottom: 4px solid var(--rarity-milspec);
   border-radius: 12px;
-  padding: 1rem 0.5rem;
+  padding: 1rem 0.6rem;
   text-align: center;
-  height: 175px;
+  height: 180px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
 }
 
-.item-card svg, .item-card img { width: 110px; height: 85px; object-fit: contain; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5)); }
+.item-card img { width: 120px; height: 90px; object-fit: contain; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5)); }
 .item-card .name { font-size: 0.75rem; font-weight: 700; }
 .item-card .price { color: var(--neon-green); font-size: 0.85rem; font-weight: 800; }
 
@@ -326,20 +314,77 @@ body {
 .item-card.covert { border-bottom-color: var(--rarity-covert); }
 .item-card.gold { border-bottom-color: var(--rarity-gold); }
 
-/* BATTLES LAYOUT */
-.battles-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; }
-.battles-lobby { display: flex; flex-direction: column; gap: 15px; }
+/* LOOTBOX CASE BATTLES STYLES */
+.battles-main-layout {
+  display: grid;
+  grid-template-columns: 2.2fr 1fr;
+  gap: 25px;
+}
 
-.battle-room-item {
+.battles-list-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.battle-card-item {
   background: var(--bg-panel);
   border: 1px solid var(--border-color);
   border-radius: 14px;
-  padding: 1.2rem 1.8rem;
+  padding: 1.2rem 1.6rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  transition: all 0.2s;
 }
 
+.battle-card-item:hover {
+  border-color: var(--purple-accent);
+  background: var(--bg-card);
+}
+
+.battle-info-left {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.battle-case-preview {
+  display: flex;
+  align-items: center;
+  gap: -10px;
+}
+
+.battle-case-img {
+  width: 50px;
+  height: 45px;
+  object-fit: contain;
+}
+
+.battle-details h4 {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 1.1rem;
+}
+
+.battle-details p {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.battle-actions-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.battle-cost-tag {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--neon-green);
+}
+
+/* BORROW PANEL */
 .borrow-panel {
   background: var(--bg-panel);
   border: 1px solid var(--border-color);
@@ -347,32 +392,120 @@ body {
   padding: 1.5rem;
 }
 
-.sponsor-feed { display: flex; flex-direction: column; gap: 12px; }
-.sponsor-item {
-  background: #04060a;
+.borrow-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.borrow-header h3 {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 1.1rem;
+}
+
+.borrow-badge {
+  background: var(--purple-accent);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.panel-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin-bottom: 1.2rem;
+}
+
+.sponsor-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sponsor-card {
+  background: var(--bg-dark);
   border: 1px solid var(--border-color);
   padding: 1rem;
   border-radius: 10px;
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  justify-content: space-between;
+  align-items: center;
 }
 
+.sponsor-card .p-name { font-weight: 700; font-size: 0.9rem; }
+.sponsor-card .p-need { font-size: 0.75rem; color: var(--text-muted); }
+
+/* BATTLE ARENA */
 .battle-arena {
   background: var(--bg-panel);
   border: 2px solid var(--neon-green);
-  border-radius: 16px;
+  border-radius: 20px;
   padding: 2rem;
   margin-bottom: 2.5rem;
 }
 
-.battle-arena-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-.battle-players-grid { display: grid; grid-template-columns: 1fr 50px 1fr; gap: 20px; align-items: center; }
-.battle-player-card { background: var(--bg-dark); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: 12px; text-align: center; }
-.battle-vs { text-align: center; font-family: 'Chakra Petch', sans-serif; font-size: 1.8rem; font-weight: 800; color: var(--text-muted); }
+.battle-arena-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.battle-mode-badge {
+  background: var(--purple-accent);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.arena-total-pot {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+
+.arena-total-pot span { color: var(--neon-green); }
+
+.battle-players-grid {
+  display: grid;
+  grid-template-columns: 1fr 60px 1fr;
+  gap: 20px;
+  align-items: center;
+}
+
+.battle-player-card {
+  background: var(--bg-dark);
+  border: 1px solid var(--border-color);
+  padding: 1.5rem;
+  border-radius: 14px;
+}
+
+.player-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 1rem;
+}
+
+.player-avatar { font-size: 1.8rem; }
+.player-name { font-weight: 700; font-size: 1rem; }
+.player-total { color: var(--neon-green); font-family: 'Chakra Petch', sans-serif; font-weight: 800; }
+
+.battle-vs-badge {
+  text-align: center;
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--text-muted);
+}
 
 .battle-drop-slot {
-  height: 130px;
+  height: 140px;
   background: var(--bg-panel);
   border: 1px dashed var(--border-color);
   border-radius: 10px;
@@ -381,9 +514,16 @@ body {
   justify-content: center;
 }
 
-.battle-controls { display: flex; justify-content: center; gap: 15px; margin-top: 2rem; }
+.slot-placeholder { color: var(--text-muted); font-size: 0.85rem; }
 
-/* UPGRADER STYLES */
+.battle-controls {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 2rem;
+}
+
+/* UPGRADER */
 .upgrader-container {
   display: grid;
   grid-template-columns: 1fr 320px 1fr;
@@ -418,8 +558,7 @@ body {
   cursor: pointer;
 }
 
-.mini-item-card.selected { border-color: var(--neon-green); background: rgba(0,255,136,0.1); }
-.mini-item-card svg, .mini-item-card img { width: 50px; height: 40px; object-fit: contain; }
+.mini-item-card img { width: 60px; height: 45px; object-fit: contain; }
 .mini-item-card .name { font-size: 0.65rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .mini-item-card .price { font-size: 0.75rem; color: var(--neon-green); font-weight: 700; }
 
@@ -482,7 +621,7 @@ body {
   text-align: center;
 }
 
-.target-display-box svg, .target-display-box img { width: 120px; height: 90px; object-fit: contain; margin-bottom: 10px; }
+.target-display-box img { width: 130px; height: 95px; object-fit: contain; margin-bottom: 10px; }
 .target-display-box h4 { font-family: 'Chakra Petch', sans-serif; font-size: 1.1rem; }
 .target-display-box .target-price { color: var(--neon-green); font-weight: 800; font-size: 1.2rem; display: block; margin-top: 5px; }
 
@@ -497,4 +636,4 @@ body {
 .modal-close { position: absolute; top: 15px; right: 20px; font-size: 1.8rem; cursor: pointer; color: var(--text-muted); }
 .form-field { margin-bottom: 1.2rem; display: flex; justify-content: space-between; align-items: center; }
 .form-field label { font-size: 0.9rem; color: var(--text-muted); }
-.form-field input[type="text"], .form-field input[type="password"], .form-field input[type="number"] { width: 100%; background: #000; border: 1px solid var(--border-color); padding: 0.8rem; color: #fff; border-radius: 8px; }
+.form-field input[type="number"] { width: 100%; background: #000; border: 1px solid var(--border-color); padding: 0.8rem; color: #fff; border-radius: 8px; }
