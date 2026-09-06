@@ -1,4 +1,6 @@
-// --- HELYI images/ MAPPÁBÓL BETÖLTŐ NYÍLT CS2 SKINEK ÉS LÁDÁK ---
+// ==========================================
+// CS2 SKINEK ÉS LÁDÁK ADATBÁZISA
+// ==========================================
 const SKIN_DATABASE = [
   { id: 1, name: "P250 | Sand Dune", price: 0.50, color: "#4b69ff", img: "images/p250_sanddune.png" },
   { id: 2, name: "Glock-18 | Water Elemental", price: 8.50, color: "#8847ff", img: "images/glock_waterelemental.png" },
@@ -106,9 +108,13 @@ function getRarityClass(price) {
   return 'milspec';
 }
 
+// ==========================================
+// INICIALIZÁLÁS DOM BETÖLTÉSKOR
+// ==========================================
 document.addEventListener('DOMContentLoaded', () => {
   setupNavigation();
   setupAuthAndModals();
+  setupDropdownInventory();
   renderCasesCatalog();
   renderBattlesLobby();
   renderSponsorFeed();
@@ -137,19 +143,19 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// REGISZTRÁCIÓ ÉS BEJELENTKEZÉSI LOGIKA
+// ==========================================
+// REGISZTRÁCIÓ, BEJELENTKEZÉS ÉS MODALOK
+// ==========================================
 function setupAuthAndModals() {
   const loginModal = document.getElementById('login-modal');
   const settingsModal = document.getElementById('settings-modal');
 
-  // MODAL NYITÁS / ZÁRÁS
   const openLoginBtn = document.getElementById('open-login-btn');
   if (openLoginBtn) openLoginBtn.onclick = () => loginModal?.classList.remove('hidden');
 
   const closeLoginBtn = document.getElementById('close-login-btn');
   if (closeLoginBtn) closeLoginBtn.onclick = () => loginModal?.classList.add('hidden');
 
-  // AUTH TAB VÁLTÁS (LOGIN VS REGISTER)
   const tabBtnLogin = document.getElementById('tab-btn-login');
   const tabBtnRegister = document.getElementById('tab-btn-register');
   const formLogin = document.getElementById('auth-form-login');
@@ -171,7 +177,6 @@ function setupAuthAndModals() {
     };
   }
 
-  // BEJELENTKEZÉS ÉS REGISZTRÁCIÓ KATTINTÁSOK
   const confirmLoginBtn = document.getElementById('confirm-login-btn');
   if (confirmLoginBtn) confirmLoginBtn.onclick = performLogin;
 
@@ -199,33 +204,17 @@ function setupAuthAndModals() {
   }
 }
 
-// REGISZTRÁCIÓ VÉGREHAJTÁSA
 function performRegister() {
   const userIn = document.getElementById('reg-username-input')?.value.trim();
   const emailIn = document.getElementById('reg-email-input')?.value.trim();
   const passIn = document.getElementById('reg-password-input')?.value.trim();
   const passConfIn = document.getElementById('reg-password-confirm-input')?.value.trim();
 
-  if (!userIn || !passIn) {
-    return alert("Adj meg egy felhasználónevet és egy jelszót!");
-  }
+  if (!userIn || !passIn) return alert("Adj meg egy felhasználónevet és egy jelszót!");
+  if (passIn !== passConfIn) return alert("A két jelszó nem egyezik meg!");
+  if (usersDb[userIn]) return alert("Ez a felhasználónév már létezik!");
 
-  if (passIn !== passConfIn) {
-    return alert("A két jelszó nem egyezik meg!");
-  }
-
-  if (usersDb[userIn]) {
-    return alert("Ez a felhasználónév már létezik!");
-  }
-
-  // ÚJ USER MENTÉSE
-  usersDb[userIn] = {
-    email: emailIn,
-    password: passIn,
-    balance: 100.00,
-    inventory: []
-  };
-
+  usersDb[userIn] = { email: emailIn, password: passIn, balance: 100.00, inventory: [] };
   currentUser = userIn;
   userBalance = 100.00;
   userInventory = [];
@@ -237,22 +226,13 @@ function performRegister() {
   alert(`Sikeres regisztráció! Üdv, ${currentUser}! ($100.00 kezdőegyenleg jóváírva)`);
 }
 
-// BEJELENTKEZÉS VÉGREHAJTÁSA
 function performLogin() {
   const userIn = document.getElementById('login-username-input')?.value.trim();
   const passIn = document.getElementById('login-password-input')?.value.trim();
 
-  if (!userIn || !passIn) {
-    return alert("Adj meg felhasználónevet és jelszót!");
-  }
-
-  if (!usersDb[userIn]) {
-    return alert("Nincs ilyen felhasználó! Válts a REGISZTRÁCIÓ fülre.");
-  }
-
-  if (usersDb[userIn].password !== passIn) {
-    return alert("Hibás jelszó!");
-  }
+  if (!userIn || !passIn) return alert("Adj meg felhasználónevet és jelszót!");
+  if (!usersDb[userIn]) return alert("Nincs ilyen felhasználó! Válts a REGISZTRÁCIÓ fülre.");
+  if (usersDb[userIn].password !== passIn) return alert("Hibás jelszó!");
 
   currentUser = userIn;
   userBalance = usersDb[userIn].balance;
@@ -278,11 +258,7 @@ function applyLoggedInState() {
   document.getElementById('open-deposit-btn')?.classList.remove('hidden');
 
   const displayUser = document.getElementById('display-username');
-  if (displayUser) {
-    displayUser.innerText = currentUser;
-    displayUser.onclick = performLogout;
-    displayUser.title = "Kattints a kijelentkezéshez";
-  }
+  if (displayUser) displayUser.innerText = currentUser;
 
   const p1Name = document.getElementById('p1-display-name');
   if (p1Name) p1Name.innerText = currentUser;
@@ -302,7 +278,32 @@ function applyLoggedOutState() {
   renderInventory();
 }
 
-// ITEM ELADÁS
+// ==========================================
+// LENYÍLÓ LELTÁR KINÉZET ÉS ELADÁS
+// ==========================================
+function setupDropdownInventory() {
+  const toggleBtn = document.getElementById('toggle-inventory-btn');
+  const dropdownPanel = document.getElementById('dropdown-inventory-panel');
+  const closeBtn = document.getElementById('close-dropdown-inv');
+
+  if (toggleBtn && dropdownPanel) {
+    toggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      dropdownPanel.classList.toggle('hidden');
+    });
+
+    closeBtn?.addEventListener('click', () => {
+      dropdownPanel.classList.add('hidden');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!dropdownPanel.contains(e.target) && e.target !== toggleBtn) {
+        dropdownPanel.classList.add('hidden');
+      }
+    });
+  }
+}
+
 window.sellItem = function(index) {
   if (index < 0 || index >= userInventory.length) return;
 
@@ -322,24 +323,45 @@ window.sellItem = function(index) {
 
 function renderInventory() {
   const grid = document.getElementById('inventory-grid');
-  if (!grid) return;
+  const dropdownGrid = document.getElementById('dropdown-inventory-grid');
 
   if (userInventory.length === 0) {
-    grid.innerHTML = `<p class="empty-inv-msg" id="txt-empty-inv">${TRANSLATIONS[currentLang].emptyInv}</p>`;
+    const emptyMsg = `<p class="empty-inv-msg" id="txt-empty-inv">${TRANSLATIONS[currentLang]?.emptyInv || 'Még nincs tárgyad.'}</p>`;
+    if (grid) grid.innerHTML = emptyMsg;
+    if (dropdownGrid) dropdownGrid.innerHTML = emptyMsg;
     return;
   }
 
-  grid.innerHTML = userInventory.map((item, index) => `
-    <div class="item-card ${getRarityClass(item.price)}">
-      <img src="${item.img}" alt="${item.name}">
-      <div class="name">${item.name}</div>
-      <div class="price">$${item.price.toFixed(2)}</div>
-      <button class="btn-sell-item" onclick="sellItem(${index})">ELADÁS ($${item.price.toFixed(2)})</button>
-    </div>
-  `).join('');
+  // Fő oldali leltár (ha megjelenítésre kerül)
+  if (grid) {
+    grid.innerHTML = userInventory.map((item, index) => `
+      <div class="item-card ${getRarityClass(item.price)}">
+        <img src="${item.img}" alt="${item.name}">
+        <div class="name">${item.name}</div>
+        <div class="price">$${item.price.toFixed(2)}</div>
+        <button class="btn-sell-item" onclick="sellItem(${index})">ELADÁS ($${item.price.toFixed(2)})</button>
+      </div>
+    `).join('');
+  }
+
+  // Lenyíló fül alatti leltár
+  if (dropdownGrid) {
+    dropdownGrid.innerHTML = userInventory.map((item, index) => `
+      <div class="dropdown-item-card" style="border-left-color: ${item.price >= 100 ? '#eb4b4b' : '#4b69ff'};">
+        <img src="${item.img}" alt="${item.name}">
+        <div class="dropdown-item-info">
+          <div class="item-name">${item.name}</div>
+          <div class="item-price">$${item.price.toFixed(2)}</div>
+        </div>
+        <button class="btn-sell-dropdown" onclick="sellItem(${index})">ELADÁS</button>
+      </div>
+    `).join('');
+  }
 }
 
-// NYELVVÁLTÁS
+// ==========================================
+// NYELV ÉS NAVIGÁCIÓ
+// ==========================================
 window.switchLanguage = function(lang) {
   currentLang = lang;
   document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
@@ -387,6 +409,9 @@ function setupNavigation() {
   });
 }
 
+// ==========================================
+// LÁDANYITÁS LOGIKA
+// ==========================================
 function renderCasesCatalog() {
   const grid = document.getElementById('cases-grid');
   if (!grid) return;
@@ -446,7 +471,6 @@ function closeCaseView() {
   document.getElementById('case-catalog-view')?.classList.remove('hidden');
 }
 
-// LÁDANYITÁS
 function handleOpenCase() {
   if (!isLoggedIn) return document.getElementById('login-modal')?.classList.remove('hidden');
   if (isSpinning) return;
@@ -509,7 +533,9 @@ function handleOpenCase() {
   }, spinTime * 1000 + 200);
 }
 
-// BATTLES
+// ==========================================
+// CASE BATTLES LOGIKA
+// ==========================================
 function renderBattlesLobby() {
   const list = document.getElementById('battles-list');
   if (!list) return;
@@ -604,7 +630,9 @@ function runBattleSpin() {
 
 function closeBattleArena() { document.getElementById('battle-arena')?.classList.add('hidden'); }
 
-// UPGRADER
+// ==========================================
+// UPGRADER LOGIKA
+// ==========================================
 let selectedTargetSkin = SKIN_DATABASE[2];
 
 function initUpgrader() {
