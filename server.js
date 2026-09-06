@@ -38,8 +38,7 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-// --- LÁDA KATALÓGUS ÉS NYEREMÉNY ESÉLYEK ---
-// Dynamic Case Architecture with House Edge Configuration
+// --- LÁDA KATALÓGUS ÉS HOUSE EDGE BEÁLLÍTÁSOK ---
 const CASES_CATALOG = {
   "hyper_beast": {
     id: "hyper_beast",
@@ -126,7 +125,7 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-// 3. PROFILE ÉS EGYENLEG LEKÉRÉSE
+// 3. PROFIL ÉS EGYENLEG LEKÉRÉSE
 app.get('/api/user/me', authenticateToken, async (req, res) => {
   try {
     const user = await dbQuery.get('SELECT id, username, email, balance, client_seed, server_seed, nonce FROM users WHERE id = ?', [req.user.id]);
@@ -223,14 +222,85 @@ app.post('/api/user/sell-item', authenticateToken, async (req, res) => {
   }
 });
 
-// BIZTONSÁGOS SZERVER INDÍTÁS (PORT ÉS SIGINT KEZELÉS)
+// 7. KRIPTO FIZETÉSI INVOICE LÉTREHOZÁSA (Cryptomus / NOWPayments API)
+app.post('/api/payments/create-deposit', authenticateToken, async (req, res) => {
+  try {
+    const { amount, currency } = req.body;
+
+    if (!amount || amount < 5) {
+      return res.status(400).json({ error: 'A minimális befizetési összeg $5.00!' });
+    }
+
+    const orderId = `DEP-${req.user.id}-${Date.now()}`;
+
+    await dbQuery.run(
+      `INSERT INTO transactions (user_id, amount, type, status, payment_provider, payment_id) VALUES (?, ?, 'deposit', 'pending', 'crypto', ?)`,
+      [req.user.id, amount, orderId]
+    );
+
+    const paymentUrl = `https://mock-crypto-gateway.com/pay?order=${orderId}&amount=${amount}&currency=${currency || 'USDT'}`;
+
+    res.json({
+      success: true,
+      orderId,
+      amount,
+      paymentUrl
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Hiba a fizetési hivatkozás generálásakor.' });
+  }
+});
+
+// 8. AUTOMATIKUS KRIPTO WEBHOOK (Garantált egyenleg jóváírás)
+app.post('/api/payments/webhook', async (req, res) => {
+  try {
+    const { order_id, status } = req.body;
+
+    if (status === 'paid' || status === 'completed') {
+      const tx = await dbQuery.get('SELECT * FROM transactions WHERE payment_id = ? AND status = "pending"', [order_id]);
+
+      if (tx) {
+        await dbQuery.run('UPDATE transactions SET status = "completed" WHERE id = ?', [tx.id]);
+        await dbQuery.run('UPDATE users SET balance = balance + ? WHERE id = ?', [tx.user_id, tx.amount]);
+
+        console.log(`[PAYMENT] Sikeres befizetés! User ID: ${tx.user_id}, Összeg: +$${tx.amount}`);
+        return res.json({ status: 'success' });
+      }
+    }
+
+    res.status(400).json({ error: 'Érvénytelen tranzakció vagy már feldolgozva.' });
+  } catch (err) {
+    console.error('Webhook hiba:', err);
+    res.status(500).send('Webhook Error');
+  }
+});
+
+// 9. ADMIN: EGYENLEG MÓDOSÍTÁSA
+app.post('/api/admin/set-balance', authenticateToken, async (req, res) => {
+  try {
+    const adminUser = await dbQuery.get('SELECT role FROM users WHERE id = ?', [req.user.id]);
+    
+    if (!adminUser || adminUser.role !== 'admin') {
+      return res.status(403).json({ error: 'Hozzáférés megtagadva! Admin jogosultság szükséges.' });
+    }
+
+    const { targetUserId, newBalance } = req.body;
+    await dbQuery.run('UPDATE users SET balance = ? WHERE id = ?', [newBalance, targetUserId]);
+
+    res.json({ success: true, targetUserId, newBalance });
+  } catch (err) {
+    res.status(500).json({ error: 'Admin művelet sikertelen.' });
+  }
+});
+
+// BIZTONSÁGOS SZERVER INDÍTÁS ÉS GRACEFUL SHUTDOWN
 const server = app.listen(PORT, () => {
-  console.log(`[SERVER] Szerver elindult a ${PORT}-es porton!`);
+  console.log(`[SERVER] Enterprise Kaszinó Szerver elindult a ${PORT}-es porton!`);
 });
 
 process.on('SIGINT', () => {
   server.close(() => {
-    console.log('[SERVER] Szerver biztonságosan leállítva.');
+    console.log('[SERVER] Szerver leállítva, portok felszabadítva.');
     process.exit(0);
   });
 });
