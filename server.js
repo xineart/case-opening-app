@@ -1,233 +1,229 @@
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
-const crypto = require('crypto');
-const session = require('express-session');
-const passport = require('passport');
-const SteamStrategy = require('passport-steam').Strategy;
-const sqlite3 = require('sqlite3').verbose();
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const rateLimit = require('express-rate-limit');
+const { dbQuery } = require('./database');
+const ProvablyFair = require('./provablyFair');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const DOMAIN = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
+const JWT_SECRET = process.env.JWT_SECRET || 'SUPER_SECRET_ENTERPRISE_JWT_KEY_998877';
 
-// --- 1. ADATBÁZIS INICIALIZÁLÁSA (SQLite Persistent Store) ---
-const db = new sqlite3.Database('./lootbox.db', (err) => {
-  if (err) console.error('Adatbázis hiba:', err.message);
-  else console.log('SQLite Adatbázis csatlakoztatva.');
-});
-
-db.serialize(() => {
-  // Felhasználók tábla
-  db.run(`CREATE TABLE IF NOT EXISTS users (
-    steam_id TEXT PRIMARY KEY,
-    username TEXT,
-    avatar TEXT,
-    balance REAL DEFAULT 0.0,
-    client_seed TEXT
-  )`);
-
-  // Inventory / Raktár tábla
-  db.run(`CREATE TABLE IF NOT EXISTS inventory (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    steam_id TEXT,
-    item_name TEXT,
-    item_price REAL,
-    item_color TEXT,
-    item_image TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  )`);
-
-  // Tranzakciók tábla (Befizetésekhez)
-  db.run(`CREATE TABLE IF NOT EXISTS transactions (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    steam_id TEXT,
-    amount REAL,
-    status TEXT,
-    payment_id TEXT
-  )`);
-});
-
-// --- 2. MIDDLEWARE-EK & SESSION ---
+// --- MIDDLEWARE-EK ---
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'lootbox_super_secret_key_12345',
-  resave: false,
-  saveUninitialized: true
-}));
+// Rate Limiting (DDoS és Brute Force elleni védelem)
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 perc
+  max: 100, // max 100 kérés IP-nként
+  message: { error: 'Túl sok kérés erről az IP címről, próbáld újra később!' }
+});
+app.use('/api/', apiLimiter);
 
-app.use(passport.initialize());
-app.use(passport.session());
+// --- AUTH MIDDLEWARE (JWT Ellenőrzés) ---
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
 
-// --- 3. STEAM OAUTH BEJELENTKEZÉS ---
-passport.serializeUser((user, done) => done(null, user));
-passport.deserializeUser((obj, done) => done(null, obj));
+  if (!token) return res.status(401).json({ error: 'Azonosítás szükséges (Nincs Token)!' });
 
-passport.use(new SteamStrategy({
-    returnURL: `${DOMAIN}/auth/steam/return`,
-    realm: `${DOMAIN}/`,
-    apiKey: process.env.STEAM_API_KEY || 'DUMMY_STEAM_API_KEY' // Írd át a saját Steam API kulcsodra
-  },
-  (identifier, profile, done) => {
-    const steamId = profile.id;
-    const username = profile.displayName;
-    const avatar = profile.photos[2].value;
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) return res.status(403).json({ error: 'Érvénytelen vagy lejárt Token!' });
+    req.user = user;
+    next();
+  });
+};
 
-    db.get('SELECT * FROM users WHERE steam_id = ?', [steamId], (err, row) => {
-      if (!row) {
-        const defaultClientSeed = crypto.randomBytes(8).toString('hex');
-        db.run('INSERT INTO users (steam_id, username, avatar, balance, client_seed) VALUES (?, ?, ?, ?, ?)',
-          [steamId, username, avatar, 100.0, defaultClientSeed]);
-      }
-      return done(null, profile);
-    });
-  }
-));
-
-app.get('/auth/steam', passport.authenticate('steam'));
-app.get('/auth/steam/return',
-  passport.authenticate('steam', { failureRedirect: '/' }),
-  (req, res) => res.redirect('/')
-);
-
-// --- 4. PROVABLY FAIR (HMAC-SHA256) RNG ALGORITMUS ---
-// Ez garantálja, hogy a nyeremény matmatikailag bizonyíthatóan csalásmentes
-function generateProvablyFairRoll(serverSeed, clientSeed, nonce) {
-  const hmac = crypto.createHmac('sha256', serverSeed);
-  hmac.update(`${clientSeed}:${nonce}`);
-  const hex = hmac.digest('hex');
-  const subHash = hex.substring(0, 8);
-  const decimalValue = parseInt(subHash, 16);
-  return decimalValue % 100000; // 0 és 99,999 közötti szám
-}
-
-// --- 5. LÁDA KATALÓGUS & ESÉLYEK ---
-const CASES = {
-  "cobblestone": {
-    name: "Cobblestone Souvenir Case",
-    price: 10.00,
+// --- LÁDA KATALÓGUS ÉS NYEREMÉNY ESÉLYEK ---
+const CASES_CATALOG = {
+  "hyper_beast": {
+    id: "hyper_beast",
+    name: "Hyper Beast Edition Case",
+    price: 25.00,
     items: [
-      { name: "P2000 | Turf", price: 0.50, weight: 79900, color: "#b0c3d9", img: "https://via.placeholder.com/150/b0c3d9?text=P2000" },
-      { name: "UMP-45 | Briefing", price: 3.00, weight: 15000, color: "#5e98d9", img: "https://via.placeholder.com/150/5e98d9?text=UMP-45" },
-      { name: "AWP | Pink DDPAT", price: 45.00, weight: 4000, color: "#d32ce6", img: "https://via.placeholder.com/150/d32ce6?text=AWP+Pink" },
-      { name: "M4A1-S | Knight", price: 350.00, weight: 950, color: "#eb4b4b", img: "https://via.placeholder.com/150/eb4b4b?text=M4A1-S+Knight" },
-      { name: "AWP | Dragon Lore", price: 2500.00, weight: 50, color: "#caab05", img: "https://via.placeholder.com/150/caab05?text=Dragon+Lore" }
+      { id: "p250_ripple", name: "P250 | Ripple", price: 1.20, weight: 75000, color: "#4b69ff", img: "https://via.placeholder.com/150/4b69ff?text=P250" },
+      { id: "ak47_point_disarray", name: "AK-47 | Point Disarray", price: 18.50, weight: 18000, color: "#8847ff", img: "https://via.placeholder.com/150/8847ff?text=AK-47" },
+      { id: "m4a4_desolate_space", name: "M4A4 | Desolate Space", price: 45.00, weight: 5500, color: "#d32ce6", img: "https://via.placeholder.com/150/d32ce6?text=M4A4" },
+      { id: "awp_hyper_beast", name: "AWP | Hyper Beast", price: 120.00, weight: 1400, color: "#eb4b4b", img: "https://via.placeholder.com/150/eb4b4b?text=AWP+Hyper" },
+      { id: "karambit_gamma_doppler", name: "★ Karambit | Gamma Doppler", price: 1450.00, weight: 100, color: "#caab05", img: "https://via.placeholder.com/150/caab05?text=Karambit" }
     ]
   }
 };
 
-// --- 6. API ENDPOINTOK ---
+// --- API ENDPOINTOK ---
 
-// Felhasználói adatok lekérése
-app.get('/api/user', (req, res) => {
-  // DUMMY AUTH: Ha nincs Steam bejelentkezés, egy teszt elemet adunk vissza
-  const steamId = req.user ? req.user.id : 'TEST_STEAM_ID';
+// 1. REGISZTRÁCIÓ
+app.post('/api/auth/register', async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
 
-  db.get('SELECT * FROM users WHERE steam_id = ?', [steamId], (err, user) => {
-    if (!user) {
-      // Létrehozunk egy teszt elemet ha nem létezne
-      db.run('INSERT OR IGNORE INTO users (steam_id, username, avatar, balance, client_seed) VALUES (?, ?, ?, ?, ?)',
-        ['TEST_STEAM_ID', 'Teszt Elek', 'https://via.placeholder.com/50', 250.00, 'my_client_seed']);
-      return res.json({ steam_id: 'TEST_STEAM_ID', username: 'Teszt Elek', balance: 250.00, client_seed: 'my_client_seed' });
-    }
-    res.json(user);
-  });
-});
-
-// Inventory lekérése
-app.get('/api/inventory', (req, res) => {
-  const steamId = req.user ? req.user.id : 'TEST_STEAM_ID';
-  db.all('SELECT * FROM inventory WHERE steam_id = ? ORDER BY id DESC', [steamId], (err, rows) => {
-    res.json(rows || []);
-  });
-});
-
-// PÖRGETÉS (Ládanyitás API)
-app.post('/api/open-case', (req, res) => {
-  const steamId = req.user ? req.user.id : 'TEST_STEAM_ID';
-  const caseData = CASES["cobblestone"];
-
-  db.get('SELECT * FROM users WHERE steam_id = ?', [steamId], (err, user) => {
-    if (!user || user.balance < caseData.price) {
-      return res.status(400).json({ error: "Nincs elég egyenleged a nyitáshoz!" });
+    if (!username || !email || !password) {
+      return res.status(400).json({ error: 'Minden mező kitöltése kötelező!' });
     }
 
-    const newBalance = user.balance - caseData.price;
-    const serverSeed = crypto.randomBytes(16).toString('hex');
-    const nonce = Date.now();
-    
-    // Provably Fair roll kiszámítása
-    const roll = generateProvablyFairRoll(serverSeed, user.client_seed || 'default', nonce);
-    
-    // Nyeremény megállapítása
-    let cumulative = 0;
-    let wonItem = caseData.items[0];
-
-    for (const item of caseData.items) {
-      cumulative += item.weight;
-      if (roll < cumulative) {
-        wonItem = item;
-        break;
-      }
+    const existingUser = await dbQuery.get('SELECT id FROM users WHERE username = ? OR email = ?', [username, email]);
+    if (existingUser) {
+      return res.status(400).json({ error: 'Ez a felhasználónév vagy email már foglalt!' });
     }
 
-    // Adatbázis frissítése: Egyenleg levonás & Inventory elmentés
-    db.run('UPDATE users SET balance = ? WHERE steam_id = ?', [newBalance, steamId]);
-    db.run('INSERT INTO inventory (steam_id, item_name, item_price, item_color, item_image) VALUES (?, ?, ?, ?, ?)',
-      [steamId, wonItem.name, wonItem.price, wonItem.color, wonItem.img]);
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(password, salt);
+    const clientSeed = ProvablyFair.generateClientSeed();
+    const serverSeed = ProvablyFair.generateServerSeed();
+
+    const result = await dbQuery.run(
+      `INSERT INTO users (username, email, password_hash, client_seed, server_seed) VALUES (?, ?, ?, ?, ?)`,
+      [username, email, passwordHash, clientSeed, serverSeed]
+    );
+
+    const token = jwt.sign({ id: result.lastID, username }, JWT_SECRET, { expiresIn: '7d' });
 
     res.json({
+      success: true,
+      token,
+      user: { id: result.lastID, username, balance: 100.0, clientSeed }
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Szerver hiba a regisztráció során!' });
+  }
+});
+
+// 2. BEJELENTKEZÉS
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    const user = await dbQuery.get('SELECT * FROM users WHERE username = ?', [username]);
+    if (!user) {
+      return res.status(400).json({ error: 'Hibás felhasználónév vagy jelszó!' });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password_hash);
+    if (!isMatch) {
+      return res.status(400).json({ error: 'Hibás felhasználónév vagy jelszó!' });
+    }
+
+    const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '7d' });
+
+    res.json({
+      success: true,
+      token,
+      user: {
+        id: user.id,
+        username: user.username,
+        balance: user.balance,
+        clientSeed: user.client_seed
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Szerver hiba a bejelentkezéskor!' });
+  }
+});
+
+// 3. PROFILE ÉS EGYENLEG LEKÉRÉSE
+app.get('/api/user/me', authenticateToken, async (req, res) => {
+  try {
+    const user = await dbQuery.get('SELECT id, username, email, balance, client_seed, server_seed, nonce FROM users WHERE id = ?', [req.user.id]);
+    res.json({
+      ...user,
+      serverSeedHash: ProvablyFair.hashServerSeed(user.server_seed)
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Nem sikerült lekérni a profil adatokat.' });
+  }
+});
+
+// 4. LÁDANYITÁS (PROVABLY FAIR GAMBLING ENGINE)
+app.post('/api/game/open-case', authenticateToken, async (req, res) => {
+  try {
+    const { caseId } = req.body;
+    const caseData = CASES_CATALOG[caseId || "hyper_beast"];
+
+    if (!caseData) {
+      return res.status(404).json({ error: 'A kért láda nem létezik!' });
+    }
+
+    const user = await dbQuery.get('SELECT * FROM users WHERE id = ?', [req.user.id]);
+
+    if (user.balance < caseData.price) {
+      return res.status(400).json({ error: 'Nincs elegendő egyenleged a ládanyitáshoz!' });
+    }
+
+    // Számítások
+    const newBalance = user.balance - caseData.price;
+    const currentNonce = user.nonce + 1;
+    const roll = ProvablyFair.calculateRoll(user.server_seed, user.client_seed, currentNonce);
+    const wonItem = ProvablyFair.determineOutcome(caseData.items, roll);
+
+    // ADATBÁZIS TRANZAKCIÓ LÉPÉSEK
+    await dbQuery.run('UPDATE users SET balance = ?, nonce = ? WHERE id = ?', [newBalance, currentNonce, user.id]);
+
+    await dbQuery.run(
+      `INSERT INTO inventory (user_id, item_id, item_name, item_price, item_color, item_image) VALUES (?, ?, ?, ?, ?, ?)`,
+      [user.id, wonItem.id, wonItem.name, wonItem.price, wonItem.color, wonItem.img]
+    );
+
+    await dbQuery.run(
+      `INSERT INTO game_history (user_id, case_id, won_item_name, won_item_price, server_seed, client_seed, nonce, roll_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [user.id, caseData.id, wonItem.name, wonItem.price, user.server_seed, user.client_seed, currentNonce, roll]
+    );
+
+    res.json({
+      success: true,
       wonItem,
       newBalance,
       provablyFair: {
-        serverSeedHash: crypto.createHash('sha256').update(serverSeed).digest('hex'),
+        serverSeedHash: ProvablyFair.hashServerSeed(user.server_seed),
         clientSeed: user.client_seed,
-        nonce,
+        nonce: currentNonce,
         roll
       },
       allItems: caseData.items
     });
-  });
-});
-
-// Tárgy eladása egyenlegért
-app.post('/api/sell-item', (req, res) => {
-  const { id } = req.body;
-  const steamId = req.user ? req.user.id : 'TEST_STEAM_ID';
-
-  db.get('SELECT * FROM inventory WHERE id = ? AND steam_id = ?', [id, steamId], (err, item) => {
-    if (!item) return res.status(404).json({ error: "Tárgy nem található!" });
-
-    db.run('DELETE FROM inventory WHERE id = ?', [id], () => {
-      db.run('UPDATE users SET balance = balance + ? WHERE steam_id = ?', [item.item_price, steamId], () => {
-        db.get('SELECT balance FROM users WHERE steam_id = ?', [steamId], (err, row) => {
-          res.json({ success: true, newBalance: row.balance });
-        });
-      });
-    });
-  });
-});
-
-// --- 7. KRIPTO FIZETÉSI WEBHOOK (Cryptomus / NOWPayments) ---
-app.post('/api/payment/webhook', (req, res) => {
-  const { status, order_id, amount } = req.body;
-
-  // Ha a fizetés sikeres volt a blokkláncon
-  if (status === 'paid' || status === 'finished') {
-    db.get('SELECT * FROM transactions WHERE id = ?', [order_id], (err, tx) => {
-      if (tx && tx.status !== 'completed') {
-        db.run('UPDATE transactions SET status = "completed" WHERE id = ?', [order_id]);
-        db.run('UPDATE users SET balance = balance + ? WHERE steam_id = ?', [amount, tx.steam_id]);
-      }
-    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Hiba történt a pörgetés közben!' });
   }
-  res.sendStatus(200);
 });
 
+// 5. INVENTORY LEKÉRÉS
+app.get('/api/user/inventory', authenticateToken, async (req, res) => {
+  try {
+    const items = await dbQuery.all('SELECT * FROM inventory WHERE user_id = ? AND is_sold = 0 ORDER BY id DESC', [req.user.id]);
+    res.json(items);
+  } catch (err) {
+    res.status(500).json({ error: 'Hiba a leltár lekérésekor.' });
+  }
+});
+
+// 6. TÁRGY ELADÁSA EGYENLEGÉRT
+app.post('/api/user/sell-item', authenticateToken, async (req, res) => {
+  try {
+    const { inventoryId } = req.body;
+    const item = await dbQuery.get('SELECT * FROM inventory WHERE id = ? AND user_id = ? AND is_sold = 0', [inventoryId, req.user.id]);
+
+    if (!item) {
+      return res.status(404).json({ error: 'A tárgy nem található vagy már eladtad!' });
+    }
+
+    await dbQuery.run('UPDATE inventory SET is_sold = 1 WHERE id = ?', [inventoryId]);
+    await dbQuery.run('UPDATE users SET balance = balance + ? WHERE id = ?', [item.item_price, req.user.id]);
+
+    const updatedUser = await dbQuery.get('SELECT balance FROM users WHERE id = ?', [req.user.id]);
+
+    res.json({ success: true, newBalance: updatedUser.balance });
+  } catch (err) {
+    res.status(500).json({ error: 'Hiba az eladás során.' });
+  }
+});
+
+app.listen(PORT, () => {
+  console.log(`[SERVER] Enterprise Kaszinó Szerver elindult a ${PORT}-es porton!`);
+});
 app.listen(PORT, () => {
   console.log(`Lootbox Enterprise Szerver fut a ${PORT}-es porton!`);
 });
