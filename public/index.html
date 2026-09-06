@@ -1,949 +1,199 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BEST - CS2 Case Opening & Gambling</title>
-  <link href="https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-  <style>
-    /* ==========================================
-       1. LUXDROP STÍLUS & DESIGN SYSTEM
-       ========================================== */
-    :root {
-      --bg-dark: #08090c;
-      --bg-card: #12151c;
-      --bg-panel: #181c26;
-      --bg-panel-light: #212634;
-      --accent-green: #22c55e;
-      --accent-green-glow: rgba(34, 197, 94, 0.4);
-      --accent-gold: #eab308;
-      --accent-cyan: #06b6d4;
-      --text-main: #f8fafc;
-      --text-muted: #64748b;
-      --border-color: #2a3142;
-
-      /* CS2 Ritkasági Színek */
-      --rarity-milspec: #4b69ff;
-      --rarity-restricted: #8847ff;
-      --rarity-classified: #d32ce6;
-      --rarity-covert: #eb4b4b;
-      --rarity-gold: #ffd700;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Inter', sans-serif;
-      user-select: none;
-    }
-
-    body {
-      background-color: var(--bg-dark);
-      color: var(--text-main);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow-x: hidden;
-    }
-
-    /* ==========================================
-       2. FEJLÉC (NAVBAR)
-       ========================================== */
-    header {
-      background: var(--bg-panel);
-      height: 75px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 40px;
-      border-bottom: 1px solid var(--border-color);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.6);
-      position: relative;
-      z-index: 100;
-    }
-
-    .brand-logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-    }
-
-    .brand-logo .logo-text {
-      font-family: 'Teko', sans-serif;
-      font-size: 2.8rem;
-      font-weight: 700;
-      letter-spacing: 2px;
-      line-height: 1;
-      background: linear-gradient(135deg, #fff 0%, var(--accent-green) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-transform: uppercase;
-    }
-
-    .nav-menu {
-      display: flex;
-      gap: 8px;
-      background: rgba(0,0,0,0.3);
-      padding: 5px;
-      border-radius: 10px;
-      border: 1px solid var(--border-color);
-    }
-
-    .nav-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      font-size: 0.85rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      padding: 10px 22px;
-      cursor: pointer;
-      border-radius: 8px;
-      transition: all 0.2s ease;
-      letter-spacing: 0.5px;
-    }
-
-    .nav-btn:hover, .nav-btn.active {
-      color: #fff;
-      background: var(--bg-panel-light);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    }
-
-    .nav-btn.active {
-      border-bottom: 2px solid var(--accent-green);
-    }
-
-    .user-actions {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-
-    .balance-badge {
-      background: #0b0d12;
-      border: 1px solid var(--border-color);
-      padding: 8px 18px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .balance-badge .label {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      font-weight: 700;
-      text-transform: uppercase;
-    }
-
-    .balance-badge .val {
-      font-size: 1.1rem;
-      font-weight: 800;
-      color: var(--accent-green);
-    }
-
-    .btn-deposit {
-      background: var(--accent-green);
-      color: #000;
-      border: none;
-      padding: 10px 22px;
-      font-weight: 800;
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 0 0 15px var(--accent-green-glow);
-      transition: all 0.2s ease;
-    }
-
-    .btn-deposit:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 0 25px var(--accent-green-glow);
-    }
-
-    /* ==========================================
-       3. LIVE DROPS FEED
-       ========================================== */
-    .live-feed-container {
-      background: #0a0c10;
-      height: 70px;
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
-      align-items: center;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .live-feed-tag {
-      background: var(--bg-panel);
-      padding: 0 20px;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Teko', sans-serif;
-      font-size: 1.3rem;
-      letter-spacing: 1px;
-      color: var(--accent-green);
-      border-right: 1px solid var(--border-color);
-      z-index: 10;
-      box-shadow: 5px 0 15px rgba(0,0,0,0.5);
-    }
-
-    .feed-scroll-track {
-      display: flex;
-      gap: 10px;
-      padding-left: 15px;
-      align-items: center;
-    }
-
-    .feed-card {
-      width: 120px;
-      height: 54px;
-      background: var(--bg-card);
-      border-radius: 6px;
-      border: 1px solid var(--border-color);
-      border-bottom: 3px solid var(--rarity-milspec);
-      display: flex;
-      align-items: center;
-      padding: 5px 8px;
-      gap: 8px;
-      flex-shrink: 0;
-      animation: fadeIn 0.3s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateX(-20px); }
-      to { opacity: 1; transform: translateX(0); }
-    }
-
-    .feed-card img {
-      width: 45px;
-      height: 35px;
-      object-fit: contain;
-    }
-
-    .feed-card .info {
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    .feed-card .info .name {
-      font-size: 0.65rem;
-      font-weight: 700;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      width: 55px;
-    }
-
-    .feed-card .info .price {
-      font-size: 0.6rem;
-      color: var(--accent-green);
-      font-weight: 800;
-    }
-
-    /* ==========================================
-       4. MAIN CONTAINER & ROULETTE STAGE
-       ========================================== */
-    main {
-      max-width: 1280px;
-      margin: 30px auto;
-      padding: 0 20px;
-      width: 100%;
-      flex-grow: 1;
-    }
-
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-
-    .roulette-stage {
-      background: var(--bg-panel);
-      border-radius: 16px;
-      border: 1px solid var(--border-color);
-      padding: 35px;
-      text-align: center;
-      position: relative;
-      box-shadow: 0 15px 40px rgba(0,0,0,0.7);
-      background: radial-gradient(circle at top, rgba(34, 197, 94, 0.05) 0%, var(--bg-panel) 70%);
-    }
-
-    .case-title {
-      font-family: 'Teko', sans-serif;
-      font-size: 3rem;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      margin-bottom: 20px;
-      text-shadow: 0 0 20px rgba(255,255,255,0.1);
-    }
-
-    /* Multi Track Containers */
-    .tracks-wrapper {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      margin-bottom: 30px;
-    }
-
-    .roulette-viewport {
-      position: relative;
-      width: 100%;
-      height: 150px;
-      background: #090b0e;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 2px solid var(--border-color);
-      box-shadow: inset 0 0 30px rgba(0,0,0,0.9);
-    }
-
-    .roulette-pointer {
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 4px;
-      height: 100%;
-      background: var(--accent-green);
-      z-index: 20;
-      box-shadow: 0 0 15px var(--accent-green);
-    }
-
-    .roulette-pointer::before, .roulette-pointer::after {
-      content: '';
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 0;
-      height: 0;
-      border-left: 10px solid transparent;
-      border-right: 10px solid transparent;
-    }
-
-    .roulette-pointer::before {
-      top: 0;
-      border-top: 12px solid var(--accent-green);
-    }
-
-    .roulette-pointer::after {
-      bottom: 0;
-      border-bottom: 12px solid var(--accent-green);
-    }
-
-    .roulette-track {
-      display: flex;
-      gap: 10px;
-      position: absolute;
-      left: 0;
-      top: 10px;
-      will-change: transform;
-    }
-
-    /* CARD DESIGN */
-    .item-card {
-      width: 182px;
-      height: 126px;
-      background: var(--bg-card);
-      border-radius: 8px;
-      border: 1px solid var(--border-color);
-      border-bottom: 4px solid var(--rarity-milspec);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px;
-      flex-shrink: 0;
-      position: relative;
-      transition: transform 0.2s ease;
-    }
-
-    .item-card img {
-      max-height: 60px;
-      object-fit: contain;
-      filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
-    }
-
-    .item-card .item-name {
-      font-size: 0.75rem;
-      font-weight: 700;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      width: 100%;
-    }
-
-    .item-card .item-price {
-      font-size: 0.7rem;
-      color: var(--accent-green);
-      font-weight: 800;
-    }
-
-    .item-card.milspec { border-bottom-color: var(--rarity-milspec); }
-    .item-card.restricted { border-bottom-color: var(--rarity-restricted); }
-    .item-card.classified { border-bottom-color: var(--rarity-classified); }
-    .item-card.covert { border-bottom-color: var(--rarity-covert); }
-    .item-card.gold { border-bottom-color: var(--rarity-gold); }
-
-    /* CONTROLS BAR */
-    .controls-bar {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 25px;
-      background: var(--bg-card);
-      padding: 15px 30px;
-      border-radius: 12px;
-      border: 1px solid var(--border-color);
-      max-width: 800px;
-      margin: 0 auto;
-    }
-
-    .multi-btn-group {
-      display: flex;
-      gap: 5px;
-      background: rgba(0,0,0,0.4);
-      padding: 4px;
-      border-radius: 8px;
-    }
-
-    .btn-multi {
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      font-weight: 800;
-      padding: 8px 14px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .btn-multi:hover, .btn-multi.active {
-      background: var(--bg-panel-light);
-      color: #fff;
-    }
-
-    .fast-toggle {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      cursor: pointer;
-    }
-
-    .btn-open-case {
-      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-      color: #000;
-      border: none;
-      padding: 14px 45px;
-      font-weight: 900;
-      font-size: 1.1rem;
-      text-transform: uppercase;
-      border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 0 0 20px var(--accent-green-glow);
-      transition: all 0.2s ease;
-      letter-spacing: 0.5px;
-    }
-
-    .btn-open-case:hover {
-      transform: scale(1.03);
-      box-shadow: 0 0 30px var(--accent-green-glow);
-    }
-
-    /* ==========================================
-       5. GRID SECTIONS (CASES & PREVIEW)
-       ========================================== */
-    .section-title {
-      font-family: 'Teko', sans-serif;
-      font-size: 2rem;
-      letter-spacing: 1px;
-      margin: 40px 0 20px 0;
-      text-transform: uppercase;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .section-title::after {
-      content: '';
-      flex-grow: 1;
-      height: 1px;
-      background: var(--border-color);
-    }
-
-    .grid-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 20px;
-    }
-
-    .case-card {
-      background: var(--bg-panel);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 20px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .case-card:hover {
-      border-color: var(--accent-green);
-      transform: translateY(-5px);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-    }
-
-    .case-card img {
-      width: 130px;
-      height: 100px;
-      object-fit: contain;
-      margin-bottom: 15px;
-      filter: drop-shadow(0 10px 15px rgba(0,0,0,0.6));
-    }
-
-    .case-card h3 {
-      font-size: 0.95rem;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .case-card .price {
-      font-size: 0.9rem;
-      font-weight: 800;
-      color: var(--accent-green);
-    }
-
-    /* INVENTORY DROPDOWN / PANEL */
-    .inventory-panel {
-      background: var(--bg-panel);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 20px;
-      margin-top: 20px;
-    }
-
-    .inventory-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      gap: 12px;
-      max-height: 300px;
-      overflow-y: auto;
-      padding-right: 5px;
-    }
-
-    .inventory-card {
-      background: var(--bg-card);
-      border-radius: 8px;
-      border: 1px solid var(--border-color);
-      padding: 10px;
-      text-align: center;
-      position: relative;
-    }
-
-    .inventory-card img {
-      width: 60px;
-      height: 45px;
-      object-fit: contain;
-    }
-
-    .inventory-card .name {
-      font-size: 0.7rem;
-      font-weight: 700;
-      margin: 5px 0;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .inventory-card .price {
-      font-size: 0.65rem;
-      color: var(--accent-green);
-      font-weight: 800;
-    }
-
-    .btn-sell {
-      background: #ef4444;
-      color: #fff;
-      border: none;
-      padding: 4px 8px;
-      font-size: 0.65rem;
-      font-weight: 800;
-      border-radius: 4px;
-      cursor: pointer;
-      margin-top: 5px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LuxDrop - CS2 Unboxing & Battles</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700;800&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Style Sheet -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- 1. FEJLÉC / NAV -->
-  <header>
-    <div class="brand-logo" onclick="switchTab('cases')">
-      <div class="logo-text">LUXDROP</div>
+    <!-- ÉLŐ DROP SÁV -->
+    <div class="drop-bar">
+        <div class="drop-bar-label">ÉLŐ DROPOK</div>
+        <div class="drop-track" id="live-feed-track">
+            <!-- A JS ide generálja a .feed-item elemeket -->
+        </div>
     </div>
 
-    <nav class="nav-menu">
-      <button class="nav-btn active" onclick="switchTab('cases')">Ládák</button>
-      <button class="nav-btn" onclick="switchTab('battles')">Battles</button>
-      <button class="nav-btn" onclick="switchTab('upgrader')">Upgrader</button>
-      <button class="nav-btn" onclick="switchTab('inventory')">Leltár</button>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="logo">
+            <span class="logo-icon">🎰</span>
+            <span>LUX<span class="highlight">DROP</span></span>
+        </div>
+
+        <div class="nav-links">
+            <button class="nav-item active" data-tab="cases">Ládák</button>
+            <button class="nav-item" data-tab="battles">Battles</button>
+            <button class="nav-item" data-tab="upgrader">Upgrader</button>
+        </div>
+
+        <div class="header-right">
+            <!-- Nyelvváltó -->
+            <div class="lang-selector">
+                <button class="lang-btn active">HU</button>
+                <button class="lang-btn">EN</button>
+            </div>
+
+            <!-- Egyenleg -->
+            <div class="balance-display">
+                <span class="balance-label">EGYENLEG</span>
+                <span class="balance-value" id="user-balance">$100.00</span>
+            </div>
+
+            <!-- Felhasználó Profil & Lenyíló Leltár -->
+            <div class="user-profile-tag" id="profile-toggle">
+                <span>Profil</span>
+                
+                <div class="dropdown-inventory hidden" id="dropdown-inventory">
+                    <div class="dropdown-header">
+                        <h4>Saját Leltár</h4>
+                    </div>
+                    <div class="dropdown-items-list" id="inventory-list">
+                        <!-- A JS ide generálja a .dropdown-item-card elemeket -->
+                    </div>
+                </div>
+            </div>
+        </div>
     </nav>
 
-    <div class="user-actions">
-      <div class="balance-badge">
-        <span class="label">Egyenleg:</span>
-        <span class="val" id="user-balance">$250.00</span>
-      </div>
-      <button class="btn-deposit" onclick="addFunds()">Befizetés</button>
-    </div>
-  </header>
+    <!-- MAIN APP CONTAINER -->
+    <main class="app-container">
 
-  <!-- 2. LIVE DROP FEED -->
-  <div class="live-feed-container">
-    <div class="live-feed-tag">LIVE DROPS</div>
-    <div class="feed-scroll-track" id="live-feed-track">
-      <!-- JavaScript ide szúrja be a nyitásokat -->
-    </div>
-  </div>
+        <!-- TAB 1: LÁDÁK ÉS UNBOXING -->
+        <section id="tab-cases" class="tab-page active">
+            
+            <!-- UNBOXING STAGE (A PÖRGETŐ TERÜLET) -->
+            <div class="unboxing-stage hidden" id="unboxing-stage">
+                <h2 id="current-case-title" style="font-family: 'Chakra Petch', sans-serif; margin-bottom: 10px;">Láda Nyitás</h2>
+                
+                <div class="roulette-container">
+                    <div class="roulette-pointer"></div>
+                    <div class="roulette-track" id="roulette-track">
+                        <!-- A JS ide helyezi el a pörgetési kártyákat (.item-card) -->
+                    </div>
+                </div>
 
-  <main>
-    <!-- ==========================================
-         TAB 1: LÁDANYITÁS
-         ========================================== -->
-    <div id="tab-cases" class="tab-content active">
-      <div class="roulette-stage">
-        <h1 class="case-title" id="active-case-title">Kilowatt Case</h1>
+                <div class="multi-open-selector">
+                    <button class="btn-multi active">1x</button>
+                    <button class="btn-multi">2x</button>
+                    <button class="btn-multi">3x</button>
+                    <button class="btn-multi">4x</button>
+                    <button class="btn-multi">5x</button>
+                </div>
 
-        <div class="tracks-wrapper" id="tracks-wrapper">
-          <!-- JS ide rendereli a pörgető sávokat (1x, 2x, 3x stb.) -->
-        </div>
+                <div style="margin-top: 20px; display: flex; justify-content: center; gap: 10px;">
+                    <button class="btn btn-launch" id="btn-open-case">NYITÁS</button>
+                    <button class="btn btn-ghost" id="btn-close-stage">Vissza</button>
+                </div>
 
-        <div class="controls-bar">
-          <div class="multi-btn-group">
-            <button class="btn-multi active" onclick="setMultiOpen(1, this)">1x</button>
-            <button class="btn-multi" onclick="setMultiOpen(2, this)">2x</button>
-            <button class="btn-multi" onclick="setMultiOpen(3, this)">3x</button>
-            <button class="btn-multi" onclick="setMultiOpen(4, this)">4x</button>
-            <button class="btn-multi" onclick="setMultiOpen(5, this)">5x</button>
-          </div>
-
-          <label class="fast-toggle">
-            <input type="checkbox" id="fast-spin-toggle"> Gyors Nyitás
-          </label>
-
-          <button class="btn-open-case" id="btn-open-main" onclick="handleOpenCase()">
-            Nyitás ($2.50)
-          </button>
-        </div>
-      </div>
-
-      <div class="section-title">Válassz Ládát</div>
-      <div class="grid-container" id="cases-grid"></div>
-
-      <div class="section-title">Láda Tartalma</div>
-      <div class="grid-container" id="case-preview-grid"></div>
-    </div>
-
-    <!-- ==========================================
-         TAB 2: CASE BATTLES
-         ========================================== -->
-    <div id="tab-battles" class="tab-content">
-      <div class="roulette-stage">
-        <h1 class="case-title">Case Battles</h1>
-        <p style="color: var(--text-muted);">Hamarosan... Hozz létre csatát és nyerd el az ellenfeled skinjeit!</p>
-      </div>
-    </div>
-
-    <!-- ==========================================
-         TAB 3: UPGRADGER
-         ========================================== -->
-    <div id="tab-upgrader" class="tab-content">
-      <div class="roulette-stage">
-        <h1 class="case-title">Skin Upgrader</h1>
-        <p style="color: var(--text-muted);">Hamarosan... Fejleszd a kis értéku skinjeidet késre vagy kesztyure!</p>
-      </div>
-    </div>
-
-    <!-- ==========================================
-         TAB 4: LELTÁR (INVENTORY)
-         ========================================== -->
-    <div id="tab-inventory" class="tab-content">
-      <div class="section-title">A Te Leltárad</div>
-      <div class="inventory-panel">
-        <div class="inventory-grid" id="inventory-grid">
-          <!-- JS ide rendezi a megszerzett skineket -->
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <!-- ==========================================
-       6. JAVASCRIPT ENGINE (LOGIKA & ESÉLYEK)
-       ========================================== -->
-  <script>
-    // CS:GO Gyári esélyek (%)
-    const RARITY_CHANCES = {
-      milspec: 79.92,     // Kék (~80%)
-      restricted: 15.98,  // Lila (~16%)
-      classified: 3.20,   // Rózsaszín (~3.2%)
-      covert: 0.64,       // Piros (~0.64%)
-      gold: 0.26          // Kés / Kesztyű (~0.26%)
-    };
-
-    const SKIN_DATABASE = [
-      { id: 1, name: "P250 | Sand Dune", price: 0.15, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f", rarity: "milspec" },
-      { id: 2, name: "AK-47 | Safari Mesh", price: 0.50, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f", rarity: "milspec" },
-      { id: 3, name: "M4A4 | Evil Daimyo", price: 3.50, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f", rarity: "restricted" },
-      { id: 4, name: "AWP | Atheris", price: 12.00, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f", rarity: "restricted" },
-      { id: 5, name: "AK-47 | Redline", price: 25.00, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f", rarity: "classified" },
-      { id: 6, name: "M4A1-S | Player Two", price: 65.00, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f", rarity: "classified" },
-      { id: 7, name: "AK-47 | Fire Serpent", price: 750.00, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f", rarity: "covert" },
-      { id: 8, name: "AWP | Dragon Lore", price: 3500.00, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f", rarity: "covert" },
-      { id: 9, name: "Karambit | Doppler", price: 1200.00, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f", rarity: "gold" }
-    ];
-
-    const CASE_DATABASE = [
-      { id: "kilowatt", name: "Kilowatt Case", price: 2.50, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f" },
-      { id: "dreams", name: "Dreams & Nightmares", price: 1.80, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f" },
-      { id: "revolution", name: "Revolution Case", price: 1.20, img: "https://community.cloudflare.steamstatic.com/economy/image/-9a117zeCAfMBo212p-E4Na_3300YARz3k31U430444_m-a41tW_269eT11PjYQ6Y8Xm6_X1Ie11iGZ333333333/360fx360f" }
-    ];
-
-    let userBalance = 250.00;
-    let userInventory = [];
-    let isSpinning = false;
-    let multiOpenCount = 1;
-    let activeCase = CASE_DATABASE[0];
-
-    document.addEventListener('DOMContentLoaded', () => {
-      renderCasesGrid();
-      renderCasePreview();
-      renderTracks();
-      initLiveFeed();
-    });
-
-    function getRandomSkinByRarity() {
-      const rand = Math.random() * 100;
-      let cumulative = 0;
-      let selectedRarity = 'milspec';
-
-      for (const [rarity, chance] of Object.entries(RARITY_CHANCES)) {
-        cumulative += chance;
-        if (rand <= cumulative) {
-          selectedRarity = rarity;
-          break;
-        }
-      }
-
-      const availableSkins = SKIN_DATABASE.filter(skin => skin.rarity === selectedRarity);
-      return availableSkins.length > 0 
-        ? availableSkins[Math.floor(Math.random() * availableSkins.length)]
-        : SKIN_DATABASE[0];
-    }
-
-    function renderTracks() {
-      const wrapper = document.getElementById('tracks-wrapper');
-      let html = '';
-      for (let i = 0; i < multiOpenCount; i++) {
-        html += `
-          <div class="roulette-viewport">
-            <div class="roulette-pointer"></div>
-            <div class="roulette-track" id="spinner-track-${i}"></div>
-          </div>
-        `;
-      }
-      wrapper.innerHTML = html;
-
-      for (let i = 0; i < multiOpenCount; i++) {
-        const track = document.getElementById(`spinner-track-${i}`);
-        if (track) {
-          track.innerHTML = SKIN_DATABASE.slice(0, 10).map(item => `
-            <div class="item-card ${item.rarity}">
-              <img src="${item.img}">
-              <div class="item-name">${item.name}</div>
-              <div class="item-price">$${item.price.toFixed(2)}</div>
+                <!-- LÁDA TARTALOM ELŐNÉZET -->
+                <div class="section-divider">
+                    <h3>LÁDA TARTALMA</h3>
+                </div>
+                <div class="items-grid" id="case-preview-grid">
+                    <!-- A JS ide generálja a ládában lévő skineket -->
+                </div>
             </div>
-          `).join('');
-        }
-      }
-    }
 
-    function setMultiOpen(count, btn) {
-      if (isSpinning) return;
-      document.querySelectorAll('.btn-multi').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      multiOpenCount = count;
-      renderTracks();
-      updateOpenBtnText();
-    }
+            <!-- LÁDA VÁLASZTÓ GRID -->
+            <div id="cases-selector-view">
+                <div class="page-title">
+                    <h1>Válassz Ládát</h1>
+                    <p>Nyiss exkluzív CS2 skineket a legjobb esélyekkel.</p>
+                </div>
+                
+                <div class="cases-grid" id="cases-grid">
+                    <!-- A JS ide generálja a .case-card elemeket -->
+                </div>
+            </div>
+        </section>
 
-    function updateOpenBtnText() {
-      const total = (activeCase.price * multiOpenCount).toFixed(2);
-      document.getElementById('btn-open-main').innerText = `Nyitás ($${total})`;
-    }
+        <!-- TAB 2: BATTLES -->
+        <section id="tab-battles" class="tab-page">
+            <div class="page-title flex-title">
+                <div>
+                    <h1>Case Battles</h1>
+                    <p>Mérkőzz meg más játékosokkal a teljes nyereményalapért.</p>
+                </div>
+                <button class="btn btn-primary" id="btn-create-battle">+ Csata Létrehozása</button>
+            </div>
 
-    function handleOpenCase() {
-      if (isSpinning) return;
-      const totalCost = activeCase.price * multiOpenCount;
-      if (userBalance < totalCost) {
-        alert("Nincs elég egyenleged!");
-        return;
-      }
+            <div class="battles-main-layout">
+                <div class="battles-list-grid" id="battles-grid">
+                    <!-- Aktív csaták listája -->
+                </div>
 
-      userBalance -= totalCost;
-      updateBalanceUI();
-      isSpinning = true;
+                <!-- BORROW / SPONSOR PANEL -->
+                <div class="borrow-panel">
+                    <div class="borrow-header">
+                        <h3>Szponzoráció</h3>
+                        <span class="borrow-badge">AKTÍV</span>
+                    </div>
+                    <p class="panel-desc">Kérj kölcsön más játékosoktól, ha kifogytál az egyenlegből a csatához!</p>
+                    <div class="sponsor-feed" id="sponsor-feed">
+                        <!-- Szponzor kérelmek listája -->
+                    </div>
+                </div>
+            </div>
+        </section>
 
-      const isFast = document.getElementById('fast-spin-toggle').checked;
-      const spinTime = isFast ? 1.2 : 4.0;
+        <!-- TAB 3: UPGRADER -->
+        <section id="tab-upgrader" class="tab-page">
+            <div class="page-title">
+                <h1>Skin Upgrader</h1>
+                <p>Cseréld el az olcsóbb skinedet egy értékesebbre.</p>
+            </div>
 
-      const CARD_WIDTH = 182;
-      const CARD_GAP = 10;
-      const TOTAL_STEP = CARD_WIDTH + CARD_GAP;
-      const WINNING_INDEX = 65;
+            <div class="upgrader-container">
+                <!-- BAL OLDAL: SAJÁT INVENTORY -->
+                <div class="upgrader-card">
+                    <h3>1. Válaszd ki a skined</h3>
+                    <div class="mini-inv-list" id="upgrader-my-inventory">
+                        <!-- JS generálja a kiválasztható skineket -->
+                    </div>
+                </div>
 
-      for (let s = 0; s < multiOpenCount; s++) {
-        const wonItem = getRandomSkinByRarity();
-        const track = document.getElementById(`spinner-track-${s}`);
-        if (!track) continue;
+                <!-- KÖZÉP: KERÉK ÉS ESÉLY -->
+                <div class="upgrader-center">
+                    <div class="upgrade-wheel-wrapper">
+                        <svg class="upgrade-svg" viewBox="0 0 180 180">
+                            <circle class="wheel-bg" cx="90" cy="90" r="80"></circle>
+                            <circle class="wheel-chance" id="wheel-chance-circle" cx="90" cy="90" r="80"></circle>
+                        </svg>
+                        <div class="wheel-pointer" id="wheel-pointer"></div>
+                        <div class="wheel-center-info">
+                            <span id="upgrade-chance-value">50.00%</span>
+                            <small>ESÉLY</small>
+                        </div>
+                    </div>
 
-        track.style.transition = 'none';
-        track.style.transform = 'translateX(0px)';
+                    <div class="target-display-box" id="target-display-box">
+                        <p style="color: #64748b;">Válassz célpontot!</p>
+                    </div>
 
-        let trackItems = [];
-        for (let i = 0; i < 80; i++) {
-          if (i === WINNING_INDEX) {
-            trackItems.push(wonItem);
-          } else {
-            trackItems.push(getRandomSkinByRarity());
-          }
-        }
+                    <button class="btn btn-launch width-100" id="btn-start-upgrade">UPGRADE</button>
+                </div>
 
-        track.innerHTML = trackItems.map(item => `
-          <div class="item-card ${item.rarity}">
-            <img src="${item.img}">
-            <div class="item-name">${item.name}</div>
-            <div class="item-price">$${item.price.toFixed(2)}</div>
-          </div>
-        `).join('');
+                <!-- JOBB OLDAL: CÉLPONT SKINEK -->
+                <div class="upgrader-card">
+                    <h3>2. Válaszd ki a célpontot</h3>
+                    <div class="mini-target-list" id="upgrader-target-list">
+                        <!-- JS generálja a megcélozható skineket -->
+                    </div>
+                </div>
+            </div>
+        </section>
 
-        const containerWidth = track.parentElement.clientWidth;
-        const targetX = -(WINNING_INDEX * TOTAL_STEP) + (containerWidth / 2) - (CARD_WIDTH / 2);
+    </main>
 
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            track.style.transition = `transform ${spinTime}s cubic-bezier(0.1, 0.8, 0.1, 1)`;
-            track.style.transform = `translateX(${targetX}px)`;
-          });
-        });
-
-        userInventory.push(wonItem);
-        addLiveFeedItem(wonItem);
-      }
-
-      setTimeout(() => {
-        isSpinning = false;
-        renderInventory();
-      }, spinTime * 1000 + 200);
-    }
-
-    function renderCasesGrid() {
-      const grid = document.getElementById('cases-grid');
-      grid.innerHTML = CASE_DATABASE.map(c => `
-        <div class="case-card" onclick="selectCase('${c.id}')">
-          <img src="${c.img}">
-          <h3>${c.name}</h3>
-          <div class="price">$${c.price.toFixed(2)}</div>
-        </div>
-      `).join('');
-    }
-
-    function renderCasePreview() {
-      const grid = document.getElementById('case-preview-grid');
-      grid.innerHTML = SKIN_DATABASE.map(item => `
-        <div class="item-card ${item.rarity}">
-          <img src="${item.img}">
-          <div class="item-name">${item.name}</div>
-          <div class="item-price">$${item.price.toFixed(2)}</div>
-        </div>
-      `).join('');
-    }
-
-    function selectCase(id) {
-      const c = CASE_DATABASE.find(x => x.id === id);
-      if (!c) return;
-      activeCase = c;
-      document.getElementById('active-case-title').innerText = c.name;
-      updateOpenBtnText();
-    }
-
-    function updateBalanceUI() {
-      document.getElementById('user-balance').innerText = `$${userBalance.toFixed(2)}`;
-    }
-
-    function addFunds() {
-      userBalance += 100;
-      updateBalanceUI();
-    }
-
-    function switchTab(tabId) {
-      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(p => p.classList.remove('active'));
-
-      event.target.classList.add('active');
-      document.getElementById(`tab-${tabId}`).classList.add('active');
-    }
-
-    function initLiveFeed() {
-      for (let i = 0; i < 10; i++) {
-        addLiveFeedItem(SKIN_DATABASE[Math.floor(Math.random() * SKIN_DATABASE.length)]);
-      }
-    }
-
-    function addLiveFeedItem(item) {
-      const track = document.getElementById('live-feed-track');
-      const div = document.createElement('div');
-      div.className = 'feed-card';
-      div.style.borderBottomColor = `var(--rarity-${item.rarity})`;
-      div.innerHTML = `
-        <img src="${item.img}">
-        <div class="info">
-          <span class="name">${item.name}</span>
-          <span class="price">$${item.price.toFixed(2)}</span>
-        </div>
-      `;
-      track.insertBefore(div, track.firstChild);
-      if (track.children.length > 15) track.removeChild(track.lastChild);
-    }
-
-    function renderInventory() {
-      const grid = document.getElementById('inventory-grid');
-      if (!grid) return;
-      if (userInventory.length === 0) {
-        grid.innerHTML = `<p style="color:var(--text-muted); grid-column:span 4;">A leltárad üres.</p>`;
-        return;
-      }
-      grid.innerHTML = userInventory.map((item, idx) => `
-        <div class="inventory-card">
-          <img src="${item.img}">
-          <div class="name">${item.name}</div>
-          <div class="price">$${item.price.toFixed(2)}</div>
-          <button class="btn-sell" onclick="sellItem(${idx})">Eladás</button>
-        </div>
-      `).join('');
-    }
-
-    function sellItem(idx) {
-      userBalance += userInventory[idx].price;
-      userInventory.splice(idx, 1);
-      updateBalanceUI();
-      renderInventory();
-    }
-  </script>
+    <!-- JAVASCRIPT BEHÍVÁSA -->
+    <script src="script.js"></script>
 </body>
 </html>
